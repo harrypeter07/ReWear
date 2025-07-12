@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { STOCK_IMAGES } from "../utils/constants";
 
 export default function Home() {
 	const [currentSlide, setCurrentSlide] = useState(0);
@@ -14,19 +15,19 @@ export default function Home() {
 			id: 1,
 			title: "Vintage Denim Jacket",
 			category: "Jackets",
-			image: "/images/denim-jacket.jpg",
+			image: STOCK_IMAGES[0],
 		},
 		{
 			id: 2,
 			title: "Summer Floral Dress",
 			category: "Dresses",
-			image: "/images/floral-dress.jpg",
+			image: STOCK_IMAGES[1],
 		},
 		{
 			id: 3,
 			title: "Classic White Sneakers",
 			category: "Shoes",
-			image: "/images/sneakers.jpg",
+			image: STOCK_IMAGES[2],
 		},
 	];
 
