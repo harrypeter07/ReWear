@@ -24,6 +24,7 @@ export default function ItemForm({ onSubmit }) {
 			size: form.size.value.trim(),
 			condition: form.condition.value.trim(),
 			description: form.description.value.trim(),
+			pointsValue: Number(form.pointsValue.value),
 			image: imageBase64,
 		};
 
@@ -34,6 +35,12 @@ export default function ItemForm({ onSubmit }) {
 		if (!data.condition) return setError("Condition is required.");
 		if (!data.description || data.description.length < 2)
 			return setError("Description must be at least 2 characters.");
+		if (
+			!form.pointsValue.value ||
+			isNaN(data.pointsValue) ||
+			data.pointsValue <= 0
+		)
+			return setError("Points Value must be a positive number.");
 		// Optionally, check for image
 		// if (!data.image) return setError("Image is required.");
 
@@ -77,6 +84,14 @@ export default function ItemForm({ onSubmit }) {
 				name="description"
 				placeholder="Description"
 				className="border p-2 rounded"
+				required
+			/>
+			<input
+				type="number"
+				name="pointsValue"
+				placeholder="Points Value"
+				className="border p-2 rounded"
+				min={1}
 				required
 			/>
 			<input

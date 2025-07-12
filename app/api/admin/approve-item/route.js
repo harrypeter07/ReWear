@@ -1,16 +1,16 @@
 // app/api/admin/approve-item/route.js
 import { getCollections } from "@/lib/db";
 import { ObjectId } from "mongodb";
-import { itemSchema } from "@/lib/validations";
+import withAuth from "@/middlewares/withAuth";
 
-export async function PATCH(req) {
-	const body = await req.json();
-	const validated = itemSchema.parse(body); // validates fields
-	const { itemId } = validated;
+async function approveItemHandler(req, res) {
+	console.log("[ADMIN] PATCH /api/admin/approve-item called");
+	const { itemId } = req.body || (await req.json());
+	if (!itemId) return res.status(400).json({ error: "itemId is required" });
 	const { items, users } = await getCollections();
 
 	const item = await items.findOne({ _id: new ObjectId(itemId) });
-	if (!item) return Response.json({ error: "Item not found" }, { status: 404 });
+	if (!item) return res.status(404).json({ error: "Item not found" });
 
 	await items.updateOne(
 		{ _id: item._id },
@@ -24,7 +24,11 @@ export async function PATCH(req) {
 		}
 	);
 
-	await users.updateOne({ _id: item.uploaderId }, { $inc: { points: 10 } });
+	if (item.uploaderId) {
+		await users.updateOne({ _id: item.uploaderId }, { $inc: { points: 10 } });
+	}
 
-	return Response.json({ message: "Item approved" });
+	return res.json({ message: "Item approved" });
 }
+
+export const PATCH = withAuth(approveItemHandler, "admin");

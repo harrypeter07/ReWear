@@ -2,25 +2,61 @@
 import Link from "next/link";
 
 export default function ItemCard({ item }) {
+	// Use a remote placeholder image as the default (now .jpg)
+	const defaultImage = "https://placehold.co/300x300.jpg?text=No+Image";
+	let imageSrc = defaultImage;
+	if (item.image && typeof item.image === "string") {
+		if (item.image.startsWith("data:image/")) {
+			imageSrc = item.image;
+		} else if (
+			item.image.startsWith("http://") ||
+			item.image.startsWith("https://") ||
+			item.image.match(/\.(jpg|jpeg|png|webp)$/i)
+		) {
+			imageSrc = item.image;
+		}
+	}
+
 	return (
-		<div className="border rounded p-4 shadow hover:shadow-lg transition">
-			<div className="w-full h-40 mb-2 bg-white flex items-center justify-center rounded overflow-hidden">
+		<div className="border rounded-lg p-4 shadow hover:shadow-lg transition bg-white flex flex-col h-full">
+			<div className="w-full h-40 mb-2 bg-gray-50 flex items-center justify-center rounded overflow-hidden">
 				<img
-					src={item.image || "/images/default.png"}
+					src={imageSrc}
 					alt={item.title}
 					className="max-w-full max-h-full object-contain"
+					onError={(e) => {
+						e.target.onerror = null;
+						e.target.src = defaultImage;
+					}}
 				/>
 			</div>
-
-			<h2 className="font-semibold text-lg">{item.title}</h2>
-			<p className="text-gray-600">Category: {item.category}</p>
-			<p className="text-gray-600">Size: {item.size}</p>
-			<p className="text-gray-600">Condition: {item.condition}</p>
-			{item.points !== undefined && (
-				<p className="text-gray-600">Points: {item.points}</p>
+			<h2 className="font-semibold text-lg mb-1 truncate">{item.title}</h2>
+			<div className="text-gray-600 text-sm mb-1">
+				Category: <span className="font-medium">{item.category}</span>
+			</div>
+			<div className="text-gray-600 text-sm mb-1">
+				Size: <span className="font-medium">{item.size}</span>
+			</div>
+			<div className="text-gray-600 text-sm mb-1">
+				Condition: <span className="font-medium">{item.condition}</span>
+			</div>
+			{item.pointsValue !== undefined && (
+				<div className="text-gray-600 text-sm mb-1">
+					Points: <span className="font-medium">{item.pointsValue}</span>
+				</div>
 			)}
-			<p className="text-sm mt-2">{item.description}</p>
-			{/* TODO: Add swap/redeem button */}
+			<div className="text-gray-700 text-sm mt-2 line-clamp-3">
+				{item.description}
+			</div>
+			{/* Optionally, add a link to detail page */}
+			<div className="mt-auto pt-4 flex justify-end">
+				<Link
+					href={`/items/${item._id || item.id}`}
+					className="text-blue-600 hover:underline text-sm font-medium"
+				>
+					View Details
+				</Link>
+			</div>
 		</div>
 	);
 }
