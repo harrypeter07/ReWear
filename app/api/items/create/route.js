@@ -1,9 +1,15 @@
 // app/api/items/create/route.js
 import { getCollections } from "@/lib/db";
 import { ObjectId } from "mongodb";
+import { itemSchema } from "@/lib/validations";
 
 export async function POST(req) {
   try {
+    const body = await req.json();
+
+    // ✅ Validate input using Zod
+    const validated = itemSchema.parse(body);
+
     const {
       title,
       description,
@@ -13,7 +19,7 @@ export async function POST(req) {
       tags,
       images,
       uploaderId
-    } = await req.json();
+    } = validated;
 
     const { items } = await getCollections();
 
@@ -23,8 +29,8 @@ export async function POST(req) {
       category,
       size,
       condition,
-      tags,
-      images,
+      tags: tags || [],
+      images: images || [],
       uploaderId: new ObjectId(uploaderId),
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -36,6 +42,9 @@ export async function POST(req) {
     const result = await items.insertOne(newItem);
     return Response.json({ message: "Item submitted", itemId: result.insertedId });
   } catch (err) {
+    if (err.name === "ZodError") {
+      return Response.json({ error: "Validation failed", details: err.errors }, { status: 400 });
+    }
     console.error("Create Item Error:", err);
     return Response.json({ error: "Internal server error" }, { status: 500 });
   }
