@@ -1,31 +1,32 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Home() {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  
-  // Sample featured items data
-  const featuredItems = [
-    {
-      id: 1,
-      title: "Vintage Denim Jacket",
-      category: "Jackets",
-      image: "/images/denim-jacket.jpg"
-    },
-    {
-      id: 2,
-      title: "Summer Floral Dress",
-      category: "Dresses",
-      image: "/images/floral-dress.jpg"
-    },
-    {
-      id: 3,
-      title: "Classic White Sneakers",
-      category: "Shoes",
-      image: "/images/sneakers.jpg"
-    }
-  ];
+	const [currentSlide, setCurrentSlide] = useState(0);
+
+	// Sample featured items data
+	const featuredItems = [
+		{
+			id: 1,
+			title: "Vintage Denim Jacket",
+			category: "Jackets",
+			image: "/images/denim-jacket.jpg",
+		},
+		{
+			id: 2,
+			title: "Summer Floral Dress",
+			category: "Dresses",
+			image: "/images/floral-dress.jpg",
+		},
+		{
+			id: 3,
+			title: "Classic White Sneakers",
+			category: "Shoes",
+			image: "/images/sneakers.jpg",
+		},
+	];
 
 	// Sample testimonials
 	const testimonials = [
@@ -68,54 +69,64 @@ export default function Home() {
 				</div>
 			</section>
 
-      {/* Featured Items Carousel */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
-            Featured Items
-          </h2>
-          <div className="relative">
-            <div className="flex overflow-hidden">
-              {featuredItems.map((item, index) => (
-                <div 
-                  key={item.id}
-                  className={`min-w-full transition-transform duration-300 ${index === currentSlide ? 'block' : 'hidden'}`}
-                >
-                  <div className="bg-gray-50 rounded-xl p-6 flex flex-col md:flex-row items-center gap-8">
-                    <div className="w-full md:w-1/2">
-                      <img 
-                        src={item.image} 
-                        alt={item.title}
-                        className="w-full h-64 object-cover rounded-lg shadow-md"
-                      />
-                    </div>
-                    <div className="w-full md:w-1/2 text-center md:text-left">
-                      <span className="text-green-600 font-medium">{item.category}</span>
-                      <h3 className="text-2xl font-bold text-gray-800 mt-2">{item.title}</h3>
-                      <Link 
-                        href={`/items/${item.id}`}
-                        className="inline-block mt-4 text-green-600 hover:text-green-700 font-medium"
-                      >
-                        View Details →
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-center mt-6 gap-2">
-              {featuredItems.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentSlide(index)}
-                  className={`w-3 h-3 rounded-full ${index === currentSlide ? 'bg-green-600' : 'bg-gray-300'}`}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+			{/* Featured Items Carousel */}
+			<section className="py-16 bg-white">
+				<div className="container mx-auto px-4">
+					<h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
+						Featured Items
+					</h2>
+					<div className="relative">
+						<div className="flex overflow-hidden">
+							{featuredItems.map((item, index) => (
+								<div
+									key={item.id}
+									className={`min-w-full transition-transform duration-300 ${
+										index === currentSlide ? "block" : "hidden"
+									}`}
+								>
+									<div className="bg-gray-50 rounded-xl p-6 flex flex-col md:flex-row items-center gap-8">
+										<div className="w-full md:w-1/2">
+											<Image
+												src={item.image}
+												alt={item.title}
+												width={600}
+												height={400}
+												className="w-full h-64 object-cover rounded-lg shadow-md"
+											/>
+										</div>
+										<div className="w-full md:w-1/2 text-center md:text-left">
+											<span className="text-green-600 font-medium">
+												{item.category}
+											</span>
+											<h3 className="text-2xl font-bold text-gray-800 mt-2">
+												{item.title}
+											</h3>
+											<Link
+												href={`/items/${item.id}`}
+												className="inline-block mt-4 text-green-600 hover:text-green-700 font-medium"
+											>
+												View Details →
+											</Link>
+										</div>
+									</div>
+								</div>
+							))}
+						</div>
+						<div className="flex justify-center mt-6 gap-2">
+							{featuredItems.map((_, index) => (
+								<button
+									key={index}
+									onClick={() => setCurrentSlide(index)}
+									className={`w-3 h-3 rounded-full ${
+										index === currentSlide ? "bg-green-600" : "bg-gray-300"
+									}`}
+									aria-label={`Go to slide ${index + 1}`}
+								/>
+							))}
+						</div>
+					</div>
+				</div>
+			</section>
 
 			{/* Impact Metrics */}
 			<section className="py-16 bg-gray-50">
