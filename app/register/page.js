@@ -26,7 +26,7 @@ export default function RegisterPage() {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		if (!agreeTerms) {
-			setError("You must agree to the terms and conditions");
+			setError("You must agreeto the terms and conditions");
 			return;
 		}
 		setIsLoading(true);
