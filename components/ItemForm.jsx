@@ -24,7 +24,7 @@ export default function ItemForm({ onSubmit }) {
 			<input
 				type="url"
 				name="image"
-				placeholder="Image URL"
+				placeholder="Image URL (e.g. https://images.unsplash.com/...)"
 				className="border p-2 rounded"
 			/>
 			<button type="submit" className="bg-blue-600 text-white p-2 rounded">

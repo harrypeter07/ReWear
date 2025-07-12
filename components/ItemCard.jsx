@@ -2,7 +2,7 @@ export default function ItemCard({ item }) {
 	return (
 		<div className="border rounded p-4 shadow hover:shadow-lg transition">
 			<img
-				src={item.image || "/images/default.png"}
+				src={item.image || "/images/default-item.jpg"}
 				alt={item.title}
 				className="w-full h-40 object-cover mb-2 rounded"
 			/>
