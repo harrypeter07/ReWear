@@ -14,3 +14,6 @@
 ## Problem Statement
 
 ReWear is a Community Clothing Exchange platform designed to facilitate the sharing and exchange of clothing within a community, promoting sustainability and reducing waste.
+
+
+
