@@ -3,17 +3,17 @@ import { getCollections } from "@/lib/db";
 import { ObjectId } from "mongodb";
 import withAuth from "@/middlewares/withAuth";
 
-async function swapRequestHandler(req, res) {
+async function swapRequestHandler(req) {
 	if (req.method === "POST") {
-		const { itemId, requesterId, type, message } =
-			req.body || (await req.json());
+		const { itemId, requesterId, type, message } = await req.json();
 		const { swaps, items, users } = await getCollections();
 
 		// Check item exists and is available
 		const item = await items.findOne({ _id: new ObjectId(itemId) });
-		if (!item) return res.status(404).json({ error: "Item not found" });
+		if (!item)
+			return Response.json({ error: "Item not found" }, { status: 404 });
 		if (item.status !== "available")
-			return res.status(400).json({ error: "Item not available" });
+			return Response.json({ error: "Item not available" }, { status: 400 });
 
 		// Prevent duplicate requests
 		const existing = await swaps.findOne({
@@ -23,16 +23,24 @@ async function swapRequestHandler(req, res) {
 			status: { $in: ["pending", "accepted"] },
 		});
 		if (existing)
-			return res.status(400).json({
-				error: "You already have a pending or accepted request for this item.",
-			});
+			return Response.json(
+				{
+					error:
+						"You already have a pending or accepted request for this item.",
+				},
+				{ status: 400 }
+			);
 
 		// For redeem, check points
 		if (type === "redeem") {
 			const user = await users.findOne({ _id: new ObjectId(requesterId) });
-			if (!user) return res.status(404).json({ error: "User not found" });
+			if (!user)
+				return Response.json({ error: "User not found" }, { status: 404 });
 			if (user.points < item.pointsValue) {
-				return res.status(400).json({ error: "Not enough points to redeem" });
+				return Response.json(
+					{ error: "Not enough points to redeem" },
+					{ status: 400 }
+				);
 			}
 		}
 
@@ -45,18 +53,21 @@ async function swapRequestHandler(req, res) {
 			createdAt: new Date(),
 		});
 
-		return res.json({
+		return Response.json({
 			message: "Swap requested",
 			swapId: result.insertedId,
 		});
 	} else if (req.method === "PATCH") {
-		// Accept or reject a swap request
-		const { swapId, action } = req.body || (await req.json()); // action: 'accept' or 'reject'
+		const { swapId, action } = await req.json(); // action: 'accept' or 'reject'
 		const { swaps, items, users } = await getCollections();
 		const swap = await swaps.findOne({ _id: new ObjectId(swapId) });
-		if (!swap) return res.status(404).json({ error: "Swap request not found" });
+		if (!swap)
+			return Response.json(
+				{ error: "Swap request not found" },
+				{ status: 404 }
+			);
 		if (swap.status !== "pending")
-			return res.status(400).json({ error: "Already processed" });
+			return Response.json({ error: "Already processed" }, { status: 400 });
 
 		if (action === "accept") {
 			// Update swap status
@@ -90,18 +101,18 @@ async function swapRequestHandler(req, res) {
 					{ $inc: { points: item.pointsValue } }
 				);
 			}
-			return res.json({ message: "Swap accepted and processed" });
+			return Response.json({ message: "Swap accepted and processed" });
 		} else if (action === "reject") {
 			await swaps.updateOne(
 				{ _id: swap._id },
 				{ $set: { status: "rejected", resolvedAt: new Date() } }
 			);
-			return res.json({ message: "Swap rejected" });
+			return Response.json({ message: "Swap rejected" });
 		} else {
-			return res.status(400).json({ error: "Invalid action" });
+			return Response.json({ error: "Invalid action" }, { status: 400 });
 		}
 	} else {
-		return res.status(405).json({ error: "Method not allowed" });
+		return Response.json({ error: "Method not allowed" }, { status: 405 });
 	}
 }
 

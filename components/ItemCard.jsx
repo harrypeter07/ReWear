@@ -2,8 +2,16 @@
 import Link from "next/link";
 import { STOCK_IMAGES } from "../utils/constants";
 
-function getRandomFallbackImage() {
-	return STOCK_IMAGES[Math.floor(Math.random() * STOCK_IMAGES.length)];
+function getDeterministicFallbackImage(item) {
+	// Use a simple hash of item._id or item.title to pick a fallback image
+	const key = item._id || item.id || item.title || "0";
+	let hash = 0;
+	for (let i = 0; i < key.length; i++) {
+		hash = (hash << 5) - hash + key.charCodeAt(i);
+		hash |= 0; // Convert to 32bit integer
+	}
+	const idx = Math.abs(hash) % STOCK_IMAGES.length;
+	return STOCK_IMAGES[idx];
 }
 
 export default function ItemCard({ item }) {
@@ -19,21 +27,21 @@ export default function ItemCard({ item }) {
 			imageSrc = item.image;
 		}
 	}
-	// If imageSrc is still default or is /images/denim-jacket.jpg, use a random fallback
+	// If imageSrc is still default or is /images/denim-jacket.jpg, use a deterministic fallback
 	if (imageSrc === defaultImage || imageSrc === "/images/denim-jacket.jpg") {
-		imageSrc = getRandomFallbackImage();
+		imageSrc = getDeterministicFallbackImage(item);
 	}
 
 	return (
 		<div className="border rounded-lg p-4 shadow hover:shadow-lg transition bg-white flex flex-col h-full">
-			<div className="w-full h-40 mb-2 bg-gray-50 flex items-center justify-center rounded overflow-hidden">
+			<div className="w-full aspect-[4/5] mb-2 bg-gray-100 flex items-center justify-center rounded-lg overflow-hidden shadow-sm border border-gray-200">
 				<img
 					src={imageSrc}
 					alt={item.title}
-					className="max-w-full max-h-full object-contain"
+					className="w-full h-full object-cover rounded-lg"
 					onError={(e) => {
 						e.target.onerror = null;
-						e.target.src = getRandomFallbackImage();
+						e.target.src = getDeterministicFallbackImage(item);
 					}}
 				/>
 			</div>
