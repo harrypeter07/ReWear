@@ -1,6 +1,12 @@
 import { getCollections } from "@/lib/db";
 import bcrypt from "bcrypt";
 
+import { userSchema } from "@/lib/validations";
+
+const body = await req.json();
+const validated = userSchema.parse(body);
+
+
 export default async function handler(req, res) {
 	if (req.method !== "POST") {
 		return res.status(405).json({ message: "Method not allowed" });
