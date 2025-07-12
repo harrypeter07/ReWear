@@ -19,6 +19,8 @@ export default function ItemForm({ onSubmit }) {
 		const data = {
 			title: form.title.value,
 			category: form.category.value,
+			size: form.size.value,
+			condition: form.condition.value,
 			description: form.description.value,
 			image: imageBase64,
 		};
@@ -38,6 +40,20 @@ export default function ItemForm({ onSubmit }) {
 				type="text"
 				name="category"
 				placeholder="Category"
+				className="border p-2 rounded"
+				required
+			/>
+			<input
+				type="text"
+				name="size"
+				placeholder="Size"
+				className="border p-2 rounded"
+				required
+			/>
+			<input
+				type="text"
+				name="condition"
+				placeholder="Condition (e.g. New, Like New, Used)"
 				className="border p-2 rounded"
 				required
 			/>

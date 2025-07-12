@@ -10,7 +10,8 @@ export async function POST(req) {
 		// Validate input using Zod
 		const validated = itemSchema.parse(body);
 
-		const { title, description, category, image, uploaderId } = validated;
+		const { title, description, category, image, uploaderId, size, condition } =
+			validated;
 
 		const { items } = await getCollections();
 
@@ -18,6 +19,8 @@ export async function POST(req) {
 			title,
 			description,
 			category,
+			size,
+			condition,
 			image: image || "",
 			uploaderId: new ObjectId(uploaderId),
 			createdAt: new Date(),
