@@ -1,17 +1,33 @@
 import { useState } from "react";
 
 export default function ItemForm({ onSubmit }) {
-	const [imageBase64, setImageBase64] = useState("");
+	const [imageUrl, setImageUrl] = useState("");
+	const [uploading, setUploading] = useState(false);
 	const [error, setError] = useState("");
 
-	const handleImageChange = (e) => {
+	const handleImageChange = async (e) => {
 		const file = e.target.files[0];
 		if (!file) return;
-		const reader = new FileReader();
-		reader.onloadend = () => {
-			setImageBase64(reader.result);
-		};
-		reader.readAsDataURL(file);
+		setUploading(true);
+		setError("");
+		const formData = new FormData();
+		formData.append("file", file);
+		try {
+			const res = await fetch("/api/upload", {
+				method: "POST",
+				body: formData,
+			});
+			const data = await res.json();
+			if (res.ok && data.url) {
+				setImageUrl(data.url);
+			} else {
+				setError(data.error || "Upload failed");
+			}
+		} catch (err) {
+			setError("Upload failed");
+		} finally {
+			setUploading(false);
+		}
 	};
 
 	const handleSubmit = (e) => {
@@ -25,7 +41,7 @@ export default function ItemForm({ onSubmit }) {
 			condition: form.condition.value.trim(),
 			description: form.description.value.trim(),
 			pointsValue: Number(form.pointsValue.value),
-			image: imageBase64,
+			image: imageUrl,
 		};
 
 		// Frontend validation
@@ -41,8 +57,7 @@ export default function ItemForm({ onSubmit }) {
 			data.pointsValue <= 0
 		)
 			return setError("Points Value must be a positive number.");
-		// Optionally, check for image
-		// if (!data.image) return setError("Image is required.");
+		if (!data.image) return setError("Image is required.");
 
 		onSubmit(data);
 	};
@@ -100,6 +115,19 @@ export default function ItemForm({ onSubmit }) {
 				onChange={handleImageChange}
 				className="border p-2 rounded"
 			/>
+			{uploading && (
+				<div className="text-blue-600 text-sm">Uploading image...</div>
+			)}
+			{imageUrl && (
+				<div className="flex items-center gap-2 mt-2">
+					<img
+						src={imageUrl}
+						alt="Preview"
+						className="w-24 h-24 object-cover rounded border"
+					/>
+					<span className="text-xs text-gray-500">Image uploaded</span>
+				</div>
+			)}
 			<button type="submit" className="bg-blue-600 text-white p-2 rounded">
 				Submit
 			</button>

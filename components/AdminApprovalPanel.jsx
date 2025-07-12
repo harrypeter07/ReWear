@@ -12,7 +12,9 @@ export default function AdminApprovalPanel() {
 			try {
 				const res = await fetch("/api/items?pending=true");
 				const items = res.ok ? await res.json() : [];
-				setPendingItems(items.filter((i) => !i.isApproved));
+				setPendingItems(
+					Array.isArray(items) ? items.filter((i) => !i.isApproved) : []
+				);
 			} catch (err) {
 				setError("Failed to fetch pending items");
 			}

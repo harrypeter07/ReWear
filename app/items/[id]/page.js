@@ -11,11 +11,10 @@ async function fetchItem(id) {
 }
 
 function getImageSrc(image) {
-	const defaultImage = "/images/default.png";
+	const defaultImage = "/images/default.jpg";
 	if (!image || typeof image !== "string") return defaultImage;
-	if (image.startsWith("data:image/")) return image;
+	if (image.startsWith("/uploads/")) return image;
 	if (image.startsWith("http://") || image.startsWith("https://")) return image;
-	if (image.match(/\.(jpg|jpeg|png|webp)$/i)) return image;
 	return defaultImage;
 }
 
@@ -60,10 +59,6 @@ export default function ItemDetailPage() {
 	}
 
 	const imageSrc = getImageSrc(item.image);
-	const isBase64 = imageSrc.startsWith("data:image/");
-	const isRemote =
-		imageSrc.startsWith("http://") || imageSrc.startsWith("https://");
-	const isFile = imageSrc.match(/\.(jpg|jpeg|png|webp)$/i);
 
 	return (
 		<div className="container mx-auto px-4 py-8">
@@ -73,19 +68,15 @@ export default function ItemDetailPage() {
 					<img
 						src={imageSrc}
 						alt={item.title}
-						className="w-full max-w-xs h-72 object-contain rounded border mb-4"
+						className="w-full max-w-xs h-72 object-cover rounded border shadow-md hover:shadow-xl transition mb-4 bg-gray-50"
 						onError={(e) => {
 							e.target.onerror = null;
-							e.target.src = "/images/default.png";
-							console.log("[ITEM DETAIL] Image failed to load:", imageSrc);
+							e.target.src = "/images/default.jpg";
 						}}
 					/>
-					<div className="text-xs text-gray-500 mt-1">
-						{isBase64 && "(Base64 image)"}
-						{isRemote && "(Remote image)"}
-						{isFile && "(File path image)"}
-						{!isBase64 && !isRemote && !isFile && "(No valid image)"}
-					</div>
+					{imageSrc === "/images/default.jpg" && (
+						<div className="text-xs text-gray-500 mt-1">No image available</div>
+					)}
 				</div>
 				{/* Description Section */}
 				<div className="flex-1 flex flex-col justify-between">
@@ -137,7 +128,7 @@ export default function ItemDetailPage() {
 								className="w-full h-24 object-cover mb-2"
 								onError={(e) => {
 									e.target.onerror = null;
-									e.target.src = "/images/default.png";
+									e.target.src = "/images/default.jpg";
 								}}
 							/>
 							<div className="px-2 text-sm font-medium truncate">

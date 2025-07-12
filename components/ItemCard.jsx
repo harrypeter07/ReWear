@@ -2,16 +2,14 @@
 import Link from "next/link";
 
 export default function ItemCard({ item }) {
-	// Use a remote placeholder image as the default (now .jpg)
-	const defaultImage = "https://placehold.co/300x300.jpg?text=No+Image";
+	const defaultImage = "/images/default.jpg";
 	let imageSrc = defaultImage;
 	if (item.image && typeof item.image === "string") {
-		if (item.image.startsWith("data:image/")) {
+		if (item.image.startsWith("/uploads/")) {
 			imageSrc = item.image;
 		} else if (
 			item.image.startsWith("http://") ||
-			item.image.startsWith("https://") ||
-			item.image.match(/\.(jpg|jpeg|png|webp)$/i)
+			item.image.startsWith("https://")
 		) {
 			imageSrc = item.image;
 		}
@@ -48,7 +46,6 @@ export default function ItemCard({ item }) {
 			<div className="text-gray-700 text-sm mt-2 line-clamp-3">
 				{item.description}
 			</div>
-			{/* Optionally, add a link to detail page */}
 			<div className="mt-auto pt-4 flex justify-end">
 				<Link
 					href={`/items/${item._id || item.id}`}
