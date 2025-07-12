@@ -1,61 +1,61 @@
-import { useState } from "react";
+'use client';
+import { useState } from 'react';
 
 export default function ItemForm({ onSubmit }) {
-	const [imageBase64, setImageBase64] = useState("");
+  const [form, setForm] = useState({
+    title: '',
+    description: '',
+    category: '',
+    size: '',
+    condition: '',
+    uploaderId: '', // can be hardcoded for now
+    imageFile: null
+  });
 
-	const handleImageChange = (e) => {
-		const file = e.target.files[0];
-		if (!file) return;
-		const reader = new FileReader();
-		reader.onloadend = () => {
-			setImageBase64(reader.result);
-		};
-		reader.readAsDataURL(file);
-	};
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+  };
 
-	const handleSubmit = (e) => {
-		e.preventDefault();
-		const form = e.target;
-		const data = {
-			title: form.title.value,
-			category: form.category.value,
-			description: form.description.value,
-			image: imageBase64,
-		};
-		onSubmit(data);
-	};
+  const handleFileChange = (e) => {
+    setForm(prev => ({ ...prev, imageFile: e.target.files[0] }));
+  };
 
-	return (
-		<form className="flex flex-col gap-2" onSubmit={handleSubmit}>
-			<input
-				type="text"
-				name="title"
-				placeholder="Title"
-				className="border p-2 rounded"
-				required
-			/>
-			<input
-				type="text"
-				name="category"
-				placeholder="Category"
-				className="border p-2 rounded"
-				required
-			/>
-			<textarea
-				name="description"
-				placeholder="Description"
-				className="border p-2 rounded"
-				required
-			/>
-			<input
-				type="file"
-				accept="image/*"
-				onChange={handleImageChange}
-				className="border p-2 rounded"
-			/>
-			<button type="submit" className="bg-blue-600 text-white p-2 rounded">
-				Submit
-			</button>
-		</form>
-	);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!form.imageFile) {
+      alert("Please upload an image.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64Image = reader.result;
+      const payload = {
+        title: form.title,
+        description: form.description,
+        category: form.category,
+        size: form.size,
+        condition: form.condition,
+        uploaderId: form.uploaderId || "64f5cdd83e5b110fc1aeff98", // Replace with actual user ID
+        images: [base64Image]
+      };
+
+      await onSubmit(payload);
+    };
+    reader.readAsDataURL(form.imageFile);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <input type="text" name="title" placeholder="Title" onChange={handleChange} required />
+      <textarea name="description" placeholder="Description" onChange={handleChange} required />
+      <input type="text" name="category" placeholder="Category" onChange={handleChange} required />
+      <input type="text" name="size" placeholder="Size" onChange={handleChange} required />
+      <input type="text" name="condition" placeholder="Condition" onChange={handleChange} required />
+      <input type="file" name="imageFile" accept="image/*" onChange={handleFileChange} required />
+      <button type="submit">Submit</button>
+    </form>
+  );
 }
