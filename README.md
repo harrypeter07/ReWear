@@ -1,5 +1,97 @@
 # ReWear – Community Clothing Exchange
 
+## Tech Stack
+
+- **Next.js (App Router)**
+- **MongoDB**
+- **TailwindCSS**
+- **Custom Authentication** (no Firebase)
+
+## Objective
+
+Build a web app that allows users to exchange clothing through direct swaps or a point-based redemption system. It promotes sustainable fashion and reduces textile waste.
+
+## Core Features
+
+- User Registration & Login (email/password)
+- Landing Page with featured items, categories, and CTAs
+- Item Listings with filters and search
+- Product Detail Page with swap/redeem actions
+- Add New Item Form
+- User Dashboard with profile, listings, and purchases
+- Admin Panel to approve/reject items and manage users
+
+## 🗃️ MongoDB Collections
+
+- `User`: stores user info, role, points
+- `Item`: item listings with metadata
+- `SwapRequest`: tracks swap/redeem requests
+
+## ⚙️ Requirements
+
+- Modular, reusable components (e.g., `ItemCard`, `UserCard`)
+- API routes or server actions for auth, CRUD, and real-time updates
+- Route protection via middleware
+- Form validation using Zod or Yup
+- ESLint-configured code
+- Minimal network calls and optimized queries
+- Responsive UI with Tailwind
+- Use WebSockets or polling for live updates (swap status)
+
+## 📁 Updated Directory Structure
+
+```
+harrypeter07-rewear/
+├── public/
+│   └── images/          # Static assets (default avatars, banners, etc.)
+├── app/
+│   ├── layout.js
+│   ├── globals.css
+│   ├── page.js          # Landing Page
+│   ├── login/
+│   │   └── page.js
+│   ├── register/
+│   │   └── page.js
+│   ├── dashboard/
+│   │   └── page.js
+│   ├── items/
+│   │   ├── page.js              # Browse Items
+│   │   ├── [id]/page.js         # Item Detail Page
+│   │   └── new/page.js          # Add Item
+│   ├── admin/
+│   │   └── page.js
+│   └── api/
+│       ├── auth/                # login, register handlers
+│       ├── users/
+│       ├── items/
+│       └── swaps/
+├── lib/
+│   ├── db.js                   # MongoDB client
+│   ├── auth.js                 # Auth middleware
+│   └── validations.js          # Zod/Yup validators
+├── models/
+│   ├── User.js
+│   ├── Item.js
+│   └── SwapRequest.js
+├── components/
+│   ├── Navbar.jsx
+│   ├── ItemCard.jsx
+│   ├── ItemForm.jsx
+│   ├── UserCard.jsx
+│   └── DashboardWidgets.jsx
+├── utils/
+│   ├── constants.js
+│   └── helpers.js
+├── hooks/
+│   └── useAuth.js
+├── middlewares/
+│   └── withAuth.js
+├── eslint.config.mjs
+├── next.config.mjs
+├── jsconfig.json
+└── package.json
+```
+
 ## Team Members
 
 - **Hassan Mansuri**  
@@ -10,10 +102,3 @@
   jainr_1@rknec.edu
 - **Harshal Pande**  
   pandeh@rknec.edu
-
-## Problem Statement
-
-ReWear is a Community Clothing Exchange platform designed to facilitate the sharing and exchange of clothing within a community, promoting sustainability and reducing waste.
-
-
-
