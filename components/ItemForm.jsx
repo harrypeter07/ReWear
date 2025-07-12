@@ -2,6 +2,7 @@ import { useState } from "react";
 
 export default function ItemForm({ onSubmit }) {
 	const [imageBase64, setImageBase64] = useState("");
+	const [error, setError] = useState("");
 
 	const handleImageChange = (e) => {
 		const file = e.target.files[0];
@@ -15,20 +16,35 @@ export default function ItemForm({ onSubmit }) {
 
 	const handleSubmit = (e) => {
 		e.preventDefault();
+		setError("");
 		const form = e.target;
 		const data = {
-			title: form.title.value,
-			category: form.category.value,
-			size: form.size.value,
-			condition: form.condition.value,
-			description: form.description.value,
+			title: form.title.value.trim(),
+			category: form.category.value.trim(),
+			size: form.size.value.trim(),
+			condition: form.condition.value.trim(),
+			description: form.description.value.trim(),
 			image: imageBase64,
 		};
+
+		// Frontend validation
+		if (!data.title) return setError("Title is required.");
+		if (!data.category) return setError("Category is required.");
+		if (!data.size) return setError("Size is required.");
+		if (!data.condition) return setError("Condition is required.");
+		if (!data.description || data.description.length < 2)
+			return setError("Description must be at least 2 characters.");
+		// Optionally, check for image
+		// if (!data.image) return setError("Image is required.");
+
 		onSubmit(data);
 	};
 
 	return (
 		<form className="flex flex-col gap-2" onSubmit={handleSubmit}>
+			{error && (
+				<div className="bg-red-100 text-red-700 p-2 rounded">{error}</div>
+			)}
 			<input
 				type="text"
 				name="title"

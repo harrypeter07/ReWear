@@ -2,7 +2,11 @@ import ItemCard from "@/components/ItemCard";
 import Link from "next/link";
 
 async function getItems() {
-	const res = await fetch("/api/items", { cache: "no-store" });
+	const baseUrl =
+		typeof window === "undefined"
+			? process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"
+			: "";
+	const res = await fetch(`${baseUrl}/api/items`, { cache: "no-store" });
 	if (!res.ok) return [];
 	return await res.json();
 }

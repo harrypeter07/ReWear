@@ -6,9 +6,10 @@ const ItemSchema = new mongoose.Schema({
 	category: { type: String, required: true },
 	image: { type: String }, // base64 string
 	owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+	pointsValue: { type: Number, required: true },
 	status: {
 		type: String,
-		enum: ["available", "swapped", "pending"],
+		enum: ["available", "swapped", "pending", "redeemed"],
 		default: "available",
 	},
 	createdAt: { type: Date, default: Date.now },

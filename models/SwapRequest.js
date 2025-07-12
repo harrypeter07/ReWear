@@ -10,10 +10,12 @@ const SwapRequestSchema = new mongoose.Schema({
 	type: { type: String, enum: ["swap", "redeem"], required: true },
 	status: {
 		type: String,
-		enum: ["pending", "approved", "rejected"],
+		enum: ["pending", "accepted", "rejected"],
 		default: "pending",
 	},
+	message: { type: String },
 	createdAt: { type: Date, default: Date.now },
+	resolvedAt: { type: Date },
 });
 
 export default mongoose.models.SwapRequest ||
