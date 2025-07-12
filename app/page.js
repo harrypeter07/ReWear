@@ -2,9 +2,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
 	const [currentSlide, setCurrentSlide] = useState(0);
+	const router = useRouter();
 
 	// Sample featured items data
 	const featuredItems = [
@@ -40,6 +42,25 @@ export default function Home() {
 		},
 	];
 
+	const handleStartSwapping = async () => {
+		console.log("Start Swapping button clicked");
+		try {
+			const res = await fetch("/api/auth/me", { credentials: "include" });
+			if (res.ok) {
+				const data = await res.json();
+				console.log("User is authenticated:", data.user);
+				// You can choose where to send logged-in users
+				router.push("/items");
+			} else {
+				console.log("User not authenticated, redirecting to /register");
+				router.push("/register");
+			}
+		} catch (err) {
+			console.log("Error checking auth:", err);
+			router.push("/register");
+		}
+	};
+
 	return (
 		<div className="min-h-screen bg-white">
 			{/* Hero Section */}
@@ -53,12 +74,12 @@ export default function Home() {
 						community
 					</p>
 					<div className="flex justify-center gap-4">
-						<Link
-							href="/register"
+						<button
+							onClick={handleStartSwapping}
 							className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition"
 						>
 							Start Swapping
-						</Link>
+						</button>
 						<Link
 							href="/items"
 							className="bg-white hover:bg-gray-100 text-gray-800 font-bold py-3 px-6 border border-gray-300 rounded-lg transition"

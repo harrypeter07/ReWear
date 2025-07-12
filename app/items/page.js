@@ -1,45 +1,11 @@
 import ItemCard from "@/components/ItemCard";
 import Link from "next/link";
 
-// Mock data - replace with real data fetching
-const getItems = async () => {
-	// In a real app, you would fetch from your API:
-	// const res = await fetch('/api/items');
-	// return await res.json();
-
-	return [
-		{
-			id: 1,
-			title: "Vintage Denim Jacket",
-			category: "Jackets",
-			description:
-				"Light wash denim jacket from the 90s in excellent condition",
-			size: "M",
-			image:
-				"https://www.alamodelabel.in/cdn/shop/files/AD15F82B-CAD5-4B7A-9B2E-814B092A3068_600x600_crop_center.jpg?v=1749207515",
-			points: 150,
-		},
-		{
-			id: 2,
-			title: "Floral Summer Dress",
-			category: "Dresses",
-			description: "Lightweight cotton dress with floral pattern",
-			size: "S",
-			image:
-				"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtKdDLXw5t-0a7qxJB8p7e16JPkeuU3N-CEg&s",
-			points: 100,
-		},
-		{
-			id: 3,
-			title: "Classic White Sneakers",
-			category: "Shoes",
-			description: "Like-new condition, size 9",
-			size: "9",
-			image:
-				"https://assets.myntassets.com/h_1440,q_100,w_1080/v1/assets/images/24908578/2023/9/12/da8743b9-d2aa-4d7e-a4d4-c63d1ea9e9ad1694490216796ASIANBoysWhitePerforationsSneakers1.jpg",
-		},
-	];
-};
+async function getItems() {
+	const res = await fetch("/api/items", { cache: "no-store" });
+	if (!res.ok) return [];
+	return await res.json();
+}
 
 export default async function ItemsPage() {
 	const items = await getItems();
@@ -66,7 +32,7 @@ export default async function ItemsPage() {
 			{items.length > 0 ? (
 				<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
 					{items.map((item) => (
-						<ItemCard key={item.id} item={item} />
+						<ItemCard key={item._id || item.id} item={item} />
 					))}
 				</div>
 			) : (

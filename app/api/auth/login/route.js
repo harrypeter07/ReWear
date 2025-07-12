@@ -41,7 +41,7 @@ export async function POST(req) {
 			);
 		}
 		const token = jwt.sign(
-			{ userId: user._id, role: user.role, email: user.email },
+			{ _id: user._id, role: user.role, email: user.email },
 			process.env.JWT_SECRET,
 			{ expiresIn: "8h" }
 		);
@@ -50,7 +50,8 @@ export async function POST(req) {
 			token ? "[TOKEN GENERATED]" : "[FAILED]"
 		);
 		// Set JWT as HttpOnly cookie
-		cookies().set("token", token, {
+		const cookieStore = await cookies();
+		cookieStore.set("token", token, {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",
 			sameSite: "lax",

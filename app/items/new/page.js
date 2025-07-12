@@ -20,19 +20,33 @@ export default function AddItemPage() {
 					setUser(data.user);
 				} else {
 					setUser(null);
+					router.push("/login");
 				}
 			} catch {
 				setUser(null);
+				router.push("/login");
 			} finally {
 				setLoading(false);
 			}
 		}
 		fetchUser();
-	}, []);
+	}, [router]);
 
 	const handleSubmit = async (data) => {
 		setError("");
 		setSuccess("");
+		console.log("Current user:", user);
+		if (
+			!user ||
+			!user._id ||
+			typeof user._id !== "string" ||
+			user._id.length !== 24
+		) {
+			setError(
+				"User ID is missing or invalid. Please log out and log in again."
+			);
+			return;
+		}
 		try {
 			const payload = { ...data, uploaderId: user._id };
 			console.log("Submitting item payload:", payload);
@@ -46,18 +60,6 @@ export default function AddItemPage() {
 	};
 
 	if (loading) return <div className="p-8 text-center">Loading...</div>;
-	if (!user)
-		return (
-			<div className="p-8 text-center">
-				<p>You must be logged in to add an item.</p>
-				<button
-					className="mt-4 px-4 py-2 bg-blue-600 text-white rounded"
-					onClick={() => router.push("/login")}
-				>
-					Go to Login
-				</button>
-			</div>
-		);
 
 	return (
 		<main
