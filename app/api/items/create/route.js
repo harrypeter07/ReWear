@@ -6,9 +6,20 @@ import { itemSchema } from "@/lib/validations";
 export async function POST(req) {
 	try {
 		const body = await req.json();
+		console.log("[ITEM CREATE] Received body:", body);
 
 		// Validate input using Zod
-		const validated = itemSchema.parse(body);
+		let validated;
+		try {
+			validated = itemSchema.parse(body);
+			console.log("[ITEM CREATE] Validation passed:", validated);
+		} catch (zodErr) {
+			console.error("[ITEM CREATE] Validation failed:", zodErr, zodErr.errors);
+			return Response.json(
+				{ error: "Validation failed", details: zodErr.errors || zodErr },
+				{ status: 400 }
+			);
+		}
 
 		const { title, description, category, image, uploaderId, size, condition } =
 			validated;
@@ -29,20 +40,19 @@ export async function POST(req) {
 			isApproved: false,
 			isVisible: false,
 		};
+		console.log("[ITEM CREATE] Inserting new item:", newItem);
 
 		const result = await items.insertOne(newItem);
+		console.log("[ITEM CREATE] Insert result:", result);
 		return Response.json({
 			message: "Item submitted",
 			itemId: result.insertedId,
 		});
 	} catch (err) {
-		if (err.name === "ZodError") {
-			return Response.json(
-				{ error: "Validation failed", details: err.errors },
-				{ status: 400 }
-			);
-		}
-		console.error("Create Item Error:", err);
-		return Response.json({ error: "Internal server error" }, { status: 500 });
+		console.error("[ITEM CREATE] Error:", err);
+		return Response.json(
+			{ error: "Internal server error", details: err.message },
+			{ status: 500 }
+		);
 	}
 }

@@ -35,10 +35,12 @@ export default function AddItemPage() {
 		setSuccess("");
 		try {
 			const payload = { ...data, uploaderId: user._id };
+			console.log("Submitting item payload:", payload);
 			await createItem(payload);
 			setSuccess("Item submitted for review!");
 			setTimeout(() => router.push("/dashboard"), 1500);
 		} catch (err) {
+			console.log("Item creation error:", err);
 			setError(err.message || "Failed to add item");
 		}
 	};
