@@ -2,6 +2,12 @@
 import { getCollections } from "@/lib/db";
 import { ObjectId } from "mongodb";
 
+import { itemSchema } from "@/lib/validations";
+
+const body = await req.json();
+const validated = itemSchema.parse(body); // validates fields
+
+
 export async function PATCH(req) {
   const { itemId } = await req.json();
   const { items, users } = await getCollections();
