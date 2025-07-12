@@ -12,7 +12,9 @@ const userListings = [
     description: "Listed 3 days ago",
     image: "/denim-jacket.jpg",
     status: "Available",
-    points: 150
+    points: 150,
+    image: "https://www.alamodelabel.in/cdn/shop/files/AD15F82B-CAD5-4B7A-9B2E-814B092A3068_600x600_crop_center.jpg?v=1749207515"
+
   },
   // ... more listings
 ];

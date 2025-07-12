@@ -75,11 +75,11 @@ export default function Home() {
                   className={`min-w-full transition-transform duration-300 ${index === currentSlide ? 'block' : 'hidden'}`}
                 >
                   <div className="bg-gray-50 rounded-xl p-6 flex flex-col md:flex-row items-center gap-8">
-                    <div className="w-full md:w-1/2">
+                    <div className="w-full md:w-1/2 h-60 w-60 overflow-hidden">
                       <img 
                         src={item.image} 
                         alt={item.title}
-                        className="w-full h-64 object-cover rounded-lg shadow-md"
+                        className="h-full w-full object-contain rounded-lg shadow-lg"
                       />
                     </div>
                     <div className="w-full md:w-1/2 text-center md:text-left">

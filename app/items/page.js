@@ -13,8 +13,8 @@ const getItems = async () => {
       category: "Jackets",
       description: "Light wash denim jacket from the 90s in excellent condition",
       size: "M",
-      image: "/denim-jacket.jpg",
-      points: 150
+      image: "https://www.alamodelabel.in/cdn/shop/files/AD15F82B-CAD5-4B7A-9B2E-814B092A3068_600x600_crop_center.jpg?v=1749207515"
+,      points: 150
     },
     {
       id: 2,
@@ -22,8 +22,8 @@ const getItems = async () => {
       category: "Dresses",
       description: "Lightweight cotton dress with floral pattern",
       size: "S",
-      image: "/floral-dress.jpg",
-      points: 100
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQtKdDLXw5t-0a7qxJB8p7e16JPkeuU3N-CEg&s"
+,      points: 100
     },
     {
       id: 3,
@@ -31,7 +31,7 @@ const getItems = async () => {
       category: "Shoes",
       description: "Like-new condition, size 9",
       size: "9",
-      image: "/sneakers.jpg"
+      image: "https://assets.myntassets.com/h_1440,q_100,w_1080/v1/assets/images/24908578/2023/9/12/da8743b9-d2aa-4d7e-a4d4-c63d1ea9e9ad1694490216796ASIANBoysWhitePerforationsSneakers1.jpg"
     }
   ];
 };
