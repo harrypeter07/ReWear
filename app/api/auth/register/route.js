@@ -1,6 +1,6 @@
 import { getCollections } from "@/lib/db";
 import { NextResponse } from "next/server";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 function isValidEmail(email) {
 	return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
