@@ -1,3 +1,7 @@
+'use client';
+import Link from 'next/link';
+import Image from 'next/image';
+
 export default function ItemCard({ item }) {
 	// Determine image source: base64 or URL
 	let imgSrc = "/images/default-item.jpg";
@@ -11,7 +15,7 @@ export default function ItemCard({ item }) {
 	return (
 		<div className="border rounded p-4 shadow hover:shadow-lg transition">
 			<img
-				src={imgSrc}
+				src={item.image || "/images/default-item.jpg"}
 				alt={item.title}
 				className="w-full h-40 object-cover mb-2 rounded"
 			/>

@@ -3,29 +3,29 @@ import { useState } from "react";
 import Link from "next/link";
 
 export default function Home() {
-	const [currentSlide, setCurrentSlide] = useState(0);
-
-	// Sample featured items data
-	const featuredItems = [
-		{
-			id: 1,
-			title: "Vintage Denim Jacket",
-			category: "Jackets",
-			image: "/images/denim-jacket.jpg",
-		},
-		{
-			id: 2,
-			title: "Summer Floral Dress",
-			category: "Dresses",
-			image: "/images/floral-dress.jpg",
-		},
-		{
-			id: 3,
-			title: "Classic White Sneakers",
-			category: "Shoes",
-			image: "/images/sneakers.jpg",
-		},
-	];
+  const [currentSlide, setCurrentSlide] = useState(0);
+  
+  // Sample featured items data
+  const featuredItems = [
+    {
+      id: 1,
+      title: "Vintage Denim Jacket",
+      category: "Jackets",
+      image: "/images/denim-jacket.jpg"
+    },
+    {
+      id: 2,
+      title: "Summer Floral Dress",
+      category: "Dresses",
+      image: "/images/floral-dress.jpg"
+    },
+    {
+      id: 3,
+      title: "Classic White Sneakers",
+      category: "Shoes",
+      image: "/images/sneakers.jpg"
+    }
+  ];
 
 	// Sample testimonials
 	const testimonials = [

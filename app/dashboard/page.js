@@ -1,33 +1,135 @@
+'use client';
+import { useState } from 'react';
+import Link from 'next/link';
+import ItemCard from '@/components/ItemCard';
+
+// Mock data
+const userListings = [
+  {
+    id: 1,
+    title: "Vintage Denim Jacket",
+    category: "Jackets",
+    description: "Listed 3 days ago",
+    image: "/denim-jacket.jpg",
+    status: "Available",
+    points: 150
+  },
+  // ... more listings
+];
+
+const userPurchases = [
+  // ... purchases data
+];
+
 export default function DashboardPage() {
-	return (
-		<main
-			className="min-h-screen p-8 flex flex-col items-center"
-			style={{ background: "var(--background)" }}
-		>
-			<div
-				className="rounded-lg shadow p-8 w-full max-w-2xl"
-				style={{ background: "var(--surface)" }}
-			>
-				<h1
-					className="text-2xl font-bold mb-4"
-					style={{ color: "var(--foreground)" }}
-				>
-					Welcome to your Dashboard
-				</h1>
-				<p className="mb-6" style={{ color: "var(--foreground)" }}>
-					Manage your profile, view your listings, and track your swaps and
-					redemptions here.
-				</p>
-				<div
-					className="p-4 rounded"
-					style={{
-						background: "var(--surface-accent)",
-						color: "var(--foreground)",
-					}}
-				>
-					Your dashboard widgets and info will appear here.
-				</div>
-			</div>
-		</main>
-	);
-}
+  const [activeTab, setActiveTab] = useState('listings');
+
+  return (
+    <div className="container mx-auto px-4 py-8 bg-white min-h-screen">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-8 border-b pb-6">
+        <div>
+          <h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
+          <p className="text-gray-500 mt-1">Manage your listings and swaps</p>
+        </div>
+        <Link 
+          href="/items/new" 
+          className="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-md text-sm transition"
+        >
+          + List New Item
+        </Link>
+      </div>
+
+      {/* Tab Navigation */}
+      <div className="mb-8">
+        <div className="flex space-x-4 border-b border-gray-200">
+          <button
+            onClick={() => setActiveTab('listings')}
+            className={`pb-3 px-1 text-sm font-medium ${activeTab === 'listings' ? 'text-gray-900 border-b-2 border-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
+          >
+            My Listings ({userListings.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('purchases')}
+            className={`pb-3 px-1 text-sm font-medium ${activeTab === 'purchases' ? 'text-gray-900 border-b-2 border-gray-900' : 'text-gray-500 hover:text-gray-700'}`}
+          >
+            My Purchases ({userPurchases.length})
+          </button>
+        </div>
+      </div>
+
+      {/* Tab Content */}
+      <div className="mb-12">
+        {activeTab === 'listings' ? (
+          <section>
+            <h2 className="sr-only">My Listings</h2>
+            {userListings.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {userListings.map((item) => (
+                  <div key={item.id} className="relative">
+                    <ItemCard item={item} />
+                    <span className={`absolute top-3 right-3 text-xs px-2 py-1 rounded-md ${item.status === 'Available' ? 'bg-gray-100 text-gray-800' : 'bg-gray-200 text-gray-800'}`}>
+                      {item.status}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12 border-2 border-dashed border-gray-200 rounded-lg">
+                <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+                </svg>
+                <h3 className="mt-2 text-sm font-medium text-gray-900">No listings yet</h3>
+                <p className="mt-1 text-sm text-gray-500">Get started by listing an item for swap</p>
+                <div className="mt-6">
+                  <Link
+                    href="/items/new"
+                    className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+                  >
+                    + New Listing
+                  </Link>
+                </div>
+              </div>
+            )}
+          </section>
+        ) : (
+          <section>
+            <h2 className="sr-only">My Purchases</h2>
+            {/* Purchases content... */}
+          </section>
+        )}
+      </div>
+
+      {/* Activity Feed */}
+      <div className="border-t pt-8">
+        <h2 className="text-lg font-medium text-gray-900 mb-4">Recent Activity</h2>
+        <div className="space-y-4">
+          {[
+            {
+              id: 1,
+              type: 'swap',
+              title: 'Swap completed',
+              description: 'White Sneakers • 2 days ago',
+              icon: (
+                <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                </svg>
+              )
+            },
+            // ... more activities
+          ].map((activity) => (
+            <div key={activity.id} className="flex items-start pb-4 border-b border-gray-100 last:border-0">
+              <div className="bg-gray-100 p-2 rounded-full mr-3 flex-shrink-0">
+                {activity.icon}
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-900">{activity.title}</p>
+                <p className="text-sm text-gray-500">{activity.description}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+} 
