@@ -1,15 +1,18 @@
 export default function UserCard({ user }) {
 	return (
-		<div className="border rounded p-4 shadow flex flex-col items-center">
+		<div className="flex flex-col items-center p-4">
 			<img
 				src={user.avatar || "/images/default-avatar.png"}
-				alt={user.name}
-				className="w-20 h-20 rounded-full mb-2"
+				alt={user.username || user.name || "User"}
+				className="w-16 h-16 rounded-full border mb-2"
 			/>
-			<h2 className="font-semibold text-lg">{user.name}</h2>
-			<p className="text-gray-600">{user.email}</p>
-			<p className="text-sm">Points: {user.points}</p>
-			{/* TODO: Add more user info or actions */}
+			<div className="font-semibold text-base">
+				{user.username || user.name}
+			</div>
+			<div className="text-xs text-gray-500 mb-1">{user.email}</div>
+			{user.points !== undefined && (
+				<div className="text-xs text-green-700">Points: {user.points}</div>
+			)}
 		</div>
 	);
 }
