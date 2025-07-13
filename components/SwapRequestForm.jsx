@@ -73,7 +73,7 @@ export default function SwapRequestForm({ itemId, type, onSuccess }) {
 	}
 
 	return (
-		<form onSubmit={handleSubmit} className="flex flex-col gap-2 mt-4">
+		<form onSubmit={handleSubmit} className="card p-6">
 			{error && (
 				<div className="bg-red-100 text-red-700 p-2 rounded">{error}</div>
 			)}
@@ -82,13 +82,13 @@ export default function SwapRequestForm({ itemId, type, onSuccess }) {
 			)}
 			{type === "swap" && (
 				<div>
-					<label className="block mb-1 font-medium">
+					<label className="block text-primary font-semibold mb-2">
 						Select one of your own approved listings to offer:
 					</label>
 					{userItems.length === 0 ? (
-						<div className="text-sm text-gray-500">
+						<p className="text-secondary text-sm mt-2">
 							You have no approved, available listings to offer.
-						</div>
+						</p>
 					) : (
 						<select
 							className="border p-2 rounded w-full text-gray-900 bg-white"
@@ -116,7 +116,7 @@ export default function SwapRequestForm({ itemId, type, onSuccess }) {
 			/>
 			<button
 				type="submit"
-				className="bg-blue-600 text-white p-2 rounded"
+				className="btn w-full"
 				disabled={loading || (type === "swap" && userItems.length === 0)}
 			>
 				{loading

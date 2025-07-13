@@ -25,23 +25,27 @@ export default function Navbar() {
 	// Close mobile menu when clicking outside
 	useEffect(() => {
 		const handleClickOutside = (event) => {
-			if (mobileMenuOpen && !event.target.closest('.mobile-menu') && !event.target.closest('.mobile-menu-button')) {
+			if (
+				mobileMenuOpen &&
+				!event.target.closest(".mobile-menu") &&
+				!event.target.closest(".mobile-menu-button")
+			) {
 				setMobileMenuOpen(false);
 			}
 		};
 
-		document.addEventListener('click', handleClickOutside);
-		return () => document.removeEventListener('click', handleClickOutside);
+		document.addEventListener("click", handleClickOutside);
+		return () => document.removeEventListener("click", handleClickOutside);
 	}, [mobileMenuOpen]);
 
 	return (
-		<nav className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm">
+		<nav className="fixed top-0 left-0 w-full z-50 gradient-bg backdrop-blur border-b border-black/10 shadow-sm transition-all duration-300">
 			<div className="container mx-auto px-4 lg:px-8">
 				<div className="flex justify-between items-center py-2">
 					{/* Logo */}
 					<Link
 						href="/"
-						className="flex items-center gap-2 text-xl font-bold tracking-tight text-gray-800 transition-all duration-300 hover:opacity-80"
+						className="flex items-center gap-2 text-primary font-bold text-xl tracking-tight"
 					>
 						<span className="bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">
 							ReWear
@@ -88,7 +92,9 @@ export default function Navbar() {
 								<button
 									onClick={() => router.push("/profile")}
 									className={`relative w-8 h-8 rounded-full border border-gray-300 shadow-sm flex items-center justify-center transition-all duration-200 hover:scale-105 hover:border-gray-400 ${
-										pathname === "/profile" ? "ring-2 ring-gray-400 ring-opacity-50" : ""
+										pathname === "/profile"
+											? "ring-2 ring-gray-400 ring-opacity-50"
+											: ""
 									}`}
 									title="Profile"
 								>
@@ -124,10 +130,7 @@ export default function Navbar() {
 										<span className="text-xs text-gray-500">{user.email}</span>
 									)}
 								</div>
-								<button
-									onClick={handleLogout}
-									className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 rounded-lg shadow-sm transition-all duration-200 hover:bg-gray-200 hover:scale-105"
-								>
+								<button onClick={handleLogout} className="btn">
 									Logout
 								</button>
 							</div>
@@ -258,7 +261,9 @@ export default function Navbar() {
 													setMobileMenuOpen(false);
 												}}
 												className={`relative w-8 h-8 rounded-full border border-gray-300 shadow-sm flex items-center justify-center transition-all duration-200 hover:scale-105 hover:border-gray-400 ${
-													pathname === "/profile" ? "ring-2 ring-gray-400 ring-opacity-50" : ""
+													pathname === "/profile"
+														? "ring-2 ring-gray-400 ring-opacity-50"
+														: ""
 												}`}
 												title="Profile"
 											>
@@ -297,7 +302,7 @@ export default function Navbar() {
 												)}
 											</div>
 										</div>
-										
+
 										{/* Logout Button */}
 										<button
 											onClick={() => {
