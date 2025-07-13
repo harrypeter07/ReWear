@@ -1,5 +1,7 @@
 # ReWear – Community Clothing Exchange
 
+A sustainable fashion platform for swapping and redeeming clothes in your community.
+
 ![Project Status](https://img.shields.io/badge/status-active-brightgreen)
 
 ## Tech Stack
