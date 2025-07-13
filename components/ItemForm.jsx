@@ -45,7 +45,7 @@ export default function ItemForm({ onSubmit }) {
 
 	return (
 		<form
-			className="flex flex-col gap-2"
+			className="card p-8"
 			onSubmit={handleSubmit}
 			encType="multipart/form-data"
 		>
@@ -111,11 +111,7 @@ export default function ItemForm({ onSubmit }) {
 					<span className="text-xs text-gray-500">Image selected</span>
 				</div>
 			)}
-			<button
-				type="submit"
-				className="bg-blue-600 text-white p-2 rounded"
-				disabled={submitting}
-			>
+			<button type="submit" className="btn w-full" disabled={submitting}>
 				Submit
 			</button>
 		</form>

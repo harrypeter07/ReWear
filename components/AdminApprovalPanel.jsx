@@ -47,8 +47,10 @@ export default function AdminApprovalPanel() {
 	if (error) return <div className="text-red-600">{error}</div>;
 
 	return (
-		<div className="p-4 bg-white rounded shadow">
-			<h2 className="text-xl font-bold mb-4">Pending Items for Approval</h2>
+		<div className="card p-6 mb-6">
+			<h2 className="text-xl font-bold text-primary mb-4">
+				Pending Items for Approval
+			</h2>
 			{pendingItems.length === 0 ? (
 				<div>No pending items.</div>
 			) : (
@@ -60,14 +62,11 @@ export default function AdminApprovalPanel() {
 						>
 							<div>
 								<div className="font-semibold">{item.title}</div>
-								<div className="text-gray-600">{item.category}</div>
-								<div className="text-gray-600">{item.description}</div>
+								<div className="text-secondary text-sm">{item.category}</div>
+								<div className="text-secondary text-sm">{item.description}</div>
 							</div>
 							<div className="mt-2 md:mt-0 flex gap-2">
-								<button
-									className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
-									onClick={() => handleApprove(item._id)}
-								>
+								<button className="btn" onClick={() => handleApprove(item._id)}>
 									Approve
 								</button>
 								<button
