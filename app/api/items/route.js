@@ -3,13 +3,32 @@ import { getCollections } from "@/lib/db";
 import { ObjectId } from "mongodb";
 
 export async function GET() {
-	console.log("[API] GET /api/items called");
-	const { items } = await getCollections();
-	const allItems = await items.find({}).toArray();
-	console.log(`[API] /api/items found ${allItems.length} items`);
-	if (allItems.length > 0) {
-		console.log("[API] Example item:", allItems[0]);
-	}
+	const { items, users } = await getCollections();
+	// Use aggregation to join owner info, fallback to uploaderId if owner is missing
+	const allItems = await items
+		.aggregate([
+			{
+				$addFields: {
+					lookupUserId: { $ifNull: ["$owner", "$uploaderId"] },
+				},
+			},
+			{
+				$lookup: {
+					from: "users",
+					localField: "lookupUserId",
+					foreignField: "_id",
+					as: "ownerInfo",
+				},
+			},
+			{
+				$addFields: {
+					ownerUsername: { $arrayElemAt: ["$ownerInfo.username", 0] },
+					ownerName: { $arrayElemAt: ["$ownerInfo.name", 0] },
+				},
+			},
+			{ $project: { ownerInfo: 0, lookupUserId: 0 } },
+		])
+		.toArray();
 	return Response.json(allItems);
 }
 

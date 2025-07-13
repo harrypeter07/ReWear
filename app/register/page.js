@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { UserContext } from "../../contexts/UserContext";
 
 export default function RegisterPage() {
 	const [formData, setFormData] = useState({
@@ -14,6 +15,7 @@ export default function RegisterPage() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [agreeTerms, setAgreeTerms] = useState(false);
 	const router = useRouter();
+	const { setUser } = useContext(UserContext);
 
 	const handleChange = (e) => {
 		const { name, value } = e.target;
@@ -33,7 +35,6 @@ export default function RegisterPage() {
 		setError("");
 
 		try {
-			// Registration API call
 			const response = await fetch("/api/auth/register", {
 				method: "POST",
 				headers: {
@@ -43,24 +44,9 @@ export default function RegisterPage() {
 			});
 
 			if (response.ok) {
-				// Auto-login after registration
-				const loginRes = await fetch("/api/auth/login", {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({
-						email: formData.email,
-						password: formData.password,
-					}),
-				});
-				if (loginRes.ok) {
-					router.push("/dashboard");
-				} else {
-					const loginData = await loginRes.json();
-					setError(
-						loginData.message ||
-							"Registration succeeded but login failed. Please log in manually."
-					);
-				}
+				const data = await response.json();
+				setUser(data.user);
+				router.push("/dashboard");
 			} else {
 				const data = await response.json();
 				setError(data.message || "Registration failed");
@@ -73,7 +59,7 @@ export default function RegisterPage() {
 	};
 
 	return (
-		<div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+		<div className="min-h-screen gradient-bg flex items-center justify-center p-4">
 			<div className="w-full max-w-md bg-white rounded-lg shadow-md p-8">
 				<div className="text-center mb-8">
 					<h1 className="text-3xl font-bold text-gray-800">

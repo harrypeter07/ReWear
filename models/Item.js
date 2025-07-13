@@ -4,7 +4,7 @@ const ItemSchema = new mongoose.Schema({
 	title: { type: String, required: true },
 	description: { type: String, required: true },
 	category: { type: String, required: true },
-	image: { type: String }, // base64 string
+	image: { type: String, required: true }, // URL string, required
 	owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
 	pointsValue: { type: Number, required: true },
 	status: {

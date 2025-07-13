@@ -50,7 +50,6 @@ export default function Home() {
 			if (res.ok) {
 				const data = await res.json();
 				console.log("User is authenticated:", data.user);
-				// You can choose where to send logged-in users
 				router.push("/items");
 			} else {
 				console.log("User not authenticated, redirecting to /register");
@@ -63,27 +62,37 @@ export default function Home() {
 	};
 
 	return (
-		<div className="min-h-screen bg-white">
+		<div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
 			{/* Hero Section */}
-			<section className="relative bg-gradient-to-r from-green-50 to-blue-50 py-20">
-				<div className="container mx-auto px-4 text-center">
-					<h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+			<section className="container">
+				<div className="card text-center py-16">
+					<h1 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
 						Sustainable Fashion Through Swapping
 					</h1>
-					<p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-						Refresh your wardrobe sustainably by swapping clothes with our
-						community
+					<p className="text-xl mb-8 max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
+						Refresh your wardrobe sustainably by swapping clothes with our community
 					</p>
-					<div className="flex justify-center gap-4">
+					<div className="flex justify-center gap-4 flex-wrap">
 						<button
 							onClick={handleStartSwapping}
-							className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition"
+							className="btn"
+							style={{ 
+								background: 'linear-gradient(135deg, #e8f5e8, #d4edda)',
+								color: 'var(--text-primary)',
+								fontWeight: '600'
+							}}
 						>
 							Start Swapping
 						</button>
 						<Link
 							href="/items"
-							className="bg-white hover:bg-gray-100 text-gray-800 font-bold py-3 px-6 border border-gray-300 rounded-lg transition"
+							className="btn"
+							style={{ 
+								background: 'var(--bg-secondary)',
+								color: 'var(--text-primary)',
+								textDecoration: 'none',
+								display: 'inline-block'
+							}}
 						>
 							Browse Items
 						</Link>
@@ -92,40 +101,46 @@ export default function Home() {
 			</section>
 
 			{/* Featured Items Carousel */}
-			<section className="py-16 bg-white">
-				<div className="container mx-auto px-4">
-					<h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
+			<section className="container">
+				<div className="card">
+					<h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--text-primary)' }}>
 						Featured Items
 					</h2>
 					<div className="relative">
-						<div className="flex overflow-hidden">
+						<div className="overflow-hidden" style={{ borderRadius: 'var(--radius)' }}>
 							{featuredItems.map((item, index) => (
 								<div
 									key={item.id}
-									className={`min-w-full transition-transform duration-300 ${
+									className={`transition-all duration-300 ${
 										index === currentSlide ? "block" : "hidden"
 									}`}
 								>
-									<div className="bg-gray-50 rounded-xl p-6 flex flex-col md:flex-row items-center gap-8">
-										<div className="w-full md:w-1/2">
+									<div className="bento-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+										<div className="flex items-center justify-center p-4">
 											<Image
 												src={item.image}
 												alt={item.title}
 												width={600}
 												height={400}
-												className="w-full h-64 object-cover rounded-lg shadow-md"
+												className="w-full h-64 object-cover"
+												style={{ borderRadius: 'var(--radius)' }}
 											/>
 										</div>
-										<div className="w-full md:w-1/2 text-center md:text-left">
-											<span className="text-green-600 font-medium">
+										<div className="flex flex-col justify-center p-4 text-center md:text-left">
+											<span className="font-medium mb-2" style={{ color: '#6b8e6b' }}>
 												{item.category}
 											</span>
-											<h3 className="text-2xl font-bold text-gray-800 mt-2">
+											<h3 className="text-2xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
 												{item.title}
 											</h3>
 											<Link
 												href={`/items/${item.id}`}
-												className="inline-block mt-4 text-green-600 hover:text-green-700 font-medium"
+												className="inline-block font-medium hover:underline"
+												style={{ 
+													color: 'var(--text-secondary)',
+													textDecoration: 'none',
+													transition: 'var(--transition)'
+												}}
 											>
 												View Details →
 											</Link>
@@ -139,9 +154,10 @@ export default function Home() {
 								<button
 									key={index}
 									onClick={() => setCurrentSlide(index)}
-									className={`w-3 h-3 rounded-full ${
-										index === currentSlide ? "bg-green-600" : "bg-gray-300"
-									}`}
+									className={`w-3 h-3 rounded-full transition-colors duration-200`}
+									style={{
+										background: index === currentSlide ? '#a97b5f' : 'var(--border-color)'
+									}}
 									aria-label={`Go to slide ${index + 1}`}
 								/>
 							))}
@@ -151,50 +167,81 @@ export default function Home() {
 			</section>
 
 			{/* Impact Metrics */}
-			<section className="py-16 bg-gray-50">
-				<div className="container mx-auto px-4">
-					<h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
+			<section className="container">
+				<div className="card">
+					<h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--text-primary)' }}>
 						Our Community Impact
 					</h2>
-					<div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-						<div className="p-6 bg-white rounded-xl shadow-sm">
-							<div className="text-4xl font-bold text-green-600">1,200+</div>
-							<div className="text-gray-600 mt-2">Items Swapped</div>
+					<div className="bento-grid">
+						<div className="card text-center" style={{ background: 'var(--bg-secondary)' }}>
+							<div className="text-4xl font-bold mb-2" style={{ color: '#6b8e6b' }}>1,200+</div>
+							<div style={{ color: 'var(--text-secondary)' }}>Items Swapped</div>
 						</div>
-						<div className="p-6 bg-white rounded-xl shadow-sm">
-							<div className="text-4xl font-bold text-green-600">500+</div>
-							<div className="text-gray-600 mt-2">Active Members</div>
+						<div className="card text-center" style={{ background: 'var(--bg-secondary)' }}>
+							<div className="text-4xl font-bold mb-2" style={{ color: '#6b8e6b' }}>500+</div>
+							<div style={{ color: 'var(--text-secondary)' }}>Active Members</div>
 						</div>
-						<div className="p-6 bg-white rounded-xl shadow-sm">
-							<div className="text-4xl font-bold text-green-600">2.5K+</div>
-							<div className="text-gray-600 mt-2">Textile Waste Saved (kg)</div>
+						<div className="card text-center" style={{ background: 'var(--bg-secondary)' }}>
+							<div className="text-4xl font-bold mb-2" style={{ color: '#6b8e6b' }}>2.5K+</div>
+							<div style={{ color: 'var(--text-secondary)' }}>Textile Waste Saved (kg)</div>
 						</div>
-						<div className="p-6 bg-white rounded-xl shadow-sm">
-							<div className="text-4xl font-bold text-green-600">$50K+</div>
-							<div className="text-gray-600 mt-2">Value Exchanged</div>
+						<div className="card text-center" style={{ background: 'var(--bg-secondary)' }}>
+							<div className="text-4xl font-bold mb-2" style={{ color: '#6b8e6b' }}>$50K+</div>
+							<div style={{ color: 'var(--text-secondary)' }}>Value Exchanged</div>
 						</div>
 					</div>
 				</div>
 			</section>
 
 			{/* Testimonials */}
-			<section className="py-16 bg-white">
-				<div className="container mx-auto px-4">
-					<h2 className="text-3xl font-bold text-center text-gray-800 mb-12">
+			<section className="container">
+				<div className="card">
+					<h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--text-primary)' }}>
 						What Our Community Says
 					</h2>
-					<div className="grid md:grid-cols-2 gap-8">
+					<div className="bento-grid">
 						{testimonials.map((testimonial, index) => (
-							<div key={index} className="bg-gray-50 p-8 rounded-xl">
-								<blockquote className="text-lg italic text-gray-700 mb-4">
+							<div 
+								key={index} 
+								className="card" 
+								style={{ 
+									background: 'var(--bg-secondary)',
+									padding: '2rem'
+								}}
+							>
+								<blockquote className="text-lg italic mb-4" style={{ color: 'var(--text-secondary)' }}>
 									&quot;{testimonial.quote}&quot;
 								</blockquote>
-								<div className="text-gray-600 font-medium">
+								<div className="font-medium" style={{ color: 'var(--text-primary)' }}>
 									— {testimonial.author}
 								</div>
 							</div>
 						))}
 					</div>
+				</div>
+			</section>
+
+			{/* Call to Action */}
+			<section className="container pb-8">
+				<div className="card text-center" style={{ background: 'var(--accent)' }}>
+					<h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
+						Ready to Start Your Sustainable Journey?
+					</h2>
+					<p className="mb-6" style={{ color: 'var(--text-secondary)' }}>
+						Join thousands of fashion-conscious individuals making a positive impact
+					</p>
+					<button
+						onClick={handleStartSwapping}
+						className="btn"
+						style={{ 
+							background: 'var(--bg-secondary)',
+							color: 'var(--text-primary)',
+							fontWeight: '600',
+							padding: '1rem 2rem'
+						}}
+					>
+						Get Started Today
+					</button>
 				</div>
 			</section>
 		</div>

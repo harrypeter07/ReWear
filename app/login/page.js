@@ -1,7 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { UserContext } from "../../contexts/UserContext";
 
 export default function LoginPage() {
 	const [email, setEmail] = useState("");
@@ -9,6 +10,7 @@ export default function LoginPage() {
 	const [error, setError] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const router = useRouter();
+	const { setUser } = useContext(UserContext);
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
@@ -16,7 +18,6 @@ export default function LoginPage() {
 		setError("");
 
 		try {
-			// Replace with your actual authentication API call
 			const response = await fetch("/api/auth/login", {
 				method: "POST",
 				headers: {
@@ -26,6 +27,8 @@ export default function LoginPage() {
 			});
 
 			if (response.ok) {
+				const data = await response.json();
+				setUser(data.user);
 				router.push("/dashboard");
 			} else {
 				const data = await response.json();
@@ -39,128 +42,209 @@ export default function LoginPage() {
 	};
 
 	return (
-		<div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center p-4">
-			<div className="w-full max-w-md bg-white rounded-lg shadow-md p-8">
-				<div className="text-center mb-8">
-					<h1 className="text-3xl font-bold text-[#333333]">
-						Welcome to ReWear
-					</h1>
-					<p className="mt-2 text-[#666666]">Sign in to your account</p>
-				</div>
-
-				{error && (
-					<div className="mb-4 p-3 bg-red-100 border-l-4 border-red-500 text-red-700 rounded">
-						<p>{error}</p>
+		<div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--bg-primary)' }}>
+			<div className="container max-w-md">
+				<div className="card">
+					{/* Header */}
+					<div className="text-center mb-8">
+						<h1 className="text-3xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+							Welcome to ReWear
+						</h1>
+						<p style={{ color: 'var(--text-secondary)' }}>
+							Sign in to your account
+						</p>
 					</div>
-				)}
 
-				<form onSubmit={handleSubmit} className="space-y-6">
-					<div>
-						<label
-							htmlFor="email"
-							className="block text-sm font-medium text-[#333333] mb-1"
+					{/* Error Message */}
+					{error && (
+						<div 
+							className="p-4 mb-6 rounded-lg border-l-4"
+							style={{ 
+								background: '#fef2f2',
+								borderColor: '#fca5a5',
+								color: '#dc2626'
+							}}
 						>
-							Email Address
-						</label>
-						<input
-							id="email"
-							type="email"
-							placeholder="you@example.com"
-							className="w-full px-4 py-2 border border-[#dddddd] rounded-lg focus:ring-2 focus:ring-[#4a90e2] focus:border-[#4a90e2] transition bg-white text-[#333333]"
-							value={email}
-							onChange={(e) => setEmail(e.target.value)}
-							required
-						/>
-					</div>
-
-					<div>
-						<div className="flex justify-between items-center mb-1">
-							<label
-								htmlFor="password"
-								className="block text-sm font-medium text-[#333333]"
-							>
-								Password
-							</label>
-							<Link
-								href="/forgot-password"
-								className="text-sm text-[#4a90e2] hover:text-[#357abd]"
-							>
-								Forgot password?
-							</Link>
+							<p className="text-sm font-medium">{error}</p>
 						</div>
-						<input
-							id="password"
-							type="password"
-							placeholder="••••••••"
-							className="w-full px-4 py-2 border border-[#dddddd] rounded-lg focus:ring-2 focus:ring-[#4a90e2] focus:border-[#4a90e2] transition bg-white text-[#333333]"
-							value={password}
-							onChange={(e) => setPassword(e.target.value)}
-							required
-						/>
-					</div>
+					)}
 
-					<div className="flex items-center">
-						<input
-							id="remember-me"
-							name="remember-me"
-							type="checkbox"
-							className="h-4 w-4 text-[#4a90e2] focus:ring-[#4a90e2] border-[#dddddd] rounded"
-						/>
-						<label
-							htmlFor="remember-me"
-							className="ml-2 block text-sm text-[#333333]"
+					{/* Login Form */}
+					<form onSubmit={handleSubmit} className="space-y-6">
+						<div>
+							<label 
+								htmlFor="email" 
+								className="block text-sm font-medium mb-2"
+								style={{ color: 'var(--text-primary)' }}
+							>
+								Email Address
+							</label>
+							<input
+								id="email"
+								type="email"
+								placeholder="you@example.com"
+								value={email}
+								onChange={(e) => setEmail(e.target.value)}
+								required
+								style={{
+									background: '#fffdf9',
+									border: '1px solid var(--border-color)',
+									borderRadius: 'var(--radius)',
+									padding: '0.75rem 1rem',
+									width: '100%',
+									transition: 'var(--transition)',
+									color: 'var(--text-primary)'
+								}}
+							/>
+						</div>
+
+						<div>
+							<div className="flex justify-between items-center mb-2">
+								<label 
+									htmlFor="password" 
+									className="block text-sm font-medium"
+									style={{ color: 'var(--text-primary)' }}
+								>
+									Password
+								</label>
+								<Link
+									href="/forgot-password"
+									className="text-sm font-medium hover:opacity-70"
+									style={{ 
+										color: 'var(--text-secondary)',
+										transition: 'var(--transition)'
+									}}
+								>
+									Forgot password?
+								</Link>
+							</div>
+							<input
+								id="password"
+								type="password"
+								placeholder="••••••••"
+								value={password}
+								onChange={(e) => setPassword(e.target.value)}
+								required
+								style={{
+									background: '#fffdf9',
+									border: '1px solid var(--border-color)',
+									borderRadius: 'var(--radius)',
+									padding: '0.75rem 1rem',
+									width: '100%',
+									transition: 'var(--transition)',
+									color: 'var(--text-primary)'
+								}}
+							/>
+						</div>
+
+						<div className="flex items-center">
+							<input
+								id="remember-me"
+								name="remember-me"
+								type="checkbox"
+								className="w-4 h-4 rounded"
+								style={{
+									accentColor: 'var(--accent)',
+									border: '1px solid var(--border-color)'
+								}}
+							/>
+							<label
+								htmlFor="remember-me"
+								className="ml-3 text-sm font-medium"
+								style={{ color: 'var(--text-secondary)' }}
+							>
+								Remember me
+							</label>
+						</div>
+
+						<button
+							type="submit"
+							disabled={isLoading}
+							className="btn w-full py-3 text-center font-medium"
+							style={{
+								background: isLoading ? '#f0e6da' : 'var(--accent)',
+								color: 'var(--text-primary)',
+								border: 'none',
+								borderRadius: 'var(--radius)',
+								boxShadow: 'var(--shadow)',
+								transition: 'var(--transition)',
+								cursor: isLoading ? 'not-allowed' : 'pointer',
+								opacity: isLoading ? 0.7 : 1
+							}}
 						>
-							Remember me
-						</label>
-					</div>
+							{isLoading ? "Signing in..." : "Sign in"}
+						</button>
+					</form>
 
-					<button
-						type="submit"
-						disabled={isLoading}
-						className={`w-full py-2 px-4 border border-transparent rounded-lg shadow-sm text-white font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#4a90e2] transition ${
-							isLoading ? "bg-[#7aa7e1]" : "bg-[#4a90e2] hover:bg-[#357abd]"
-						}`}
-					>
-						{isLoading ? "Signing in..." : "Sign in"}
-					</button>
-				</form>
-
-				<div className="mt-6">
-					<div className="relative">
+					{/* Divider */}
+					<div className="relative my-8">
 						<div className="absolute inset-0 flex items-center">
-							<div className="w-full border-t border-[#dddddd]"></div>
+							<div 
+								className="w-full border-t"
+								style={{ borderColor: 'var(--border-color)' }}
+							></div>
 						</div>
 						<div className="relative flex justify-center text-sm">
-							<span className="px-2 bg-white text-[#666666]">
+							<span 
+								className="px-4 text-sm"
+								style={{ 
+									background: 'var(--bg-primary)',
+									color: 'var(--text-secondary)'
+								}}
+							>
 								Or continue with
 							</span>
 						</div>
 					</div>
 
-					<div className="mt-6 grid grid-cols-2 gap-3">
+					{/* Social Login Buttons */}
+					<div className="bento-grid grid-cols-2 gap-4">
 						<button
 							type="button"
-							className="w-full inline-flex justify-center py-2 px-4 border border-[#dddddd] rounded-lg shadow-sm bg-white text-sm font-medium text-[#333333] hover:bg-[#f5f5f5]"
+							className="btn text-center py-3 font-medium"
+							style={{
+								background: 'var(--bg-secondary)',
+								color: 'var(--text-primary)',
+								border: '1px solid var(--border-color)',
+								borderRadius: 'var(--radius)',
+								boxShadow: 'var(--shadow)',
+								transition: 'var(--transition)'
+							}}
 						>
 							Google
 						</button>
 						<button
 							type="button"
-							className="w-full inline-flex justify-center py-2 px-4 border border-[#dddddd] rounded-lg shadow-sm bg-white text-sm font-medium text-[#333333] hover:bg-[#f5f5f5]"
+							className="btn text-center py-3 font-medium"
+							style={{
+								background: 'var(--bg-secondary)',
+								color: 'var(--text-primary)',
+								border: '1px solid var(--border-color)',
+								borderRadius: 'var(--radius)',
+								boxShadow: 'var(--shadow)',
+								transition: 'var(--transition)'
+							}}
 						>
 							Facebook
 						</button>
 					</div>
-				</div>
 
-				<div className="mt-6 text-center text-sm text-[#666666]">
-					Don&apos;t have an account?{" "}
-					<Link
-						href="/register"
-						className="font-medium text-[#4a90e2] hover:text-[#357abd]"
-					>
-						Sign up
-					</Link>
+					{/* Sign Up Link */}
+					<div className="mt-8 text-center">
+						<p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+							Don&apos;t have an account?{" "}
+							<Link
+								href="/register"
+								className="font-medium hover:opacity-70"
+								style={{ 
+									color: 'var(--text-primary)',
+									transition: 'var(--transition)'
+								}}
+							>
+								Sign up
+							</Link>
+						</p>
+					</div>
 				</div>
 			</div>
 		</div>

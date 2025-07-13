@@ -3,6 +3,8 @@ import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import SwapRequestForm from "@/components/SwapRequestForm";
 import { useState, useEffect } from "react";
+import Image from "next/image";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 async function fetchItem(id) {
 	const res = await fetch(`/api/items/${id}`);
@@ -10,54 +12,8 @@ async function fetchItem(id) {
 	return await res.json();
 }
 
-const fallbackImages = [
-	"https://i.pinimg.com/60x60/7d/3f/2f/7d3f2f6cf9664994ee3ae56a268f26b9.jpg",
-	"https://i.pinimg.com/60x60/04/5a/cb/045acbc218006ec6857a31ebf48330e9.jpg",
-	"https://i.pinimg.com/60x60/81/35/c5/8135c5f8ef39526076ac30432ad403b3.jpg",
-	"https://i.pinimg.com/60x60/94/8f/7a/948f7a63203b896e38bbc94584595185.jpg",
-	"https://i.pinimg.com/60x60/30/c2/f8/30c2f8ba91a415a87894fd3a2b98cc16.jpg",
-	"https://i.pinimg.com/60x60/57/de/cf/57decfab8feb4ae820f423ca854a9c40.jpg",
-	"https://i.pinimg.com/60x60/50/db/cd/50dbcd4265648f000435fe6916fc1f64.jpg",
-	"https://i.pinimg.com/60x60/3c/46/58/3c4658c9e526fa01ca2502a1bd0666b7.jpg",
-	"https://i.pinimg.com/60x60/db/08/95/db0895011eaf57e30c961061bc8daa0f.jpg",
-	"https://i.pinimg.com/60x60/c2/4b/18/c24b18486862ad0cb712d490c5023f5f.jpg",
-	"https://i.pinimg.com/60x60/6f/18/e9/6f18e98732bf594c91db9b30aa312a11.jpg",
-	"https://i.pinimg.com/60x60/97/25/35/972535fe749562e2ab645d49e53059f8.jpg",
-	"https://i.pinimg.com/60x60/10/0e/83/100e83a7bc1e277b59beb35f25e95699.jpg",
-	"https://i.pinimg.com/60x60/93/7f/d4/937fd46b9c08e050fdd9160b4a13d28e.jpg",
-	"https://i.pinimg.com/60x60/a3/b0/d2/a3b0d29974f7e00a708c8a7fd1873bbb.jpg",
-	"https://i.pinimg.com/60x60/69/68/0a/69680a0274ad6cebbf12eedbda2a8ebe.jpg",
-	"https://i.pinimg.com/60x60/82/8d/73/828d7394556a00842aa19f6549e2a1fb.jpg",
-	"https://i.pinimg.com/60x60/82/7e/e2/827ee297a3142a24a4dccc41fe3f9fdf.jpg",
-	"https://i.pinimg.com/60x60/80/74/6d/80746db97891afd60f89eb36a3166983.jpg",
-	"https://i.pinimg.com/60x60/9a/fc/d4/9afcd46fb75bccab9163037e44532730.jpg",
-	"https://i.pinimg.com/60x60/a0/b3/78/a0b37803268877f0f243a1c3f1a2bf15.jpg",
-	"https://i.pinimg.com/60x60/34/80/9b/34809b86b998da77775908481281954c.jpg",
-	"https://i.pinimg.com/60x60/d8/37/0c/d8370c2816e2e10a9033f9b0e62240b7.jpg",
-	"https://i.pinimg.com/60x60/91/fd/55/91fd5569abd956ea3968a07466b2f104.jpg",
-	"https://i.pinimg.com/60x60/49/26/32/49263296e5fa1f402d4245deeeeb906e.jpg",
-	"https://i.pinimg.com/236x/18/49/8e/18498eddf60795d2a6c2778a95d2bed0.jpg",
-	"https://i.pinimg.com/236x/93/6f/6c/936f6ca1b2801cccab21d8b9006f038c.jpg",
-	"https://i.pinimg.com/236x/f5/d4/5e/f5d45ec9136f063e610d85e80c1a169d.jpg",
-	"https://i.pinimg.com/236x/e7/61/7f/e7617fbcf801f05e72d89999714df9e1.jpg",
-	"https://i.pinimg.com/236x/0a/24/83/0a24832a85b4aa488b9769baf266574a.jpg",
-	"https://i.pinimg.com/236x/e7/62/5f/e7625fe383da46abc54bd86077542168.jpg",
-	"https://i.pinimg.com/236x/cd/d8/69/cdd869465a80b59c7a6a7aa6758b5c84.jpg",
-	"https://i.pinimg.com/236x/31/ba/eb/31baeb526daba562bde059111588110e.jpg",
-	"https://i.pinimg.com/236x/8f/e4/9a/8fe49a5d5b26747bd6e75977a01c03ea.jpg",
-	"https://i.pinimg.com/236x/0f/71/d5/0f71d551ec5e1ab3d06d392e9f2f5780.jpg",
-	"https://i.pinimg.com/236x/09/8a/d1/098ad187c66201bedd7cead487b0122f.jpg",
-	"https://i.pinimg.com/236x/27/77/fc/2777fc7199949375e3d99463c2019434.jpg",
-];
-function getRandomFallbackImage() {
-	return fallbackImages[Math.floor(Math.random() * fallbackImages.length)];
-}
-function getImageSrc(image) {
-	const defaultImage = "/images/default.jpg";
-	if (!image || typeof image !== "string") return getRandomFallbackImage();
-	if (image.startsWith("/uploads/")) return image;
-	if (image.startsWith("http://") || image.startsWith("https://")) return image;
-	return getRandomFallbackImage();
+function isImageMissing(image) {
+	return !image || image === null || image === undefined || image === "";
 }
 
 export default function ItemDetailPage() {
@@ -67,123 +23,327 @@ export default function ItemDetailPage() {
 	const [showSwap, setShowSwap] = useState(false);
 	const [showRedeem, setShowRedeem] = useState(false);
 	const [previousListings, setPreviousListings] = useState([]);
+	const [loading, setLoading] = useState(true);
+	const [user, setUser] = useState(null);
 
 	useEffect(() => {
 		async function load() {
-			const data = await fetchItem(id);
-			console.log("[ITEM DETAIL] Loaded item:", data);
-			if (data && data.image) {
-				console.log("[ITEM DETAIL] item.image:", data.image);
-				console.log("[ITEM DETAIL] typeof item.image:", typeof data.image);
-			}
-			setItem(data);
-			if (data && data.uploaderId) {
-				const res = await fetch(`/api/items?uploaderId=${data.uploaderId}`);
-				if (res.ok) {
-					const apiData = await res.json();
-					if (Array.isArray(apiData.items)) {
-						setPreviousListings(apiData.items.filter((i) => i._id !== id));
+			try {
+				const data = await fetchItem(id);
+				setItem(data);
+				if (data && data.uploaderId) {
+					const res = await fetch(`/api/items?uploaderId=${data.uploaderId}`);
+					if (res.ok) {
+						const apiData = await res.json();
+						if (Array.isArray(apiData.items)) {
+							setPreviousListings(apiData.items.filter((i) => i._id !== id));
+						} else {
+							setPreviousListings([]);
+						}
 					} else {
-						console.log("[ITEM DETAIL] No items array in response", apiData);
 						setPreviousListings([]);
 					}
-				} else {
-					console.log("[ITEM DETAIL] Failed to fetch previous listings");
-					setPreviousListings([]);
 				}
+				// Fetch current user
+				const userRes = await fetch("/api/auth/me", { credentials: "include" });
+				if (userRes.ok) {
+					const userData = await userRes.json();
+					setUser(userData.user);
+				} else {
+					setUser(null);
+				}
+			} catch (error) {
+				setUser(null);
+			} finally {
+				setLoading(false);
 			}
 		}
-		if (id) load();
+		if (id) {
+			load();
+		}
 	}, [id]);
 
-	if (!item) {
-		return <div className="p-8 text-center">Item not found.</div>;
+	if (loading) {
+		return (
+			<div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
+				<div className="container">
+					<div className="flex items-center justify-center min-h-[60vh]">
+						<div className="loader"></div>
+					</div>
+				</div>
+			</div>
+		);
 	}
 
-	const imageSrc = getImageSrc(item.image);
+	if (!item) {
+		return (
+			<div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
+				<div className="container">
+					<div className="flex items-center justify-center min-h-[60vh]">
+						<div className="card text-center max-w-md">
+							<div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full" style={{ background: 'var(--accent)' }}>
+								<svg className="w-8 h-8" style={{ color: 'var(--text-secondary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+								</svg>
+							</div>
+							<h2 className="text-xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+								Item Not Found
+							</h2>
+							<p className="mb-4" style={{ color: 'var(--text-secondary)' }}>
+								The item you e looking for doesn t exist or has been removed.
+							</p>
+							<Link href="/items" className="btn inline-flex items-center">
+								← Back to Items
+							</Link>
+						</div>
+					</div>
+				</div>
+			</div>
+		);
+	}
+
+	const getStatusColor = (status) => {
+		switch (status) {
+			case "available":
+				return { background: '#e8f5e8', color: '#2d5d2d' };
+			case "pending":
+				return { background: '#fff4e6', color: '#8b4513' };
+			case "swapped":
+				return { background: 'var(--accent)', color: 'var(--text-secondary)' };
+			default:
+				return { background: 'var(--accent)', color: 'var(--text-primary)' };
+		}
+	};
+
+	const getConditionColor = (condition) => {
+		switch (condition) {
+			case "new":
+				return { background: '#e8f8e8', color: '#1a5a1a' };
+			case "like new":
+				return { background: '#f0f8f0', color: '#2d5d2d' };
+			case "good":
+				return { background: '#f0f4f8', color: '#2d4a5d' };
+			case "fair":
+				return { background: '#fff8e6', color: '#8b6914' };
+			case "poor":
+				return { background: '#ffeaea', color: '#8b2d2d' };
+			default:
+				return { background: 'var(--accent)', color: 'var(--text-secondary)' };
+		}
+	};
 
 	return (
-		<div className="container mx-auto px-4 py-8">
-			<div className="bg-white rounded shadow p-6 flex flex-col md:flex-row gap-8">
-				{/* Image Section */}
-				<div className="flex-1 flex flex-col items-center">
-					<img
-						src={imageSrc}
-						alt={item.title}
-						className="w-full max-w-xs h-72 object-cover rounded border shadow-md hover:shadow-xl transition mb-4 bg-gray-50"
-						onError={(e) => {
-							e.target.onerror = null;
-							e.target.src = getRandomFallbackImage();
-						}}
-					/>
-					{imageSrc === "/images/default.jpg" && (
-						<div className="text-xs text-gray-500 mt-1">No image available</div>
-					)}
-				</div>
-				{/* Description Section */}
-				<div className="flex-1 flex flex-col justify-between">
-					<div>
-						<h1 className="text-2xl font-bold mb-2">{item.title}</h1>
-						<div className="mb-2 text-gray-700 whitespace-pre-line">
-							{item.description}
-						</div>
-						<div className="text-gray-700 mb-1">Category: {item.category}</div>
-						<div className="text-gray-700 mb-1">Size: {item.size}</div>
-						<div className="text-gray-700 mb-1">
-							Condition: {item.condition}
-						</div>
-						<div className="text-gray-700 mb-1">
-							Points Value: {item.pointsValue}
-						</div>
-						<div className="text-gray-700 mb-1">Status: {item.status}</div>
-						<div className="text-gray-700 mb-1">
-							Approved: {item.isApproved ? "Yes" : "No"}
-						</div>
-					</div>
-					<div className="mt-4 flex gap-4">
-						<button
-							className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
-							onClick={() => setShowRedeem((v) => !v)}
-						>
-							Available/Swap
-						</button>
-					</div>
-					{showRedeem && <SwapRequestForm itemId={item._id} type="redeem" />}
-				</div>
-			</div>
-			{/* Previous Listings Section */}
-			<div className="mt-10">
-				<h2 className="text-lg font-semibold mb-2">Previous Listings:</h2>
-				<div className="flex gap-4 flex-wrap">
-					{previousListings.length === 0 && (
-						<div className="text-gray-500">No previous listings.</div>
-					)}
-					{previousListings.slice(0, 4).map((prev) => (
-						<Link
-							key={prev._id}
-							href={`/items/${prev._id}`}
-							className="block w-32 h-40 bg-gray-100 rounded shadow hover:shadow-lg transition overflow-hidden"
-						>
-							<img
-								src={getImageSrc(prev.image)}
-								alt={prev.title}
-								className="w-full h-24 object-cover mb-2"
-								onError={(e) => {
-									e.target.onerror = null;
-									e.target.src = "/images/default.jpg";
-								}}
-							/>
-							<div className="px-2 text-sm font-medium truncate">
-								{prev.title}
+		<div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
+			<div className="container">
+				{/* Main Item Card */}
+				<div className="card mb-8">
+					<div className="bento-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
+						{/* Image Section */}
+						<div className="flex items-center justify-center p-4">
+							<div className="relative w-full max-w-md aspect-square">
+								{isImageMissing(item.image) ? (
+									<div className="w-full h-full flex items-center justify-center border-2 border-dashed rounded-lg" style={{ 
+										borderColor: 'var(--border-color)',
+										background: 'var(--bg-secondary)'
+									}}>
+										<div className="text-center">
+											<svg className="w-16 h-16 mx-auto mb-4" style={{ color: 'var(--text-secondary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+											</svg>
+											<p style={{ color: 'var(--text-secondary)' }}>No image available</p>
+										</div>
+									</div>
+								) : (
+									<Image
+										src={item.image}
+										alt={`${item.title} image`}
+										fill
+										className="object-cover"
+										style={{ borderRadius: 'var(--radius)' }}
+										onError={(e) => {
+											e.target.onerror = null;
+											e.target.src = "";
+										}}
+										unoptimized={item.image.startsWith("data:")}
+									/>
+								)}
 							</div>
-						</Link>
-					))}
+						</div>
+
+						{/* Details Section */}
+						<div className="space-y-6">
+							<div>
+								<h1 className="text-3xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
+									{item.title}
+								</h1>
+								<div className="flex flex-wrap gap-2 mb-4">
+									<span className="px-3 py-1 rounded-full text-sm font-medium" style={getStatusColor(item.status)}>
+										{item.status}
+									</span>
+									<span className="px-3 py-1 rounded-full text-sm font-medium" style={getConditionColor(item.condition)}>
+										{item.condition}
+									</span>
+									{item.isApproved && (
+										<span className="px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1" style={{ background: '#e8f4f8', color: '#2d4a5d' }}>
+											<svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+												<path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+											</svg>
+											Approved
+										</span>
+									)}
+								</div>
+							</div>
+
+							<div>
+								<p className="leading-relaxed whitespace-pre-line" style={{ color: 'var(--text-secondary)' }}>
+									{item.description}
+								</p>
+							</div>
+
+							<div className="bento-grid">
+								<div className="card" style={{ background: 'var(--bg-secondary)', padding: '1rem' }}>
+									<h3 className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Details</h3>
+									<div className="space-y-2 text-sm">
+										<div className="flex justify-between">
+											<span style={{ color: 'var(--text-secondary)' }}>Category:</span>
+											<span className="font-medium" style={{ color: 'var(--text-primary)' }}>{item.category}</span>
+										</div>
+										<div className="flex justify-between">
+											<span style={{ color: 'var(--text-secondary)' }}>Size:</span>
+											<span className="font-medium" style={{ color: 'var(--text-primary)' }}>{item.size}</span>
+										</div>
+									</div>
+								</div>
+								<div className="card" style={{ background: 'var(--accent)', padding: '1rem' }}>
+									<h3 className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>Value</h3>
+									<div className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+										{item.pointsValue} <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>points</span>
+									</div>
+								</div>
+							</div>
+
+							{/* Action Buttons */}
+							{user && item && String(item.owner) !== String(user._id) && String(item.uploaderId) !== String(user._id) && (
+								<div className="space-y-4">
+									<div className="flex gap-3">
+										<button
+											className="btn flex-1 flex items-center justify-center gap-2"
+											onClick={() => setShowSwap((v) => !v)}
+											style={{ background: showSwap ? '#d5c3b8' : 'var(--accent)' }}
+										>
+											<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+											</svg>
+											{showSwap ? "Hide Swap Form" : "Request Swap"}
+										</button>
+										<button
+											className="btn flex-1 flex items-center justify-center gap-2"
+											onClick={() => setShowRedeem((v) => !v)}
+											style={{ background: showRedeem ? '#d5c3b8' : 'var(--accent)' }}
+										>
+											<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v8m4-4H8" />
+											</svg>
+											{showRedeem ? "Hide Redeem Form" : "Redeem with Points"}
+										</button>
+									</div>
+									{showSwap && (
+										<div className="card" style={{ background: 'var(--bg-secondary)' }}>
+											<SwapRequestForm itemId={item._id} type="swap" />
+										</div>
+									)}
+									{showRedeem && (
+										<div className="card" style={{ background: 'var(--bg-secondary)' }}>
+											<SwapRequestForm itemId={item._id} type="redeem" />
+										</div>
+									)}
+								</div>
+							)}
+						</div>
+					</div>
 				</div>
-			</div>
-			<div className="mt-6">
-				<Link href="/items" className="text-blue-600 hover:underline">
-					Back to Items
-				</Link>
+
+				{/* Previous Listings Section */}
+				<div className="card">
+					<h2 className="text-2xl font-bold mb-6 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+						<svg className="w-6 h-6" style={{ color: 'var(--text-secondary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+						</svg>
+						More from this seller
+					</h2>
+
+					{previousListings.length === 0 ? (
+						<div className="text-center py-8">
+							<svg className="w-16 h-16 mx-auto mb-4" style={{ color: 'var(--text-secondary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-2.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 009.586 13H7" />
+							</svg>
+							<p className="font-medium" style={{ color: 'var(--text-secondary)' }}>
+								No other listings from this seller
+							</p>
+						</div>
+					) : (
+						<div className="bento-grid">
+							{previousListings.slice(0, 4).map((prev) => (
+								<Link
+									key={prev._id}
+									href={`/items/${prev._id}`}
+									className="card block group"
+									style={{ 
+										padding: '0',
+										transition: 'var(--transition)',
+										textDecoration: 'none'
+									}}
+								>
+									<div className="aspect-square relative overflow-hidden" style={{ borderRadius: 'var(--radius) var(--radius) 0 0' }}>
+										{isImageMissing(prev.image) ? (
+											<div className="w-full h-full flex items-center justify-center" style={{ background: 'var(--bg-secondary)' }}>
+												<div className="text-center">
+													<svg className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--text-secondary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+														<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+													</svg>
+													<p className="text-xs" style={{ color: 'var(--text-secondary)' }}>No image</p>
+												</div>
+											</div>
+										) : (
+											<Image
+												src={prev.image}
+												alt={`${prev.title} image`}
+												fill
+												className="object-cover group-hover:scale-105 transition-transform duration-300"
+												onError={(e) => {
+													e.target.onerror = null;
+													e.target.src = "";
+												}}
+												unoptimized={prev.image.startsWith("data:")}
+											/>
+										)}
+									</div>
+									<div className="p-4">
+										<h3 className="font-semibold line-clamp-2" style={{ color: 'var(--text-primary)' }}>
+											{prev.title}
+										</h3>
+										<p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
+											{prev.pointsValue} points
+										</p>
+									</div>
+								</Link>
+							))}
+						</div>
+					)}
+				</div>
+
+				{/* Back Navigation */}
+				<div className="mt-8 flex justify-center">
+					<Link
+						href="/items"
+						className="btn inline-flex items-center"
+					>
+						<svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+						</svg>
+						Back to Items
+					</Link>
+				</div>
 			</div>
 		</div>
 	);

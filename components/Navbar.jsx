@@ -1,45 +1,14 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useContext } from "react";
+import { UserContext } from "../contexts/UserContext";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
 export default function Navbar() {
-	const [user, setUser] = useState(null);
-	const [dropdownOpen, setDropdownOpen] = useState(false);
+	const { user, setUser } = useContext(UserContext);
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-	const dropdownRef = useRef(null);
 	const pathname = usePathname();
 	const router = useRouter();
-
-	useEffect(() => {
-		async function fetchUser() {
-			try {
-				const res = await fetch("/api/auth/me", { credentials: "include" });
-				if (res.ok) {
-					const data = await res.json();
-					setUser(data.user);
-				} else {
-					setUser(null);
-				}
-			} catch {
-				setUser(null);
-			}
-		}
-		fetchUser();
-	}, []);
-
-	useEffect(() => {
-		function handleClickOutside(event) {
-			if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-				setDropdownOpen(false);
-			}
-		}
-		if (dropdownOpen) {
-			document.addEventListener("mousedown", handleClickOutside);
-			return () =>
-				document.removeEventListener("mousedown", handleClickOutside);
-		}
-	}, [dropdownOpen]);
 
 	const handleLogout = async () => {
 		await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
@@ -51,185 +20,310 @@ export default function Navbar() {
 		{ name: "Home", href: "/" },
 		{ name: "Browse", href: "/items" },
 		{ name: "Dashboard", href: "/dashboard" },
-		{ name: "Admin", href: "/admin" },
 	];
 
+	// Close mobile menu when clicking outside
+	useEffect(() => {
+		const handleClickOutside = (event) => {
+			if (mobileMenuOpen && !event.target.closest('.mobile-menu') && !event.target.closest('.mobile-menu-button')) {
+				setMobileMenuOpen(false);
+			}
+		};
+
+		document.addEventListener('click', handleClickOutside);
+		return () => document.removeEventListener('click', handleClickOutside);
+	}, [mobileMenuOpen]);
+
 	return (
-		<nav
-			className="flex items-center justify-between p-4 shadow sticky top-0 z-50 bg-[var(--surface)]/80 backdrop-blur border-b border-gray-200"
-			style={{ color: "var(--foreground)" }}
-		>
-			{/* Logo */}
-			<Link
-				href="/"
-				className="font-extrabold text-2xl tracking-tight hover:opacity-90 transition-opacity flex items-center gap-2"
-				style={{ color: "var(--foreground)", opacity: 0.95 }}
-			>
-				<span className="inline-block bg-gradient-to-r from-green-400 to-blue-500 bg-clip-text text-transparent">
-					ReWear
-				</span>
-			</Link>
+		<nav className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-gray-200 shadow-sm">
+			<div className="container mx-auto px-4 lg:px-8">
+				<div className="flex justify-between items-center py-2">
+					{/* Logo */}
+					<Link
+						href="/"
+						className="flex items-center gap-2 text-xl font-bold tracking-tight text-gray-800 transition-all duration-300 hover:opacity-80"
+					>
+						<span className="bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">
+							ReWear
+						</span>
+					</Link>
 
-			{/* Desktop Navigation */}
-			<ul className="hidden md:flex gap-8 items-center">
-				{navLinks.map((link) => (
-					<li key={link.name}>
-						<Link
-							href={link.href}
-							className={`px-2 py-1 rounded-lg hover:bg-gray-100/80 transition-all ${
-								pathname === link.href
-									? "font-semibold text-blue-600"
-									: "text-gray-700"
-							}`}
-						>
-							{link.name}
-						</Link>
-					</li>
-				))}
-				{user ? (
-					<li className="flex items-center gap-3 ml-6">
-						<img
-							src={user.avatar || "/images/default-avatar.png"}
-							alt={user.username || user.name || "User"}
-							className="w-9 h-9 rounded-full border-2 border-blue-400 shadow"
-						/>
-						<div className="flex flex-col">
-							<span className="font-medium text-sm">
-								{user.username || user.name || user.email}
-							</span>
-							{user.email && (user.username || user.name) && (
-								<span className="text-xs text-gray-400">{user.email}</span>
+					{/* Desktop Navigation */}
+					<div className="hidden md:flex items-center gap-8">
+						<ul className="flex items-center gap-6">
+							{navLinks.map((link) => (
+								<li key={link.name}>
+									<Link
+										href={link.href}
+										className={`px-3 py-1.5 rounded-lg transition-all duration-200 font-medium text-sm ${
+											pathname === link.href
+												? "bg-gray-100 text-gray-900 shadow-sm"
+												: "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+										}`}
+									>
+										{link.name}
+									</Link>
+								</li>
+							))}
+							{/* Admin link only for admin users */}
+							{user && user.role === "admin" && (
+								<li>
+									<Link
+										href="/admin"
+										className={`px-3 py-1.5 rounded-lg transition-all duration-200 font-medium text-sm ${
+											pathname === "/admin"
+												? "bg-gray-100 text-gray-900 shadow-sm"
+												: "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+										}`}
+									>
+										Admin
+									</Link>
+								</li>
 							)}
-						</div>
-						<button
-							onClick={handleLogout}
-							className="ml-4 px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700 transition text-sm shadow"
-						>
-							Logout
-						</button>
-					</li>
-				) : (
-					<li>
-						<Link
-							href="/login"
-							className={`px-3 py-1 rounded-lg hover:bg-blue-50 transition-all ${
-								pathname === "/login"
-									? "font-semibold text-blue-600"
-									: "text-gray-700"
-							}`}
-						>
-							Login
-						</Link>
-					</li>
-				)}
-			</ul>
+						</ul>
 
-			{/* Mobile Menu Button */}
-			<button
-				className="md:hidden p-2 rounded-full hover:bg-gray-100/80 transition"
-				aria-label="Toggle menu"
-				style={{ color: "var(--foreground)", opacity: 0.7 }}
-				onClick={() => setMobileMenuOpen((open) => !open)}
-			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					className="h-7 w-7"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke="currentColor"
-				>
-					<path
-						strokeLinecap="round"
-						strokeLinejoin="round"
-						strokeWidth={2}
-						d="M4 6h16M4 12h16M4 18h16"
-					/>
-				</svg>
-			</button>
-
-			{/* Mobile Navigation Drawer */}
-			{mobileMenuOpen && (
-				<div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex justify-end md:hidden">
-					<div className="w-2/3 max-w-xs bg-white/90 h-full shadow-xl p-6 flex flex-col gap-6 rounded-l-2xl border-l border-gray-200">
-						<button
-							className="self-end mb-4 p-2 rounded-full hover:bg-gray-100"
-							aria-label="Close menu"
-							onClick={() => setMobileMenuOpen(false)}
-						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								className="h-6 w-6"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
+						{/* User Section */}
+						{user ? (
+							<div className="flex items-center gap-3 ml-4 pl-4 border-l border-gray-200">
+								<button
+									onClick={() => router.push("/profile")}
+									className={`relative w-8 h-8 rounded-full border border-gray-300 shadow-sm flex items-center justify-center transition-all duration-200 hover:scale-105 hover:border-gray-400 ${
+										pathname === "/profile" ? "ring-2 ring-gray-400 ring-opacity-50" : ""
+									}`}
+									title="Profile"
+								>
+									{user.avatar ? (
+										<img
+											src={user.avatar}
+											alt={user.username || user.name || "User"}
+											className="w-8 h-8 rounded-full object-cover"
+										/>
+									) : (
+										<div className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full">
+											<svg
+												className="w-4 h-4 text-gray-500"
+												fill="none"
+												stroke="currentColor"
+												viewBox="0 0 24 24"
+											>
+												<path
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													strokeWidth={1.5}
+													d="M12 14c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+												/>
+											</svg>
+										</div>
+									)}
+								</button>
+								<div className="flex flex-col">
+									<span className="text-xs font-medium text-gray-800">
+										{user.username || user.name || user.email}
+									</span>
+									{user.email && (user.username || user.name) && (
+										<span className="text-xs text-gray-500">{user.email}</span>
+									)}
+								</div>
+								<button
+									onClick={handleLogout}
+									className="px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 rounded-lg shadow-sm transition-all duration-200 hover:bg-gray-200 hover:scale-105"
+								>
+									Logout
+								</button>
+							</div>
+						) : (
+							<Link
+								href="/login"
+								className={`px-3 py-1.5 rounded-lg transition-all duration-200 font-medium text-sm ${
+									pathname === "/login"
+										? "bg-gray-100 text-gray-900 shadow-sm"
+										: "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+								}`}
 							>
+								Login
+							</Link>
+						)}
+					</div>
+
+					{/* Mobile Menu Button */}
+					<button
+						className="mobile-menu-button p-2 text-gray-700 rounded-lg transition-all duration-200 md:hidden hover:bg-gray-100 hover:scale-105"
+						aria-label="Toggle menu"
+						onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							className="w-6 h-6"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke="currentColor"
+						>
+							{mobileMenuOpen ? (
 								<path
 									strokeLinecap="round"
 									strokeLinejoin="round"
 									strokeWidth={2}
 									d="M6 18L18 6M6 6l12 12"
 								/>
-							</svg>
-						</button>
-						<ul className="flex flex-col gap-4">
-							{navLinks.map((link) => (
-								<li key={link.name}>
-									<Link
-										href={link.href}
-										className={`block px-3 py-2 rounded-lg hover:bg-blue-50 transition-all ${
-											pathname === link.href
-												? "font-semibold text-blue-600"
-												: "text-gray-700"
-										}`}
-										onClick={() => setMobileMenuOpen(false)}
-									>
-										{link.name}
-									</Link>
-								</li>
-							))}
-							{user ? (
-								<li className="flex items-center gap-3 mt-6">
-									<img
-										src={user.avatar || "/images/default-avatar.png"}
-										alt={user.username || user.name || "User"}
-										className="w-9 h-9 rounded-full border-2 border-blue-400 shadow"
-									/>
-									<div className="flex flex-col">
-										<span className="font-medium text-sm">
-											{user.username || user.name || user.email}
-										</span>
-										{user.email && (user.username || user.name) && (
-											<span className="text-xs text-gray-400">
-												{user.email}
-											</span>
-										)}
-									</div>
-									<button
-										onClick={() => {
-											setMobileMenuOpen(false);
-											handleLogout();
-										}}
-										className="ml-2 px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700 transition text-sm shadow"
-									>
-										Logout
-									</button>
-								</li>
 							) : (
-								<li>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth={2}
+									d="M4 6h16M4 12h16M4 18h16"
+								/>
+							)}
+						</svg>
+					</button>
+				</div>
+			</div>
+
+			{/* Mobile Navigation Drawer */}
+			{mobileMenuOpen && (
+				<div className="mobile-menu fixed inset-0 z-50 md:hidden">
+					<div className="absolute inset-0 bg-black bg-opacity-20 backdrop-blur-sm" />
+					<div className="absolute right-0 top-0 h-full w-80 max-w-[85vw] bg-white border-l border-gray-200 shadow-2xl">
+						<div className="flex flex-col h-full">
+							{/* Header */}
+							<div className="flex items-center justify-between p-4 border-b border-gray-200">
+								<span className="text-lg font-bold bg-gradient-to-r from-gray-700 to-gray-900 bg-clip-text text-transparent">
+									ReWear
+								</span>
+								<button
+									className="p-2 rounded-full hover:bg-gray-100 transition-all duration-200"
+									onClick={() => setMobileMenuOpen(false)}
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										className="w-6 h-6"
+										fill="none"
+										viewBox="0 0 24 24"
+										stroke="currentColor"
+									>
+										<path
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth={2}
+											d="M6 18L18 6M6 6l12 12"
+										/>
+									</svg>
+								</button>
+							</div>
+
+							{/* Navigation Links */}
+							<div className="flex-1 overflow-y-auto p-4">
+								<ul className="space-y-2">
+									{navLinks.map((link) => (
+										<li key={link.name}>
+											<Link
+												href={link.href}
+												className={`block px-3 py-2 rounded-lg transition-all duration-200 font-medium text-sm ${
+													pathname === link.href
+														? "bg-gray-100 text-gray-900 shadow-sm"
+														: "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+												}`}
+												onClick={() => setMobileMenuOpen(false)}
+											>
+												{link.name}
+											</Link>
+										</li>
+									))}
+									{user && user.role === "admin" && (
+										<li>
+											<Link
+												href="/admin"
+												className={`block px-3 py-2 rounded-lg transition-all duration-200 font-medium text-sm ${
+													pathname === "/admin"
+														? "bg-gray-100 text-gray-900 shadow-sm"
+														: "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+												}`}
+												onClick={() => setMobileMenuOpen(false)}
+											>
+												Admin
+											</Link>
+										</li>
+									)}
+								</ul>
+							</div>
+
+							{/* User Section */}
+							<div className="p-4 border-t border-gray-200 bg-gray-50">
+								{user ? (
+									<div className="space-y-4">
+										{/* User Info */}
+										<div className="flex items-center gap-4">
+											<button
+												onClick={() => {
+													router.push("/profile");
+													setMobileMenuOpen(false);
+												}}
+												className={`relative w-8 h-8 rounded-full border border-gray-300 shadow-sm flex items-center justify-center transition-all duration-200 hover:scale-105 hover:border-gray-400 ${
+													pathname === "/profile" ? "ring-2 ring-gray-400 ring-opacity-50" : ""
+												}`}
+												title="Profile"
+											>
+												{user.avatar ? (
+													<img
+														src={user.avatar}
+														alt={user.username || user.name || "User"}
+														className="w-8 h-8 rounded-full object-cover"
+													/>
+												) : (
+													<div className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-full">
+														<svg
+															className="w-4 h-4 text-gray-500"
+															fill="none"
+															stroke="currentColor"
+															viewBox="0 0 24 24"
+														>
+															<path
+																strokeLinecap="round"
+																strokeLinejoin="round"
+																strokeWidth={1.5}
+																d="M12 14c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+															/>
+														</svg>
+													</div>
+												)}
+											</button>
+											<div className="flex flex-col">
+												<span className="text-xs font-medium text-gray-800">
+													{user.username || user.name || user.email}
+												</span>
+												{user.email && (user.username || user.name) && (
+													<span className="text-xs text-gray-500">
+														{user.email}
+													</span>
+												)}
+											</div>
+										</div>
+										
+										{/* Logout Button */}
+										<button
+											onClick={() => {
+												setMobileMenuOpen(false);
+												handleLogout();
+											}}
+											className="w-full px-3 py-2 text-xs font-medium text-gray-700 bg-gray-100 rounded-lg shadow-sm transition-all duration-200 hover:bg-gray-200 hover:scale-105"
+										>
+											Logout
+										</button>
+									</div>
+								) : (
 									<Link
 										href="/login"
-										className={`block px-3 py-2 rounded-lg hover:bg-blue-50 transition-all ${
+										className={`block w-full px-3 py-2 text-center rounded-lg transition-all duration-200 font-medium text-sm ${
 											pathname === "/login"
-												? "font-semibold text-blue-600"
-												: "text-gray-700"
+												? "bg-gray-100 text-gray-900 shadow-sm"
+												: "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
 										}`}
 										onClick={() => setMobileMenuOpen(false)}
 									>
 										Login
 									</Link>
-								</li>
-							)}
-						</ul>
+								)}
+							</div>
+						</div>
 					</div>
 				</div>
 			)}

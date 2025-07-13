@@ -1,16 +1,20 @@
+import { NextResponse } from "next/server";
 import { getUserFromRequest } from "../lib/auth";
 
 export default function withAuth(handler, requiredRole = null) {
-	return async (req, res) => {
+	return async (req, context) => {
 		const user = getUserFromRequest(req);
 		if (!user) {
-			return res.status(401).json({ message: "Unauthorized" });
+			return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 		}
 		if (requiredRole && user.role !== requiredRole) {
-			return res.status(403).json({ message: "Forbidden: Insufficient role" });
+			return NextResponse.json(
+				{ message: "Forbidden: Insufficient role" },
+				{ status: 403 }
+			);
 		}
-		// Attach user to request for downstream handlers
-		req.user = user;
-		return handler(req, res);
+		// Attach user to request for downstream handlers (if needed)
+		// req.user = user; // Not used in current handlers
+		return handler(req, context);
 	};
 }

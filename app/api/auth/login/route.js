@@ -27,8 +27,8 @@ export async function POST(req) {
 		if (!user) {
 			console.log("[LOGIN] User not found");
 			return NextResponse.json(
-				{ message: "Invalid credentials" },
-				{ status: 401 }
+				{ message: "User not registered" },
+				{ status: 404 }
 			);
 		}
 		const valid = await bcrypt.compare(password, user.password);
@@ -40,25 +40,33 @@ export async function POST(req) {
 				{ status: 401 }
 			);
 		}
-		const token = jwt.sign(
+		const accessToken = jwt.sign(
 			{ _id: user._id, role: user.role, email: user.email },
 			process.env.JWT_SECRET,
-			{ expiresIn: "8h" }
+			{ expiresIn: "15m" }
 		);
-		console.log(
-			"[LOGIN] JWT created:",
-			token ? "[TOKEN GENERATED]" : "[FAILED]"
+		const refreshToken = jwt.sign(
+			{ _id: user._id, role: user.role, email: user.email },
+			process.env.JWT_SECRET,
+			{ expiresIn: "7d" }
 		);
-		// Set JWT as HttpOnly cookie
+		console.log("[LOGIN] Tokens created");
 		const cookieStore = await cookies();
-		cookieStore.set("token", token, {
+		cookieStore.set("accessToken", accessToken, {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",
 			sameSite: "lax",
-			maxAge: 60 * 60 * 8,
+			maxAge: 60 * 15, // 15 minutes
 			path: "/",
 		});
-		console.log("[LOGIN] Cookie set");
+		cookieStore.set("refreshToken", refreshToken, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === "production",
+			sameSite: "lax",
+			maxAge: 60 * 60 * 24 * 7, // 7 days
+			path: "/",
+		});
+		console.log("[LOGIN] Cookies set");
 		return NextResponse.json(
 			{
 				user: {

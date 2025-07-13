@@ -102,3 +102,13 @@ harrypeter07-rewear/
   jainr_1@rknec.edu
 - **Harshal Pande**  
   pandeh@rknec.edu
+
+# Promote a User to Admin
+
+To make a user an admin, run the following in your MongoDB shell (replace the email with the user's email):
+
+```
+db.users.updateOne({ email: "user@example.com" }, { $set: { role: "admin" } })
+```
+
+After this, the user can log in as admin and access admin features.

@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import ItemCard from "@/components/ItemCard";
+import Image from "next/image";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 export default function DashboardPage() {
 	const [activeTab, setActiveTab] = useState("listings");
@@ -14,156 +16,222 @@ export default function DashboardPage() {
 	useEffect(() => {
 		async function fetchDashboard() {
 			setLoading(true);
-			// Fetch user info
-			const userRes = await fetch("/api/auth/me", { credentials: "include" });
-			if (userRes.ok) {
-				const userData = await userRes.json();
-				setUser(userData.user);
-				// Fetch user's items
-				const itemsRes = await fetch(
-					`/api/items?uploaderId=${userData.user._id}`
-				);
-				const items = itemsRes.ok ? await itemsRes.json() : [];
-				setUserListings(
-					Array.isArray(items)
-						? items.filter(
-								(i) =>
-									i.owner === userData.user._id ||
-									i.uploaderId === userData.user._id
-						  )
-						: []
-				);
-				// Fetch swap requests
-				const swapsRes = await fetch(`/api/swaps?userId=${userData.user._id}`);
-				let swaps = swapsRes.ok ? await swapsRes.json() : [];
-				if (swaps && swaps.swaps) swaps = swaps.swaps;
-				if (!Array.isArray(swaps)) swaps = [];
-				setSwapRequests(swaps);
-				// Purchases: items where user is swap/redeem recipient
-				setUserPurchases(
-					swaps.filter(
-						(s) => s.status === "accepted" && s.requester === userData.user._id
-					)
-				);
+			try {
+				const userRes = await fetch("/api/auth/me", { credentials: "include" });
+				if (userRes.ok) {
+					const userData = await userRes.json();
+					setUser(userData.user);
+					const itemsRes = await fetch(
+						`/api/items?uploaderId=${userData.user._id}`
+					);
+					const items = itemsRes.ok ? await itemsRes.json() : [];
+					setUserListings(
+						Array.isArray(items)
+							? items.filter((i) => {
+									const uploaderId =
+										typeof i.uploaderId === "object" &&
+										i.uploaderId !== null &&
+										i.uploaderId.toString
+											? i.uploaderId.toString()
+											: String(i.uploaderId);
+									return uploaderId === String(userData.user._id);
+							  })
+							: []
+					);
+					const swapsRes = await fetch(
+						`/api/swaps?userId=${userData.user._id}`
+					);
+					let swaps = swapsRes.ok ? await swapsRes.json() : [];
+					if (swaps && swaps.swaps) swaps = swaps.swaps;
+					if (!Array.isArray(swaps)) swaps = [];
+					setSwapRequests(swaps);
+					setUserPurchases(
+						swaps.filter(
+							(s) =>
+								s.status === "accepted" && s.requester === userData.user._id
+						)
+					);
+				} else {
+					setUser(null);
+				}
+			} catch (err) {
+				setUser(null);
+			} finally {
+				setLoading(false);
 			}
-			setLoading(false);
 		}
 		fetchDashboard();
 	}, []);
 
-	if (loading) return <div className="p-8 text-center">Loading...</div>;
-
-	const fallbackImages = [
-		"https://i.pinimg.com/60x60/7d/3f/2f/7d3f2f6cf9664994ee3ae56a268f26b9.jpg",
-		"https://i.pinimg.com/60x60/04/5a/cb/045acbc218006ec6857a31ebf48330e9.jpg",
-		"https://i.pinimg.com/60x60/81/35/c5/8135c5f8ef39526076ac30432ad403b3.jpg",
-		"https://i.pinimg.com/60x60/94/8f/7a/948f7a63203b896e38bbc94584595185.jpg",
-		"https://i.pinimg.com/60x60/30/c2/f8/30c2f8ba91a415a87894fd3a2b98cc16.jpg",
-		"https://i.pinimg.com/60x60/57/de/cf/57decfab8feb4ae820f423ca854a9c40.jpg",
-		"https://i.pinimg.com/60x60/50/db/cd/50dbcd4265648f000435fe6916fc1f64.jpg",
-		"https://i.pinimg.com/60x60/3c/46/58/3c4658c9e526fa01ca2502a1bd0666b7.jpg",
-		"https://i.pinimg.com/60x60/db/08/95/db0895011eaf57e30c961061bc8daa0f.jpg",
-		"https://i.pinimg.com/60x60/c2/4b/18/c24b18486862ad0cb712d490c5023f5f.jpg",
-		"https://i.pinimg.com/60x60/6f/18/e9/6f18e98732bf594c91db9b30aa312a11.jpg",
-		"https://i.pinimg.com/60x60/97/25/35/972535fe749562e2ab645d49e53059f8.jpg",
-		"https://i.pinimg.com/60x60/10/0e/83/100e83a7bc1e277b59beb35f25e95699.jpg",
-		"https://i.pinimg.com/60x60/93/7f/d4/937fd46b9c08e050fdd9160b4a13d28e.jpg",
-		"https://i.pinimg.com/60x60/a3/b0/d2/a3b0d29974f7e00a708c8a7fd1873bbb.jpg",
-		"https://i.pinimg.com/60x60/69/68/0a/69680a0274ad6cebbf12eedbda2a8ebe.jpg",
-		"https://i.pinimg.com/60x60/82/8d/73/828d7394556a00842aa19f6549e2a1fb.jpg",
-		"https://i.pinimg.com/60x60/82/7e/e2/827ee297a3142a24a4dccc41fe3f9fdf.jpg",
-		"https://i.pinimg.com/60x60/80/74/6d/80746db97891afd60f89eb36a3166983.jpg",
-		"https://i.pinimg.com/60x60/9a/fc/d4/9afcd46fb75bccab9163037e44532730.jpg",
-		"https://i.pinimg.com/60x60/a0/b3/78/a0b37803268877f0f243a1c3f1a2bf15.jpg",
-		"https://i.pinimg.com/60x60/34/80/9b/34809b86b998da77775908481281954c.jpg",
-		"https://i.pinimg.com/60x60/d8/37/0c/d8370c2816e2e10a9033f9b0e62240b7.jpg",
-		"https://i.pinimg.com/60x60/91/fd/55/91fd5569abd956ea3968a07466b2f104.jpg",
-		"https://i.pinimg.com/60x60/49/26/32/49263296e5fa1f402d4245deeeeb906e.jpg",
-		"https://i.pinimg.com/236x/18/49/8e/18498eddf60795d2a6c2778a95d2bed0.jpg",
-		"https://i.pinimg.com/236x/93/6f/6c/936f6ca1b2801cccab21d8b9006f038c.jpg",
-		"https://i.pinimg.com/236x/f5/d4/5e/f5d45ec9136f063e610d85e80c1a169d.jpg",
-		"https://i.pinimg.com/236x/e7/61/7f/e7617fbcf801f05e72d89999714df9e1.jpg",
-		"https://i.pinimg.com/236x/0a/24/83/0a24832a85b4aa488b9769baf266574a.jpg",
-		"https://i.pinimg.com/236x/e7/62/5f/e7625fe383da46abc54bd86077542168.jpg",
-		"https://i.pinimg.com/236x/cd/d8/69/cdd869465a80b59c7a6a7aa6758b5c84.jpg",
-		"https://i.pinimg.com/236x/31/ba/eb/31baeb526daba562bde059111588110e.jpg",
-		"https://i.pinimg.com/236x/8f/e4/9a/8fe49a5d5b26747bd6e75977a01c03ea.jpg",
-		"https://i.pinimg.com/236x/0f/71/d5/0f71d551ec5e1ab3d06d392e9f2f5780.jpg",
-		"https://i.pinimg.com/236x/09/8a/d1/098ad187c66201bedd7cead487b0122f.jpg",
-		"https://i.pinimg.com/236x/27/77/fc/2777fc7199949375e3d99463c2019434.jpg",
-	];
-	function getRandomFallbackImage() {
-		return fallbackImages[Math.floor(Math.random() * fallbackImages.length)];
+	if (loading) {
+		return (
+			<div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-primary)' }}>
+				<div className="card text-center">
+					<div className="loader"></div>
+					<p style={{ color: 'var(--text-secondary)', marginTop: '1rem' }}>Loading dashboard...</p>
+				</div>
+			</div>
+		);
 	}
-	function getImageSrc(image) {
-		const defaultImage = "/images/default.jpg";
-		if (!image || typeof image !== "string") return getRandomFallbackImage();
-		if (image.startsWith("/uploads/")) return image;
-		if (image.startsWith("http://") || image.startsWith("https://"))
-			return image;
-		return getRandomFallbackImage();
+
+	if (!user) {
+		return (
+			<div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-primary)' }}>
+				<div className="card text-center max-w-md">
+					<div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full" style={{ background: 'var(--accent)' }}>
+						<svg
+							className="w-8 h-8"
+							style={{ color: 'var(--text-primary)' }}
+							fill="none"
+							stroke="currentColor"
+							viewBox="0 0 24 24"
+						>
+							<path
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								strokeWidth={1.5}
+								d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+							/>
+						</svg>
+					</div>
+					<h2 className="text-xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+						Authentication Required
+					</h2>
+					<p className="mb-6" style={{ color: 'var(--text-secondary)' }}>
+						Please log in to access your dashboard.
+					</p>
+					<Link href="/login" className="btn inline-block">
+						Go to Login
+					</Link>
+				</div>
+			</div>
+		);
 	}
 
 	return (
-		<div className="container mx-auto px-4 py-8 bg-white min-h-screen">
-			{/* Header */}
-			<div className="flex flex-col md:flex-row justify-between items-center mb-8 border-b pb-6">
-				<div className="flex items-center gap-6">
-					<img
-						src={user?.avatar || "/images/default-avatar.png"}
-						alt={user?.username || user?.name || "User"}
-						className="w-24 h-24 rounded-full border shadow object-cover bg-gray-100"
-					/>
-					<div>
-						<h1 className="text-2xl font-semibold text-gray-900">Dashboard</h1>
-						<p className="text-gray-500 mt-1">
-							Welcome, {user?.username || user?.name || user?.email}
-						</p>
-						{user && (
-							<div className="mt-2 text-green-700 font-bold">
-								Points: {user.points}
+		<div className="container min-h-screen" style={{ background: 'var(--bg-primary)' }}>
+			{/* Header Card */}
+			<div className="card mb-8">
+				<div className="flex flex-col md:flex-row items-center gap-6">
+					<div className="relative">
+						{user?.avatar ? (
+							<Image
+								src={user.avatar}
+								alt={user?.username || user?.name || "User"}
+								width={80}
+								height={80}
+								className="w-20 h-20 rounded-full object-cover transition-transform hover:scale-105"
+								style={{ 
+									boxShadow: 'var(--shadow)',
+									border: `2px solid var(--border-color)`
+								}}
+								unoptimized={user?.avatar?.startsWith("http")}
+							/>
+						) : (
+							<div 
+								className="w-20 h-20 rounded-full flex items-center justify-center"
+								style={{ 
+									background: 'var(--accent)',
+									boxShadow: 'var(--shadow)'
+								}}
+							>
+								<svg
+									className="w-10 h-10"
+									style={{ color: 'var(--text-primary)' }}
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={1.5}
+										d="M12 14c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"
+									/>
+								</svg>
 							</div>
 						)}
 					</div>
+					<div className="flex-1 text-center md:text-left">
+						<h1 className="text-2xl font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
+							Welcome back!
+						</h1>
+						<p className="mb-2" style={{ color: 'var(--text-secondary)' }}>
+							{user?.username || user?.name || user?.email}
+						</p>
+						{user && (
+							<div 
+								className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium"
+								style={{ 
+									background: 'var(--accent)',
+									color: 'var(--text-primary)'
+								}}
+							>
+								<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+								</svg>
+								{user.points} Points
+							</div>
+						)}
+					</div>
+					<Link
+						href="/items/new"
+						className="btn inline-flex items-center gap-2 hover:scale-105"
+						style={{ transition: 'var(--transition)' }}
+					>
+						<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+						</svg>
+						List New Item
+					</Link>
 				</div>
-				<Link
-					href="/items/new"
-					className="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-md text-sm transition mt-6 md:mt-0"
-				>
-					+ List New Item
-				</Link>
 			</div>
 
 			{/* Tab Navigation */}
-			<div className="mb-8">
-				<div className="flex space-x-4 border-b border-gray-200">
+			<div className="card mb-8">
+				<div className="flex flex-wrap gap-2">
 					<button
 						onClick={() => setActiveTab("listings")}
-						className={`pb-3 px-1 text-sm font-medium ${
+						className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
 							activeTab === "listings"
-								? "text-gray-900 border-b-2 border-gray-900"
-								: "text-gray-500 hover:text-gray-700"
+								? "text-white"
+								: "hover:scale-105"
 						}`}
+						style={{
+							background: activeTab === "listings" ? 'var(--text-primary)' : 'var(--accent)',
+							color: activeTab === "listings" ? 'white' : 'var(--text-primary)',
+							transition: 'var(--transition)'
+						}}
 					>
 						My Listings ({userListings.length})
 					</button>
 					<button
 						onClick={() => setActiveTab("purchases")}
-						className={`pb-3 px-1 text-sm font-medium ${
+						className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
 							activeTab === "purchases"
-								? "text-gray-900 border-b-2 border-gray-900"
-								: "text-gray-500 hover:text-gray-700"
+								? "text-white"
+								: "hover:scale-105"
 						}`}
+						style={{
+							background: activeTab === "purchases" ? 'var(--text-primary)' : 'var(--accent)',
+							color: activeTab === "purchases" ? 'white' : 'var(--text-primary)',
+							transition: 'var(--transition)'
+						}}
 					>
 						My Purchases ({userPurchases.length})
 					</button>
 					<button
 						onClick={() => setActiveTab("swaps")}
-						className={`pb-3 px-1 text-sm font-medium ${
+						className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
 							activeTab === "swaps"
-								? "text-gray-900 border-b-2 border-gray-900"
-								: "text-gray-500 hover:text-gray-700"
+								? "text-white"
+								: "hover:scale-105"
 						}`}
+						style={{
+							background: activeTab === "swaps" ? 'var(--text-primary)' : 'var(--accent)',
+							color: activeTab === "swaps" ? 'white' : 'var(--text-primary)',
+							transition: 'var(--transition)'
+						}}
 					>
 						Swap Requests ({swapRequests.length})
 					</button>
@@ -175,51 +243,69 @@ export default function DashboardPage() {
 				<section>
 					<h2 className="sr-only">My Listings</h2>
 					{userListings.length > 0 ? (
-						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+						<div className="bento-grid">
 							{userListings.map((item) => (
 								<div key={item._id || item.id} className="relative">
-									<ItemCard item={item} />
+									<ItemCard
+										item={{
+											...item,
+											ownerUsername: item.ownerUsername,
+											ownerName: item.ownerName,
+										}}
+									/>
 									<span
-										className={`absolute top-3 right-3 text-xs px-2 py-1 rounded-md ${
-											item.status === "available"
-												? "bg-gray-100 text-gray-800"
-												: "bg-gray-200 text-gray-800"
+										className={`absolute top-3 right-3 text-xs px-2 py-1 rounded-full font-medium ${
+											item.isApproved
+												? "bg-green-100 text-green-700"
+												: "bg-amber-100 text-amber-700"
 										}`}
+										style={{
+											boxShadow: 'var(--shadow)',
+											border: `1px solid ${item.isApproved ? '#d1fae5' : '#fef3c7'}`
+										}}
 									>
-										{item.status}
+										{item.isApproved ? "✓ Approved" : "⏳ Pending"}
 									</span>
 								</div>
 							))}
 						</div>
 					) : (
-						<div className="text-center py-12 border-2 border-dashed border-gray-200 rounded-lg">
-							<svg
-								className="mx-auto h-12 w-12 text-gray-400"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
+						<div className="card text-center py-12">
+							<div 
+								className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center"
+								style={{ background: 'var(--accent)' }}
 							>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth={1.5}
-									d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
-								/>
-							</svg>
-							<h3 className="mt-2 text-sm font-medium text-gray-900">
+								<svg
+									className="w-10 h-10"
+									style={{ color: 'var(--text-primary)' }}
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={1.5}
+										d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"
+									/>
+								</svg>
+							</div>
+							<h3 className="text-xl font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>
 								No listings yet
 							</h3>
-							<p className="mt-1 text-sm text-gray-500">
-								Get started by listing an item for swap
+							<p className="mb-6" style={{ color: 'var(--text-secondary)' }}>
+								Create your first listing to start swapping items with others
 							</p>
-							<div className="mt-6">
-								<Link
-									href="/items/new"
-									className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
-								>
-									+ New Listing
-								</Link>
-							</div>
+							<Link
+								href="/items/new"
+								className="btn inline-flex items-center gap-2 hover:scale-105"
+								style={{ transition: 'var(--transition)' }}
+							>
+								<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+								</svg>
+								Create First Listing
+							</Link>
 						</div>
 					)}
 				</section>
@@ -227,59 +313,138 @@ export default function DashboardPage() {
 				<section>
 					<h2 className="sr-only">My Purchases</h2>
 					{userPurchases.length > 0 ? (
-						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+						<div className="bento-grid">
 							{userPurchases.map((swap) => (
-								<div key={swap._id} className="relative">
-									<div className="border rounded p-4 shadow flex flex-col items-center">
-										{/* Fetch and show the item image if possible */}
-										{swap.item && (
-											<img
-												src={getImageSrc(
-													typeof swap.item === "object" && swap.item.image
-														? swap.item.image
-														: null
-												)}
-												alt="Purchased Item"
-												className="w-24 h-24 object-cover rounded mb-2 border"
-												onError={(e) => {
-													e.target.onerror = null;
-													e.target.src = getRandomFallbackImage();
-												}}
-											/>
-										)}
-										<div className="font-semibold">
-											Item:{" "}
-											{typeof swap.item === "object" && swap.item.title
-												? swap.item.title
-												: swap.item}
-										</div>
-										<div>Status: {swap.status}</div>
-									</div>
+								<div key={swap._id}>
+									{swap.item && (
+										<ItemCard
+											item={{
+												...swap.item,
+												ownerUsername: swap.item.ownerUsername,
+												ownerName: swap.item.ownerName,
+											}}
+										/>
+									)}
 								</div>
 							))}
 						</div>
 					) : (
-						<div className="text-center py-12">No purchases yet.</div>
+						<div className="card text-center py-12">
+							<div 
+								className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center"
+								style={{ background: 'var(--accent)' }}
+							>
+								<svg
+									className="w-10 h-10"
+									style={{ color: 'var(--text-primary)' }}
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={1.5}
+										d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+									/>
+								</svg>
+							</div>
+							<h3 className="text-xl font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>
+								No purchases yet
+							</h3>
+							<p style={{ color: 'var(--text-secondary)' }}>
+								Items you e successfully swapped will appear here
+							</p>
+						</div>
 					)}
 				</section>
 			) : (
 				<section>
 					<h2 className="sr-only">Swap Requests</h2>
 					{swapRequests.length > 0 ? (
-						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+						<div className="bento-grid">
 							{swapRequests.map((swap) => (
-								<div key={swap._id} className="border rounded p-4 shadow">
-									<div className="font-semibold">Item: {swap.item}</div>
-									<div>Type: {swap.type}</div>
-									<div>Status: {swap.status}</div>
-									<div>
-										Requested: {new Date(swap.createdAt).toLocaleString()}
+								<div key={swap._id} className="card">
+									<div className="flex items-center gap-3 mb-4">
+										<div 
+											className="w-12 h-12 rounded-full flex items-center justify-center"
+											style={{ background: 'var(--accent)' }}
+										>
+											<svg
+												className="w-6 h-6"
+												style={{ color: 'var(--text-primary)' }}
+												fill="none"
+												stroke="currentColor"
+												viewBox="0 0 24 24"
+											>
+												<path
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													strokeWidth={1.5}
+													d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+												/>
+											</svg>
+										</div>
+										<div>
+											<h4 className="font-semibold" style={{ color: 'var(--text-primary)' }}>
+												{swap.item || 'Swap Request'}
+											</h4>
+											<p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+												{swap.type}
+											</p>
+										</div>
+									</div>
+									<div className="space-y-2">
+										<div className="flex justify-between items-center">
+											<span className="text-sm" style={{ color: 'var(--text-secondary)' }}>Status:</span>
+											<span 
+												className={`px-2 py-1 rounded-full text-xs font-medium ${
+													swap.status === 'accepted' ? 'bg-green-100 text-green-700' :
+													swap.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+													'bg-red-100 text-red-700'
+												}`}
+											>
+												{swap.status}
+											</span>
+										</div>
+										<div className="flex justify-between items-center">
+											<span className="text-sm" style={{ color: 'var(--text-secondary)' }}>Requested:</span>
+											<span className="text-sm" style={{ color: 'var(--text-primary)' }}>
+												{new Date(swap.createdAt).toLocaleDateString()}
+											</span>
+										</div>
 									</div>
 								</div>
 							))}
 						</div>
 					) : (
-						<div className="text-center py-12">No swap requests yet.</div>
+						<div className="card text-center py-12">
+							<div 
+								className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center"
+								style={{ background: 'var(--accent)' }}
+							>
+								<svg
+									className="w-10 h-10"
+									style={{ color: 'var(--text-primary)' }}
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={1.5}
+										d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+									/>
+								</svg>
+							</div>
+							<h3 className="text-xl font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>
+								No swap requests yet
+							</h3>
+							<p style={{ color: 'var(--text-secondary)' }}>
+								Swap requests from other users will appear here
+							</p>
+						</div>
 					)}
 				</section>
 			)}

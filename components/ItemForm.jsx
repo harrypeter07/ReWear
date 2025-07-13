@@ -1,69 +1,54 @@
 import { useState } from "react";
 
 export default function ItemForm({ onSubmit }) {
-	const [imageUrl, setImageUrl] = useState("");
-	const [uploading, setUploading] = useState(false);
+	const [selectedFile, setSelectedFile] = useState(null);
+	const [previewUrl, setPreviewUrl] = useState("");
 	const [error, setError] = useState("");
+	const [submitting, setSubmitting] = useState(false);
 
-	const handleImageChange = async (e) => {
+	const handleImageChange = (e) => {
 		const file = e.target.files[0];
 		if (!file) return;
-		setUploading(true);
+		setSelectedFile(file);
+		setPreviewUrl(URL.createObjectURL(file));
+	};
+
+	const handleSubmit = async (e) => {
+		e.preventDefault();
 		setError("");
+		setSubmitting(true);
+		const form = e.target;
 		const formData = new FormData();
-		formData.append("file", file);
+		formData.append("title", form.title.value.trim());
+		formData.append("category", form.category.value.trim());
+		formData.append("size", form.size.value.trim());
+		formData.append("condition", form.condition.value.trim());
+		formData.append("description", form.description.value.trim());
+		formData.append("pointsValue", form.pointsValue.value);
+		if (form.uploaderId) formData.append("uploaderId", form.uploaderId.value);
+		if (selectedFile) {
+			formData.append("file", selectedFile);
+		} else {
+			setError("Image is required.");
+			setSubmitting(false);
+			return;
+		}
+
 		try {
-			const res = await fetch("/api/upload", {
-				method: "POST",
-				body: formData,
-			});
-			const data = await res.json();
-			if (res.ok && data.url) {
-				setImageUrl(data.url);
-			} else {
-				setError(data.error || "Upload failed");
-			}
+			await onSubmit(formData);
 		} catch (err) {
-			setError("Upload failed");
+			setError(err.message || "Failed to add item");
 		} finally {
-			setUploading(false);
+			setSubmitting(false);
 		}
 	};
 
-	const handleSubmit = (e) => {
-		e.preventDefault();
-		setError("");
-		const form = e.target;
-		const data = {
-			title: form.title.value.trim(),
-			category: form.category.value.trim(),
-			size: form.size.value.trim(),
-			condition: form.condition.value.trim(),
-			description: form.description.value.trim(),
-			pointsValue: Number(form.pointsValue.value),
-			image: imageUrl,
-		};
-
-		// Frontend validation
-		if (!data.title) return setError("Title is required.");
-		if (!data.category) return setError("Category is required.");
-		if (!data.size) return setError("Size is required.");
-		if (!data.condition) return setError("Condition is required.");
-		if (!data.description || data.description.length < 2)
-			return setError("Description must be at least 2 characters.");
-		if (
-			!form.pointsValue.value ||
-			isNaN(data.pointsValue) ||
-			data.pointsValue <= 0
-		)
-			return setError("Points Value must be a positive number.");
-		if (!data.image) return setError("Image is required.");
-
-		onSubmit(data);
-	};
-
 	return (
-		<form className="flex flex-col gap-2" onSubmit={handleSubmit}>
+		<form
+			className="flex flex-col gap-2"
+			onSubmit={handleSubmit}
+			encType="multipart/form-data"
+		>
 			{error && (
 				<div className="bg-red-100 text-red-700 p-2 rounded">{error}</div>
 			)}
@@ -115,20 +100,22 @@ export default function ItemForm({ onSubmit }) {
 				onChange={handleImageChange}
 				className="border p-2 rounded"
 			/>
-			{uploading && (
-				<div className="text-blue-600 text-sm">Uploading image...</div>
-			)}
-			{imageUrl && (
+			{submitting && <div className="text-blue-600 text-sm">Submitting...</div>}
+			{previewUrl && (
 				<div className="flex items-center gap-2 mt-2">
 					<img
-						src={imageUrl}
+						src={previewUrl}
 						alt="Preview"
 						className="w-24 h-24 object-cover rounded border"
 					/>
-					<span className="text-xs text-gray-500">Image uploaded</span>
+					<span className="text-xs text-gray-500">Image selected</span>
 				</div>
 			)}
-			<button type="submit" className="bg-blue-600 text-white p-2 rounded">
+			<button
+				type="submit"
+				className="bg-blue-600 text-white p-2 rounded"
+				disabled={submitting}
+			>
 				Submit
 			</button>
 		</form>

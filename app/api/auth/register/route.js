@@ -56,14 +56,54 @@ export async function POST(req) {
 		const hashed = await bcrypt.hash(cleanPassword, 10);
 		const user = {
 			username: cleanUsername,
+			name: "",
 			email: cleanEmail,
 			password: hashed,
 			createdAt: new Date(),
 			role: "user",
+			points: 2,
 		};
-		await users.insertOne(user);
+		const result = await users.insertOne(user);
+		// Auto-login after registration
+		const jwt = require("jsonwebtoken");
+		const { cookies } = require("next/headers");
+		const userId = result.insertedId;
+		const accessToken = jwt.sign(
+			{ _id: userId, role: user.role, email: user.email },
+			process.env.JWT_SECRET,
+			{ expiresIn: "15m" }
+		);
+		const refreshToken = jwt.sign(
+			{ _id: userId, role: user.role, email: user.email },
+			process.env.JWT_SECRET,
+			{ expiresIn: "7d" }
+		);
+		const cookieStore = await cookies();
+		cookieStore.set("accessToken", accessToken, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === "production",
+			sameSite: "lax",
+			maxAge: 60 * 15, // 15 minutes
+			path: "/",
+		});
+		cookieStore.set("refreshToken", refreshToken, {
+			httpOnly: true,
+			secure: process.env.NODE_ENV === "production",
+			sameSite: "lax",
+			maxAge: 60 * 60 * 24 * 7, // 7 days
+			path: "/",
+		});
 		return NextResponse.json(
-			{ message: "Registration successful" },
+			{
+				user: {
+					_id: userId,
+					email: user.email,
+					role: user.role,
+					name: user.name || user.username,
+					username: user.username,
+				},
+				message: "Registration and login successful",
+			},
 			{ status: 201 }
 		);
 	} catch (err) {

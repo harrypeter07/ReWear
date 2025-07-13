@@ -8,6 +8,8 @@ const SwapRequestSchema = new mongoose.Schema({
 		required: true,
 	},
 	type: { type: String, enum: ["swap", "redeem"], required: true },
+	// New field for the item being offered in a swap
+	offeredItem: { type: mongoose.Schema.Types.ObjectId, ref: "Item" }, // required for swap type
 	status: {
 		type: String,
 		enum: ["pending", "accepted", "rejected"],
