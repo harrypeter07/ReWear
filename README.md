@@ -1,5 +1,7 @@
 # ReWear – Community Clothing Exchange
 
+![Project Status](https://img.shields.io/badge/status-active-brightgreen)
+
 ## Tech Stack
 
 - **Next.js (App Router)**
