@@ -17,6 +17,8 @@ _Built with Next.js, MongoDB, and TailwindCSS._
 
 Build a web app that allows users to exchange clothing through direct swaps or a point-based redemption system. It promotes sustainable fashion and reduces textile waste.
 
+_Users can swap items directly or use points to redeem items from others._
+
 ## Core Features
 
 - User Registration & Login (email/password)
