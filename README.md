@@ -2,6 +2,8 @@
 
 A sustainable fashion platform for swapping and redeeming clothes in your community.
 
+_Built with Next.js, MongoDB, and TailwindCSS._
+
 ![Project Status](https://img.shields.io/badge/status-active-brightgreen)
 
 ## Tech Stack
