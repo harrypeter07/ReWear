@@ -24,6 +24,7 @@ _Users can swap items directly or use points to redeem items from others._
 - Persistent login with secure authentication (access & refresh tokens)
 - Unified creamy gradient theme and modern UI throughout the app
 - Admin panel for managing users, listings, and orders
+- Robust image handling and fallback for missing images
 - User Registration & Login (email/password)
 - Landing Page with featured items, categories, and CTAs
 - Item Listings with filters and search
