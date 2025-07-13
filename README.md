@@ -21,6 +21,7 @@ _Users can swap items directly or use points to redeem items from others._
 
 ## Core Features
 
+- Persistent login with secure authentication (access & refresh tokens)
 - User Registration & Login (email/password)
 - Landing Page with featured items, categories, and CTAs
 - Item Listings with filters and search
