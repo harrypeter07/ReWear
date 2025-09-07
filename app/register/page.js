@@ -66,68 +66,122 @@ export default function RegisterPage() {
 	};
 
 	return (
-		<div className="min-h-screen flex items-center justify-center gradient-bg px-4 sm:px-6">
-			<div className="card w-full max-w-md p-8 shadow-lg rounded-2xl">
-				<h2 className="text-3xl font-bold mb-2 text-primary text-center">
-					Create Account
-				</h2>
-				<p className="text-secondary mb-6 text-center">
-					Join the ReWear community
-				</p>
-				<form onSubmit={handleSubmit} className="space-y-4">
-					<div>
-						<label className="block text-primary font-semibold mb-1">
-							Username
-						</label>
-						<input
-							type="text"
-							name="username"
-							value={formData.username}
-							onChange={handleChange}
-							className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition text-primary bg-white"
-							required
-						/>
+		<div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--bg-primary)' }}>
+			<div className="container max-w-md">
+				<div className="card">
+					{/* Header */}
+					<div className="text-center mb-8">
+						<h1 className="text-3xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+							Create your account
+						</h1>
+						<p style={{ color: 'var(--text-secondary)' }}>
+							Join ReWear to swap sustainably
+						</p>
 					</div>
-					<div>
-						<label className="block text-primary font-semibold mb-1">
-							Email
-						</label>
-						<input
-							type="email"
-							name="email"
-							value={formData.email}
-							onChange={handleChange}
-							className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition text-primary bg-white"
-							required
-						/>
-					</div>
-					<div>
-						<label className="block text-primary font-semibold mb-1">
-							Password
-						</label>
-						<input
-							type="password"
-							name="password"
-							value={formData.password}
-							onChange={handleChange}
-							className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition text-primary bg-white"
-							required
-						/>
-					</div>
-					{/* Simplified: removed confirm password and checkbox */}
+
+					{/* Error Message */}
 					{error && (
-						<p className="text-red-600 text-sm" role="alert">{error}</p>
+						<div 
+							className="p-4 mb-6 rounded-lg border-l-4"
+							style={{ 
+								background: '#fef2f2',
+								borderColor: '#fca5a5',
+								color: '#dc2626'
+							}}
+						>
+							<p className="text-sm font-medium">{error}</p>
+						</div>
 					)}
-					<button type="submit" className="btn w-full mt-2" disabled={isLoading}>
-						Register
-					</button>
-				</form>
-				<p className="text-secondary text-sm mt-4 text-center">
-					Already have an account?{" "}
-					<Link href="/login" className="text-primary underline">
-						Login
-					</Link>
-				</p>
+
+					<form onSubmit={handleSubmit} className="space-y-6">
+						<div>
+							<label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
+								Username
+							</label>
+							<input
+								type="text"
+								name="username"
+								value={formData.username}
+								onChange={handleChange}
+								required
+								style={{
+									background: '#fffdf9',
+									border: '1px solid var(--border-color)',
+									borderRadius: 'var(--radius)',
+									padding: '0.75rem 1rem',
+									width: '100%',
+									transition: 'var(--transition)',
+									color: 'var(--text-primary)'
+								}}
+							/>
+						</div>
+						<div>
+							<label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
+								Email
+							</label>
+							<input
+								type="email"
+								name="email"
+								value={formData.email}
+								onChange={handleChange}
+								required
+								style={{
+									background: '#fffdf9',
+									border: '1px solid var(--border-color)',
+									borderRadius: 'var(--radius)',
+									padding: '0.75rem 1rem',
+									width: '100%',
+									transition: 'var(--transition)',
+									color: 'var(--text-primary)'
+								}}
+							/>
+						</div>
+						<div>
+							<label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
+								Password
+							</label>
+							<input
+								type="password"
+								name="password"
+								value={formData.password}
+								onChange={handleChange}
+								required
+								style={{
+									background: '#fffdf9',
+									border: '1px solid var(--border-color)',
+									borderRadius: 'var(--radius)',
+									padding: '0.75rem 1rem',
+									width: '100%',
+									transition: 'var(--transition)',
+									color: 'var(--text-primary)'
+								}}
+							/>
+						</div>
+
+						<button type="submit" className="btn w-full py-3 font-medium" disabled={isLoading} style={{
+							background: isLoading ? '#f0e6da' : 'var(--accent)',
+							color: 'var(--text-primary)',
+							border: 'none',
+							borderRadius: 'var(--radius)',
+							boxShadow: 'var(--shadow)',
+							transition: 'var(--transition)',
+							cursor: isLoading ? 'not-allowed' : 'pointer',
+							opacity: isLoading ? 0.7 : 1
+						}}>
+						{isLoading ? 'Creating account...' : 'Create account'}
+						</button>
+					</form>
+
+					{/* Footer */}
+					<div className="mt-8 text-center">
+						<p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+							Already have an account?{" "}
+							<Link href="/login" className="font-medium hover:opacity-70" style={{ color: 'var(--text-primary)', transition: 'var(--transition)' }}>
+								Sign in
+							</Link>
+						</p>
+					</div>
+				</div>
 			</div>
 		</div>
 	);
