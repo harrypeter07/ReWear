@@ -130,17 +130,27 @@ export default function DashboardPage() {
 				<h1 className="text-4xl font-bold gradient-text mb-6 text-center">
 					Your Dashboard
 				</h1>
+				{(() => {
+					const stats = {
+						listings: userListings.length,
+						purchases: userPurchases.length,
+						swaps: swapRequests.length,
+						points: user?.points ?? 0,
+					};
+					return (
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
 					{/* Dashboard widgets */}
 					<DashboardWidgets stats={stats} />
 				</div>
+					);
+				})()}
 				<div className="card p-6 mb-8">
 					<h2 className="text-2xl font-semibold text-primary mb-4">
 						Your Listings
 					</h2>
 					{/* Listings grid or list here */}
 					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-						{listings.map((item) => (
+						{userListings.map((item) => (
 							<ItemCard key={item._id} item={item} />
 						))}
 					</div>
