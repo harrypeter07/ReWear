@@ -68,19 +68,17 @@ async function main() {
     process.exit(1);
   }
 
-  // Clean up previous demo items for this user (data: or unsplash)
-  const cleanup = await itemsCol.deleteMany({
-    uploaderId: user._id,
-    $or: [
-      { image: { $regex: '^data:' } },
-      { image: { $regex: 'images.unsplash.com' } }
-    ]
-  });
-  console.log(`Removed ${(cleanup?.deletedCount ?? 0)} previous demo items for`, seedOwnerEmail);
+  // Drop entire items collection if exists, then recreate and index
+  try {
+    await itemsCol.drop();
+    console.log("Dropped items collection");
+  } catch {}
+  const itemsCol2 = db.collection("items");
+  await itemsCol2.createIndex({ createdAt: -1 });
 
   const images = getDemoImages();
   const items = generateItems(user._id.toString(), 20, images);
-  const result = await itemsCol.insertMany(items);
+  const result = await itemsCol2.insertMany(items);
   console.log(`Inserted ${result.insertedCount || items.length} demo items for`, seedOwnerEmail);
   process.exit(0);
 }

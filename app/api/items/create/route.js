@@ -7,29 +7,35 @@ export const runtime = "nodejs";
 
 export async function POST(req) {
 	try {
-		// Accept multipart/form-data
-		const formData = await req.formData();
-		const file = formData.get("file");
-		if (!file || typeof file === "string") {
-			return Response.json({ error: "No file uploaded" }, { status: 400 });
+		// Accept either JSON (with image as url/data uri) or multipart/form-data (file upload)
+		let title, description, category, size, condition, pointsValue, uploaderId, image;
+		const contentType = req.headers.get("content-type") || "";
+		if (contentType.includes("application/json")) {
+			const body = await req.json();
+			({ title, description, category, size, condition, pointsValue, uploaderId, image } = body);
+		} else {
+			const formData = await req.formData();
+			const file = formData.get("file");
+			const imageUrlOrData = formData.get("image");
+			if (file && typeof file !== "string") {
+				const buffer = Buffer.from(await file.arrayBuffer());
+				const ext = (file.name || "").split(".").pop();
+				const allowed = ["jpg", "jpeg", "png", "webp", "gif"];
+				if (!allowed.includes((ext || "").toLowerCase())) {
+					return Response.json({ error: "Invalid file type" }, { status: 400 });
+				}
+				image = `data:image/${ext};base64,${buffer.toString("base64")}`;
+			} else if (typeof imageUrlOrData === "string") {
+				image = imageUrlOrData;
+			}
+			title = formData.get("title");
+			description = formData.get("description");
+			category = formData.get("category");
+			size = formData.get("size");
+			condition = formData.get("condition");
+			pointsValue = Number(formData.get("pointsValue"));
+			uploaderId = formData.get("uploaderId");
 		}
-		const buffer = Buffer.from(await file.arrayBuffer());
-		const ext = file.name.split(".").pop();
-		const allowed = ["jpg", "jpeg", "png", "webp", "gif"];
-		if (!allowed.includes(ext.toLowerCase())) {
-			return Response.json({ error: "Invalid file type" }, { status: 400 });
-		}
-		// Convert image to base64
-		const base64Image = `data:image/${ext};base64,${buffer.toString("base64")}`;
-
-		// Extract other fields
-		const title = formData.get("title");
-		const description = formData.get("description");
-		const category = formData.get("category");
-		const size = formData.get("size");
-		const condition = formData.get("condition");
-		const pointsValue = Number(formData.get("pointsValue"));
-		const uploaderId = formData.get("uploaderId");
 
 		// Validate input using Zod
 		let validated;
@@ -42,7 +48,7 @@ export async function POST(req) {
 				condition,
 				pointsValue,
 				uploaderId,
-				image: base64Image,
+				image,
 			});
 		} catch (zodErr) {
 			return Response.json(
