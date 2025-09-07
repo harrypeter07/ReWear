@@ -15,12 +15,12 @@ export default function ItemCard({ item }) {
 
 	const getImageSrc = () => {
 		if (!item.image || typeof item.image !== "string")
-			return "/images/default.jpg";
+			return null;
 		if (item.image.startsWith("/uploads/")) return item.image;
 		if (item.image.startsWith("http://") || item.image.startsWith("https://"))
 			return item.image;
 		if (item.image.startsWith("data:")) return item.image;
-		return "/images/default.jpg";
+		return null;
 	};
 
 	const handleImageError = () => {
