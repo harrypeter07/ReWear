@@ -24,7 +24,8 @@ export default function ItemForm({ onSubmit }) {
 		formData.append("size", form.size.value.trim());
 		formData.append("condition", form.condition.value.trim());
 		formData.append("description", form.description.value.trim());
-		formData.append("pointsValue", form.pointsValue.value);
+		const points = Number(form.pointsValue.value);
+		formData.append("pointsValue", String(points));
 		if (form.uploaderId) formData.append("uploaderId", form.uploaderId.value);
 		if (selectedFile) {
 			formData.append("file", selectedFile);
@@ -35,6 +36,15 @@ export default function ItemForm({ onSubmit }) {
 		}
 
 		try {
+			if (points > 10) {
+				const proceed = window.confirm(
+					"Points are greater than 10. This item will be sent for admin review. Continue?"
+				);
+				if (!proceed) {
+					setSubmitting(false);
+					return;
+				}
+			}
 			await onSubmit(formData);
 		} catch (err) {
 			setError(err.message || "Failed to add item");

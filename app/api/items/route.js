@@ -2,35 +2,28 @@
 import { getCollections } from "@/lib/db";
 import { ObjectId } from "mongodb";
 
-export async function GET() {
-	const { items, users } = await getCollections();
-	// Only return approved and visible items; join owner info; newest first
-	const allItems = await items
-		.aggregate([
-			{ $match: { isApproved: true, isVisible: true, status: { $ne: "pending" } } },
-			{
-				$addFields: {
-					lookupUserId: { $ifNull: ["$owner", "$uploaderId"] },
-				},
-			},
-			{
-				$lookup: {
-					from: "users",
-					localField: "lookupUserId",
-					foreignField: "_id",
-					as: "ownerInfo",
-				},
-			},
-			{
-				$addFields: {
-					ownerUsername: { $arrayElemAt: ["$ownerInfo.username", 0] },
-					ownerName: { $arrayElemAt: ["$ownerInfo.name", 0] },
-				},
-			},
-			{ $sort: { createdAt: -1 } },
-			{ $project: { ownerInfo: 0, lookupUserId: 0 } },
-		])
-		.toArray();
+export async function GET(req) {
+	const { items } = await getCollections();
+	const url = new URL(req.url, "http://localhost");
+	const uploaderId = url.searchParams.get("uploaderId");
+
+	const pipeline = [];
+	if (uploaderId) {
+		try {
+			pipeline.push({ $match: { uploaderId: new ObjectId(uploaderId) } });
+		} catch {}
+	} else {
+		pipeline.push({ $match: { isApproved: true, isVisible: true, status: { $ne: "pending" } } });
+	}
+	pipeline.push(
+		{ $addFields: { lookupUserId: { $ifNull: ["$owner", "$uploaderId"] } } },
+		{ $lookup: { from: "users", localField: "lookupUserId", foreignField: "_id", as: "ownerInfo" } },
+		{ $addFields: { ownerUsername: { $arrayElemAt: ["$ownerInfo.username", 0] }, ownerName: { $arrayElemAt: ["$ownerInfo.name", 0] } } },
+		{ $sort: { createdAt: -1 } },
+		{ $project: { ownerInfo: 0, lookupUserId: 0 } },
+	);
+
+	const allItems = await items.aggregate(pipeline).toArray();
 	return Response.json(allItems);
 }
 

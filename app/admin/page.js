@@ -218,18 +218,18 @@ export default function AdminPanel() {
 	};
 
 	return (
-		<div className="min-h-screen bg-gradient-to-br from-stone-50 via-orange-50 to-amber-50 p-4">
-			<div className="max-w-7xl mx-auto">
+		<div className="p-4 min-h-screen bg-gradient-to-br via-orange-50 to-amber-50 from-stone-50">
+			<div className="mx-auto max-w-7xl">
 				{/* Header */}
-				<div className="bg-gradient-to-r from-stone-100 to-orange-100 rounded-3xl shadow-lg border border-stone-200 p-8 mb-8">
-					<h1 className="text-4xl font-bold text-stone-800 mb-2">
+				<div className="p-8 mb-8 bg-gradient-to-r to-orange-100 rounded-3xl border shadow-lg from-stone-100 border-stone-200">
+					<h1 className="mb-2 text-4xl font-bold text-stone-800">
 						Admin Panel
 					</h1>
 					<p className="text-stone-600">Manage your platform with elegance</p>
 				</div>
 
 				{/* Tab Navigation */}
-				<div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border border-stone-200 p-6 mb-8">
+				<div className="p-6 mb-8 rounded-2xl border shadow-lg backdrop-blur-sm bg-white/80 border-stone-200">
 					<div className="flex flex-wrap gap-4 justify-center">
 						<button
 							onClick={() => setActiveTab("users")}
@@ -254,10 +254,10 @@ export default function AdminPanel() {
 
 				{/* Users Tab */}
 				{activeTab === "users" && (
-					<div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg border border-stone-200 p-8">
+					<div className="p-8 rounded-3xl border shadow-lg backdrop-blur-sm bg-white/80 border-stone-200">
 						<div className="flex items-center mb-6">
-							<div className="w-8 h-8 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full flex items-center justify-center mr-3">
-								<span className="text-blue-600 text-sm">👥</span>
+							<div className="flex justify-center items-center mr-3 w-8 h-8 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full">
+								<span className="text-sm text-blue-600">👥</span>
 							</div>
 							<h2 className="text-2xl font-semibold text-stone-800">
 								User Management
@@ -265,17 +265,17 @@ export default function AdminPanel() {
 						</div>
 
 						{loading ? (
-							<div className="flex items-center justify-center py-16">
-								<div className="w-8 h-8 border-4 border-stone-200 border-t-amber-400 rounded-full animate-spin"></div>
+							<div className="flex justify-center items-center py-16">
+								<div className="w-8 h-8 rounded-full border-4 animate-spin border-stone-200 border-t-amber-400"></div>
 								<span className="ml-3 text-stone-600">Loading users...</span>
 							</div>
 						) : error ? (
-							<div className="bg-red-50 border border-red-200 rounded-2xl p-4 text-red-700 text-center">
+							<div className="p-4 text-center text-red-700 bg-red-50 rounded-2xl border border-red-200">
 								{error}
 							</div>
 						) : users.length === 0 ? (
-							<div className="text-center py-16 text-stone-500">
-								<div className="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center mx-auto mb-4">
+							<div className="py-16 text-center text-stone-500">
+								<div className="flex justify-center items-center mx-auto mb-4 w-16 h-16 rounded-full bg-stone-100">
 									<span className="text-2xl">🤷</span>
 								</div>
 								No users found
@@ -285,17 +285,19 @@ export default function AdminPanel() {
 								{users.map((user) => (
 									<div
 										key={user._id}
-										className="bg-gradient-to-r from-stone-50 to-orange-50 rounded-2xl p-6 border border-stone-200 hover:shadow-md transition-all duration-300"
+										className="p-6 bg-gradient-to-r to-orange-50 rounded-2xl border transition-all duration-300 from-stone-50 border-stone-200 hover:shadow-md"
 									>
-										<div className="flex items-center justify-between">
+										<div className="flex justify-between items-center">
 											<div className="flex items-center space-x-4">
-												<div className="w-16 h-16 bg-gradient-to-r from-amber-100 to-orange-100 rounded-full flex items-center justify-center overflow-hidden">
-													{user.avatar ? (
+												<div className="flex overflow-hidden justify-center items-center w-16 h-16 bg-gradient-to-r from-amber-100 to-orange-100 rounded-full">
+													{user.avatar && typeof user.avatar === 'string' ? (
 														<Image
 															src={user.avatar}
 															alt={user.name || user.username || "User Avatar"}
-															fill
+															width={64}
+															height={64}
 															className="object-cover rounded-full"
+															onError={(e) => { e.currentTarget.style.display = 'none'; }}
 														/>
 													) : (
 														<span className="text-2xl text-amber-600">👤</span>
@@ -305,8 +307,8 @@ export default function AdminPanel() {
 													<h3 className="text-lg font-semibold text-stone-800">
 														{user.name || user.username}
 													</h3>
-													<p className="text-stone-600 text-sm">{user.email}</p>
-													<div className="flex items-center space-x-4 mt-2">
+													<p className="text-sm text-stone-600">{user.email}</p>
+													<div className="flex items-center mt-2 space-x-4">
 														<span className="text-xs text-stone-500">
 															Joined:{" "}
 															{user.createdAt
@@ -378,7 +380,7 @@ export default function AdminPanel() {
 									</div>
 								))}
 								{actionError && (
-									<div className="bg-red-50 border border-red-200 rounded-2xl p-4 text-red-700 text-center mt-4">
+									<div className="p-4 mt-4 text-center text-red-700 bg-red-50 rounded-2xl border border-red-200">
 										{actionError}
 									</div>
 								)}
@@ -389,10 +391,10 @@ export default function AdminPanel() {
 
 				{/* Listings Tab */}
 				{activeTab === "listings" && (
-					<div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg border border-stone-200 p-8">
+					<div className="p-8 rounded-3xl border shadow-lg backdrop-blur-sm bg-white/80 border-stone-200">
 						<div className="flex items-center mb-6">
-							<div className="w-8 h-8 bg-gradient-to-r from-green-100 to-emerald-100 rounded-full flex items-center justify-center mr-3">
-								<span className="text-green-600 text-sm">📝</span>
+							<div className="flex justify-center items-center mr-3 w-8 h-8 bg-gradient-to-r from-green-100 to-emerald-100 rounded-full">
+								<span className="text-sm text-green-600">📝</span>
 							</div>
 							<h2 className="text-2xl font-semibold text-stone-800">
 								Listings Management
@@ -400,12 +402,12 @@ export default function AdminPanel() {
 						</div>
 
 						{loading ? (
-							<div className="flex items-center justify-center py-16">
-								<div className="w-8 h-8 border-4 border-stone-200 border-t-emerald-400 rounded-full animate-spin"></div>
+							<div className="flex justify-center items-center py-16">
+								<div className="w-8 h-8 rounded-full border-4 animate-spin border-stone-200 border-t-emerald-400"></div>
 								<span className="ml-3 text-stone-600">Loading listings...</span>
 							</div>
 						) : error ? (
-							<div className="bg-red-50 border border-red-200 rounded-2xl p-4 text-red-700 text-center">
+							<div className="p-4 text-center text-red-700 bg-red-50 rounded-2xl border border-red-200">
 								{error}
 							</div>
 						) : (
@@ -415,23 +417,23 @@ export default function AdminPanel() {
 									.map((item) => (
 										<div
 											key={item._id}
-											className="bg-gradient-to-r from-stone-50 to-green-50 rounded-2xl p-6 border border-stone-200 hover:shadow-md transition-all duration-300"
+											className="p-6 bg-gradient-to-r to-green-50 rounded-2xl border transition-all duration-300 from-stone-50 border-stone-200 hover:shadow-md"
 										>
-											<div className="flex items-center justify-between">
+											<div className="flex justify-between items-center">
 												<div className="flex-1">
-													<h3 className="text-lg font-semibold text-stone-800 mb-2">
+													<h3 className="mb-2 text-lg font-semibold text-stone-800">
 														{item.title}
 													</h3>
-													<div className="flex items-center space-x-4 mb-2">
-														<span className="px-3 py-1 bg-stone-100 text-stone-700 rounded-full text-xs font-medium">
+													<div className="flex items-center mb-2 space-x-4">
+														<span className="px-3 py-1 text-xs font-medium rounded-full bg-stone-100 text-stone-700">
 															{item.category}
 														</span>
 													</div>
-													<p className="text-stone-600 text-sm">
+													<p className="text-sm text-stone-600">
 														{item.description}
 													</p>
 												</div>
-												<div className="flex space-x-3 ml-6">
+												<div className="flex ml-6 space-x-3">
 													<button
 														onClick={() => handleApproveListing(item._id)}
 														className={buttonStyle("approve")}
@@ -455,8 +457,8 @@ export default function AdminPanel() {
 										</div>
 									))}
 								{listings.filter((l) => !l.isApproved).length === 0 && (
-									<div className="text-center py-16 text-stone-500">
-										<div className="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center mx-auto mb-4">
+									<div className="py-16 text-center text-stone-500">
+										<div className="flex justify-center items-center mx-auto mb-4 w-16 h-16 rounded-full bg-stone-100">
 											<span className="text-2xl">✅</span>
 										</div>
 										All listings have been reviewed
@@ -465,7 +467,7 @@ export default function AdminPanel() {
 							</div>
 						)}
 						{actionError && (
-							<div className="bg-red-50 border border-red-200 rounded-2xl p-4 text-red-700 text-center mt-4">
+							<div className="p-4 mt-4 text-center text-red-700 bg-red-50 rounded-2xl border border-red-200">
 								{actionError}
 							</div>
 						)}
@@ -474,10 +476,10 @@ export default function AdminPanel() {
 
 				{/* Orders Tab */}
 				{activeTab === "orders" && (
-					<div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-lg border border-stone-200 p-8">
+					<div className="p-8 rounded-3xl border shadow-lg backdrop-blur-sm bg-white/80 border-stone-200">
 						<div className="flex items-center mb-6">
-							<div className="w-8 h-8 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full flex items-center justify-center mr-3">
-								<span className="text-purple-600 text-sm">📦</span>
+							<div className="flex justify-center items-center mr-3 w-8 h-8 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full">
+								<span className="text-sm text-purple-600">📦</span>
 							</div>
 							<h2 className="text-2xl font-semibold text-stone-800">
 								Orders Management
@@ -485,12 +487,12 @@ export default function AdminPanel() {
 						</div>
 
 						{loading ? (
-							<div className="flex items-center justify-center py-16">
-								<div className="w-8 h-8 border-4 border-stone-200 border-t-purple-400 rounded-full animate-spin"></div>
+							<div className="flex justify-center items-center py-16">
+								<div className="w-8 h-8 rounded-full border-4 animate-spin border-stone-200 border-t-purple-400"></div>
 								<span className="ml-3 text-stone-600">Loading orders...</span>
 							</div>
 						) : error ? (
-							<div className="bg-red-50 border border-red-200 rounded-2xl p-4 text-red-700 text-center">
+							<div className="p-4 text-center text-red-700 bg-red-50 rounded-2xl border border-red-200">
 								{error}
 							</div>
 						) : (
@@ -498,15 +500,15 @@ export default function AdminPanel() {
 								{orders.map((order) => (
 									<div
 										key={order._id}
-										className="bg-gradient-to-r from-stone-50 to-purple-50 rounded-2xl p-6 border border-stone-200 hover:shadow-md transition-all duration-300"
+										className="p-6 bg-gradient-to-r to-purple-50 rounded-2xl border transition-all duration-300 from-stone-50 border-stone-200 hover:shadow-md"
 									>
-										<div className="flex items-center justify-between">
+										<div className="flex justify-between items-center">
 											<div className="flex-1">
-												<h3 className="text-lg font-semibold text-stone-800 mb-2">
+												<h3 className="mb-2 text-lg font-semibold text-stone-800">
 													Order for Item: {order.item}
 												</h3>
-												<div className="flex items-center space-x-4 mb-2">
-													<span className="px-3 py-1 bg-stone-100 text-stone-700 rounded-full text-xs font-medium">
+												<div className="flex items-center mb-2 space-x-4">
+													<span className="px-3 py-1 text-xs font-medium rounded-full bg-stone-100 text-stone-700">
 														{order.type}
 													</span>
 													<span
@@ -521,11 +523,11 @@ export default function AdminPanel() {
 														{order.status}
 													</span>
 												</div>
-												<p className="text-stone-600 text-sm">
+												<p className="text-sm text-stone-600">
 													{order.message}
 												</p>
 											</div>
-											<div className="flex space-x-3 ml-6">
+											<div className="flex ml-6 space-x-3">
 												<button
 													onClick={() => handleOrderAction(order._id, "accept")}
 													className={buttonStyle("approve")}
@@ -549,8 +551,8 @@ export default function AdminPanel() {
 									</div>
 								))}
 								{orders.length === 0 && (
-									<div className="text-center py-16 text-stone-500">
-										<div className="w-16 h-16 bg-stone-100 rounded-full flex items-center justify-center mx-auto mb-4">
+									<div className="py-16 text-center text-stone-500">
+										<div className="flex justify-center items-center mx-auto mb-4 w-16 h-16 rounded-full bg-stone-100">
 											<span className="text-2xl">📭</span>
 										</div>
 										No orders found
@@ -559,7 +561,7 @@ export default function AdminPanel() {
 							</div>
 						)}
 						{actionError && (
-							<div className="bg-red-50 border border-red-200 rounded-2xl p-4 text-red-700 text-center mt-4">
+							<div className="p-4 mt-4 text-center text-red-700 bg-red-50 rounded-2xl border border-red-200">
 								{actionError}
 							</div>
 						)}
@@ -568,39 +570,39 @@ export default function AdminPanel() {
 
 				{/* User Detail Modal */}
 				{selectedUser && (
-					<div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-						<div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 border border-stone-200">
+					<div className="flex fixed inset-0 z-50 justify-center items-center p-4 backdrop-blur-sm bg-black/20">
+						<div className="p-8 w-full max-w-md bg-white rounded-3xl border shadow-2xl border-stone-200">
 							<div className="flex justify-between items-start mb-6">
 								<div>
 									<h3 className="text-2xl font-bold text-stone-800">
 										{selectedUser.name || selectedUser.username}
 									</h3>
-									<p className="text-stone-600 text-sm">User Details</p>
+									<p className="text-sm text-stone-600">User Details</p>
 								</div>
 								<button
 									onClick={() => setSelectedUser(null)}
-									className="w-8 h-8 bg-stone-100 rounded-full flex items-center justify-center text-stone-600 hover:bg-stone-200 transition-colors"
+									className="flex justify-center items-center w-8 h-8 rounded-full transition-colors bg-stone-100 text-stone-600 hover:bg-stone-200"
 								>
 									✕
 								</button>
 							</div>
 							<div className="space-y-6">
-								<div className="bg-gradient-to-r from-stone-50 to-orange-50 rounded-2xl p-4">
-									<p className="text-xs text-stone-500 mb-1">Email Address</p>
-									<p className="text-stone-800 font-medium">
+								<div className="p-4 bg-gradient-to-r to-orange-50 rounded-2xl from-stone-50">
+									<p className="mb-1 text-xs text-stone-500">Email Address</p>
+									<p className="font-medium text-stone-800">
 										{selectedUser.email}
 									</p>
 								</div>
-								<div className="bg-gradient-to-r from-stone-50 to-orange-50 rounded-2xl p-4">
-									<p className="text-xs text-stone-500 mb-1">Member Since</p>
-									<p className="text-stone-800 font-medium">
+								<div className="p-4 bg-gradient-to-r to-orange-50 rounded-2xl from-stone-50">
+									<p className="mb-1 text-xs text-stone-500">Member Since</p>
+									<p className="font-medium text-stone-800">
 										{selectedUser.createdAt
 											? new Date(selectedUser.createdAt).toLocaleDateString()
 											: "-"}
 									</p>
 								</div>
-								<div className="bg-gradient-to-r from-stone-50 to-orange-50 rounded-2xl p-4">
-									<p className="text-xs text-stone-500 mb-1">Account Status</p>
+								<div className="p-4 bg-gradient-to-r to-orange-50 rounded-2xl from-stone-50">
+									<p className="mb-1 text-xs text-stone-500">Account Status</p>
 									<span
 										className={`inline-flex px-3 py-1 text-xs font-medium rounded-full ${
 											selectedUser.status === "active"
@@ -611,10 +613,10 @@ export default function AdminPanel() {
 										{selectedUser.status}
 									</span>
 								</div>
-								<div className="pt-4 border-t border-stone-200 space-y-3">
+								<div className="pt-4 space-y-3 border-t border-stone-200">
 									{selectedUser.status === "active" ? (
 										<button
-											className="w-full bg-gradient-to-r from-amber-50 to-orange-50 text-amber-700 py-3 px-4 rounded-2xl hover:from-amber-100 hover:to-orange-100 transition-all duration-300 font-medium border border-amber-200"
+											className="px-4 py-3 w-full font-medium text-amber-700 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-200 transition-all duration-300 hover:from-amber-100 hover:to-orange-100"
 											onClick={() =>
 												handleUserAction(selectedUser._id, "suspend")
 											}
@@ -626,7 +628,7 @@ export default function AdminPanel() {
 										</button>
 									) : (
 										<button
-											className="w-full bg-gradient-to-r from-emerald-50 to-green-50 text-emerald-700 py-3 px-4 rounded-2xl hover:from-emerald-100 hover:to-green-100 transition-all duration-300 font-medium border border-emerald-200"
+											className="px-4 py-3 w-full font-medium text-emerald-700 bg-gradient-to-r from-emerald-50 to-green-50 rounded-2xl border border-emerald-200 transition-all duration-300 hover:from-emerald-100 hover:to-green-100"
 											onClick={() =>
 												handleUserAction(selectedUser._id, "activate")
 											}
@@ -638,7 +640,7 @@ export default function AdminPanel() {
 										</button>
 									)}
 									<button
-										className="w-full bg-gradient-to-r from-red-50 to-rose-50 text-red-700 py-3 px-4 rounded-2xl hover:from-red-100 hover:to-rose-100 transition-all duration-300 font-medium border border-red-200"
+										className="px-4 py-3 w-full font-medium text-red-700 bg-gradient-to-r from-red-50 to-rose-50 rounded-2xl border border-red-200 transition-all duration-300 hover:from-red-100 hover:to-rose-100"
 										onClick={() => setDeleteConfirm(selectedUser)}
 										disabled={actionLoading === selectedUser._id + "delete"}
 									>
@@ -652,13 +654,13 @@ export default function AdminPanel() {
 
 				{/* Delete Confirmation Modal */}
 				{deleteConfirm && (
-					<div className="fixed inset-0 bg-black/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-						<div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 border border-stone-200">
-							<div className="text-center mb-6">
-								<div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+					<div className="flex fixed inset-0 z-50 justify-center items-center p-4 backdrop-blur-sm bg-black/20">
+						<div className="p-8 w-full max-w-md bg-white rounded-3xl border shadow-2xl border-stone-200">
+							<div className="mb-6 text-center">
+								<div className="flex justify-center items-center mx-auto mb-4 w-16 h-16 bg-red-100 rounded-full">
 									<span className="text-2xl text-red-600">⚠️</span>
 								</div>
-								<h3 className="text-xl font-bold text-stone-800 mb-2">
+								<h3 className="mb-2 text-xl font-bold text-stone-800">
 									Delete User
 								</h3>
 								<p className="text-stone-600">
@@ -671,14 +673,14 @@ export default function AdminPanel() {
 							</div>
 							<div className="flex space-x-4">
 								<button
-									className="flex-1 bg-gradient-to-r from-stone-100 to-stone-50 text-stone-700 py-3 rounded-2xl hover:from-stone-200 hover:to-stone-100 transition-all duration-300 font-medium border border-stone-200"
+									className="flex-1 py-3 font-medium bg-gradient-to-r rounded-2xl border transition-all duration-300 from-stone-100 to-stone-50 text-stone-700 hover:from-stone-200 hover:to-stone-100 border-stone-200"
 									onClick={() => setDeleteConfirm(null)}
 									disabled={!!actionLoading}
 								>
 									Cancel
 								</button>
 								<button
-									className="flex-1 bg-gradient-to-r from-red-50 to-rose-50 text-red-700 py-3 rounded-2xl hover:from-red-100 hover:to-rose-100 transition-all duration-300 font-medium border border-red-200"
+									className="flex-1 py-3 font-medium text-red-700 bg-gradient-to-r from-red-50 to-rose-50 rounded-2xl border border-red-200 transition-all duration-300 hover:from-red-100 hover:to-rose-100"
 									onClick={() => handleDeleteUser(deleteConfirm._id)}
 									disabled={actionLoading === deleteConfirm._id + "delete"}
 								>
@@ -688,7 +690,7 @@ export default function AdminPanel() {
 								</button>
 							</div>
 							{actionError && (
-								<div className="bg-red-50 border border-red-200 rounded-2xl p-4 text-red-700 text-center mt-4">
+								<div className="p-4 mt-4 text-center text-red-700 bg-red-50 rounded-2xl border border-red-200">
 									{actionError}
 								</div>
 							)}

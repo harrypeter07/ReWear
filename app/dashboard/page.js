@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import ItemCard from "@/components/ItemCard";
 import Image from "next/image";
@@ -14,6 +15,7 @@ export default function DashboardPage() {
 	const [userPurchases, setUserPurchases] = useState([]);
 	const [swapRequests, setSwapRequests] = useState([]);
 	const [loading, setLoading] = useState(true);
+	const router = useRouter();
 
 	useEffect(() => {
 		async function fetchDashboard() {
@@ -203,6 +205,10 @@ export default function DashboardPage() {
 					<h2 className="mb-4 text-2xl font-semibold text-primary">
 						Your Listings
 					</h2>
+					<div className="flex gap-3 mb-4">
+						<button className="btn" onClick={() => router.push("/items/new")}>Add Item</button>
+						<button className="btn" onClick={() => router.push("/items")}>Browse Items</button>
+					</div>
 					{/* Listings grid or list here */}
 					{userListings.length === 0 ? (
 						<p className="text-secondary">You have no listings yet.</p>
@@ -228,21 +234,38 @@ export default function DashboardPage() {
 							))}
 						</div>
 					)}
+					<div className="mt-4 flex gap-3">
+						<button className="btn" onClick={() => router.push("/swaps")}>View All Swaps</button>
+					</div>
 				</div>
 
 				{/* Recent Activity */}
 				<div className="p-6 mt-8 card">
 					<h2 className="mb-4 text-2xl font-semibold text-primary">Recent Activity</h2>
-					<ul className="space-y-2">
-						<li className="flex justify-between items-center">
-							<span style={{ color: 'var(--text-secondary)' }}>Viewed dashboard</span>
-							<span className="text-sm" style={{ color: 'var(--text-secondary)' }}>Just now</span>
-						</li>
-						<li className="flex justify-between items-center">
-							<span style={{ color: 'var(--text-secondary)' }}>Checked swap requests</span>
-							<span className="text-sm" style={{ color: 'var(--text-secondary)' }}>Today</span>
-						</li>
-					</ul>
+					{(swapRequests && swapRequests.length > 0) || (userListings && userListings.length > 0) ? (
+						<ul className="space-y-2">
+							{swapRequests.slice(0,5).map((s) => (
+								<li key={s._id} className="flex justify-between items-center">
+									<span style={{ color: 'var(--text-secondary)' }}>
+										{`Swap ${s.type || 'request'} ${s.status || ''}`}
+									</span>
+									<span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+										{new Date(s.createdAt || Date.now()).toLocaleString()}
+									</span>
+								</li>
+							))}
+							{userListings.slice(0,5).map((i) => (
+								<li key={i._id} className="flex justify-between items-center">
+									<span style={{ color: 'var(--text-secondary)' }}>{`Listed: ${i.title}`}</span>
+									<span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+										{new Date(i.createdAt || Date.now()).toLocaleDateString()}
+									</span>
+								</li>
+							))}
+						</ul>
+					) : (
+						<p className="text-secondary">No recent activity yet.</p>
+					)}
 				</div>
 			</div>
 		</div>

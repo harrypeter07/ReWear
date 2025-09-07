@@ -58,15 +58,16 @@ export async function POST(req) {
 		}
 
 		const { items } = await getCollections();
+		const requireReview = Number(pointsValue) > 10;
 		const newItem = {
 			...validated,
 			uploaderId: new ObjectId(uploaderId),
 			owner: new ObjectId(uploaderId), // Set owner for aggregation
 			createdAt: new Date(),
 			updatedAt: new Date(),
-			status: "available",
-			isApproved: false,
-			isVisible: false,
+			status: requireReview ? "pending" : "available",
+			isApproved: !requireReview,
+			isVisible: !requireReview,
 		};
 
 		const result = await items.insertOne(newItem);
