@@ -1,9 +1,7 @@
 // scripts/seed-items.js
 import clientPromise from "../lib/mongodb.js";
 import { ObjectId } from "mongodb";
-import https from "node:https";
-
-// Remote demo images to fetch and store as base64 data URIs (so they don't rely on your uploads)
+// Remote demo image URLs (store as URLs, not base64)
 const demoImageUrls = [
   "https://images.unsplash.com/photo-1520975922284-8b456906c813?q=80&w=800",
   "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=800",
@@ -30,38 +28,7 @@ function pick(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-async function fetchAsDataUri(url) {
-  return new Promise((resolve, reject) => {
-    https.get(url, (res) => {
-      const statusCode = res.statusCode ?? 0;
-      if (statusCode >= 400) {
-        res.resume();
-        return resolve(null);
-      }
-      const chunks = [];
-      res.on("data", (d) => chunks.push(d));
-      res.on("end", () => {
-        const buffer = Buffer.concat(chunks);
-        const contentType = res.headers["content-type"] || "image/jpeg";
-        const base64 = buffer.toString("base64");
-        resolve(`data:${contentType};base64,${base64}`);
-      });
-    }).on("error", () => resolve(null));
-  });
-}
-
-async function prefetchDemoImages() {
-  const results = [];
-  for (const url of demoImageUrls) {
-    const dataUri = await fetchAsDataUri(url);
-    if (dataUri) results.push(dataUri);
-  }
-  // Fallback to default.jpg data uri if none fetched
-  if (results.length === 0) {
-    results.push("/images/default.jpg");
-  }
-  return results;
-}
+function getDemoImages() { return demoImageUrls; }
 
 function generateItems(seedOwnerId, count = 20, demoImages = []) {
   const items = [];
@@ -101,15 +68,18 @@ async function main() {
     process.exit(1);
   }
 
-  // Clean up previous demo items for this user (base64-seeded)
+  // Clean up previous demo items for this user (data: or unsplash)
   const cleanup = await itemsCol.deleteMany({
     uploaderId: user._id,
-    image: { $regex: '^data:' }
+    $or: [
+      { image: { $regex: '^data:' } },
+      { image: { $regex: 'images.unsplash.com' } }
+    ]
   });
   console.log(`Removed ${(cleanup?.deletedCount ?? 0)} previous demo items for`, seedOwnerEmail);
 
-  const imagesAsDataUri = await prefetchDemoImages();
-  const items = generateItems(user._id.toString(), 20, imagesAsDataUri);
+  const images = getDemoImages();
+  const items = generateItems(user._id.toString(), 20, images);
   const result = await itemsCol.insertMany(items);
   console.log(`Inserted ${result.insertedCount || items.length} demo items for`, seedOwnerEmail);
   process.exit(0);
