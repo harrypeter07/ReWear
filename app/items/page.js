@@ -307,23 +307,10 @@ export default async function ItemsPage() {
 							<h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>
 								All Items
 							</h2>
-							<div className="bento-grid">
-								{items.map((item, index) => (
-									<div
-										key={item._id || item.id}
-										className={`${
-											index % 7 === 0
-												? "col-span-2 row-span-2"
-												: index % 11 === 0
-												? "col-span-2"
-												: index % 13 === 0
-												? "col-span-2"
-												: ""
-										}`}
-									>
-										<div className="h-full">
-											<ItemCard item={item} />
-										</div>
+							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+								{items.map((item) => (
+									<div key={item._id || item.id}>
+										<ItemCard item={item} />
 									</div>
 								))}
 							</div>
