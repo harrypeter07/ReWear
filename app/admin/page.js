@@ -407,12 +407,12 @@ export default function AdminPanel() {
 										key={item._id}
 										className="p-6 bg-gradient-to-r to-green-50 rounded-2xl border transition-all duration-300 from-stone-50 border-stone-200 hover:shadow-md"
 									>
-										<div className="flex justify-between items-start gap-6">
+										<div className="flex gap-6 justify-between items-start">
 											<div className="flex-1">
 												<h3 className="mb-2 text-lg font-semibold text-stone-800">{item.title}</h3>
-												<div className="flex flex-wrap items-center mb-2 gap-2">
+												<div className="flex flex-wrap gap-2 items-center mb-2">
 													<span className="px-3 py-1 text-xs font-medium rounded-full bg-stone-100 text-stone-700">{item.category}</span>
-													<span className="px-3 py-1 text-xs font-medium rounded-full bg-amber-100 text-amber-700">Points: {item.pointsValue}</span>
+													<span className="px-3 py-1 text-xs font-medium text-amber-700 bg-amber-100 rounded-full">Points: {item.pointsValue}</span>
 													<span className="px-3 py-1 text-xs font-medium rounded-full bg-stone-100 text-stone-700">Owner: {item.ownerUsername || item.ownerName || 'Unknown'}</span>
 												</div>
 											<p className="text-sm text-stone-600">{item.description}</p>
