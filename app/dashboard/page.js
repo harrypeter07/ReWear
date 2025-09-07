@@ -174,6 +174,31 @@ export default function DashboardPage() {
 
 			{/* Main Content */}
 			<div className="container">
+				{/* Profile Overview */}
+				<div className="p-6 mb-8 card">
+					<h2 className="mb-4 text-2xl font-semibold text-primary">Your Profile</h2>
+					<div className="flex flex-col gap-6 items-center sm:flex-row sm:items-start">
+						<div className="flex justify-center items-center w-24 h-24 rounded-full" style={{ background: 'var(--bg-secondary)' }}>
+							<span className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
+								{(user?.name || user?.username || 'U')?.slice(0,1).toUpperCase()}
+							</span>
+						</div>
+						<div className="flex-1">
+							<p className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
+								{user?.name || user?.username}
+							</p>
+							<p className="mb-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+								{user?.email}
+							</p>
+							<div className="flex flex-wrap gap-3">
+								<span className="px-3 py-1 text-sm" style={{ background: 'var(--bg-secondary)', borderRadius: 'var(--radius)', color: 'var(--text-primary)' }}>Role: {user?.role || 'user'}</span>
+								<span className="px-3 py-1 text-sm" style={{ background: 'var(--bg-secondary)', borderRadius: 'var(--radius)', color: 'var(--text-primary)' }}>Points: {user?.points ?? 0}</span>
+								<span className="px-3 py-1 text-sm" style={{ background: 'var(--bg-secondary)', borderRadius: 'var(--radius)', color: 'var(--text-primary)' }}>Listings: {userListings.length}</span>
+							</div>
+						</div>
+					</div>
+				</div>
+
 				<div className="p-6 mb-8 card">
 					<h2 className="mb-4 text-2xl font-semibold text-primary">
 						Your Listings
@@ -203,6 +228,21 @@ export default function DashboardPage() {
 							))}
 						</div>
 					)}
+				</div>
+
+				{/* Recent Activity */}
+				<div className="p-6 mt-8 card">
+					<h2 className="mb-4 text-2xl font-semibold text-primary">Recent Activity</h2>
+					<ul className="space-y-2">
+						<li className="flex justify-between items-center">
+							<span style={{ color: 'var(--text-secondary)' }}>Viewed dashboard</span>
+							<span className="text-sm" style={{ color: 'var(--text-secondary)' }}>Just now</span>
+						</li>
+						<li className="flex justify-between items-center">
+							<span style={{ color: 'var(--text-secondary)' }}>Checked swap requests</span>
+							<span className="text-sm" style={{ color: 'var(--text-secondary)' }}>Today</span>
+						</li>
+					</ul>
 				</div>
 			</div>
 		</div>

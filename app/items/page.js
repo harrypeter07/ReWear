@@ -16,7 +16,7 @@ export default async function ItemsPage() {
 	const items = await getItems();
 
 	return (
-		<div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
+		<div className="min-h-screen pt-20" style={{ background: 'var(--bg-primary)' }}>
 			{/* Header Section */}
 			<div className="container">
 				<div className="card text-center mb-8">
