@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
 
 export async function GET(req) {
-	let user = getUserFromRequest(req);
+	let user = await getUserFromRequest(req);
 	const cookieStore = await cookies();
 	if (!user) {
 		// Try refresh token
@@ -46,7 +46,7 @@ export async function GET(req) {
 }
 
 export async function PATCH(req) {
-	const userFromToken = getUserFromRequest(req);
+	const userFromToken = await getUserFromRequest(req);
 	if (!userFromToken) {
 		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 	}

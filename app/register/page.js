@@ -28,7 +28,11 @@ export default function RegisterPage() {
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		if (!agreeTerms) {
-			setError("You must agreeto the terms and conditions");
+			setError("You must agree to the terms and conditions");
+			return;
+		}
+		if (formData.password !== formData.confirmPassword) {
+			setError("Passwords do not match");
 			return;
 		}
 		setIsLoading(true);
@@ -59,7 +63,7 @@ export default function RegisterPage() {
 	};
 
 	return (
-		<div className="min-h-screen flex items-center justify-center gradient-bg px-2">
+		<div className="min-h-screen flex items-center justify-center gradient-bg px-4 sm:px-6">
 			<div className="card w-full max-w-md p-8 shadow-lg rounded-2xl">
 				<h2 className="text-3xl font-bold mb-2 text-primary text-center">
 					Create Account
@@ -75,6 +79,8 @@ export default function RegisterPage() {
 						<input
 							type="text"
 							name="username"
+							value={formData.username}
+							onChange={handleChange}
 							className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition text-primary bg-white"
 							required
 						/>
@@ -86,6 +92,8 @@ export default function RegisterPage() {
 						<input
 							type="email"
 							name="email"
+							value={formData.email}
+							onChange={handleChange}
 							className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition text-primary bg-white"
 							required
 						/>
@@ -97,11 +105,33 @@ export default function RegisterPage() {
 						<input
 							type="password"
 							name="password"
+							value={formData.password}
+							onChange={handleChange}
 							className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition text-primary bg-white"
 							required
 						/>
 					</div>
-					<button type="submit" className="btn w-full mt-2">
+					<div>
+						<label className="block text-primary font-semibold mb-1">
+							Confirm Password
+						</label>
+						<input
+							type="password"
+							name="confirmPassword"
+							value={formData.confirmPassword}
+							onChange={handleChange}
+							className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition text-primary bg-white"
+							required
+						/>
+					</div>
+					<div className="flex items-center gap-2">
+						<input id="agree" type="checkbox" checked={agreeTerms} onChange={(e) => setAgreeTerms(e.target.checked)} className="h-4 w-4" />
+						<label htmlFor="agree" className="text-sm text-secondary">I agree to the Terms and Conditions</label>
+					</div>
+					{error && (
+						<p className="text-red-600 text-sm" role="alert">{error}</p>
+					)}
+					<button type="submit" className="btn w-full mt-2" disabled={isLoading}>
 						Register
 					</button>
 				</form>

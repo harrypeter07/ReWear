@@ -65,7 +65,7 @@ export default function Home() {
 		<div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
 			{/* Hero Section */}
 			<section className="container">
-				<div className="card text-center py-16">
+				<div className="card text-center py-16 md:py-24 min-h-[60vh] flex flex-col items-center justify-center">
 					<h1 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
 						Sustainable Fashion Through Swapping
 					</h1>

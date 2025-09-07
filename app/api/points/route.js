@@ -4,7 +4,7 @@ import { getCollections } from "@/lib/db";
 import { ObjectId } from "mongodb";
 
 export async function GET(req) {
-	const user = getUserFromRequest(req);
+	const user = await getUserFromRequest(req);
 	if (!user) {
 		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 	}
@@ -17,7 +17,7 @@ export async function GET(req) {
 }
 
 export async function PATCH(req) {
-	const user = getUserFromRequest(req);
+	const user = await getUserFromRequest(req);
 	if (!user) {
 		return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 	}

@@ -3,7 +3,7 @@ import { getUserFromRequest } from "../lib/auth";
 
 export default function withAuth(handler, requiredRole = null) {
 	return async (req, context) => {
-		const user = getUserFromRequest(req);
+		const user = await getUserFromRequest(req);
 		if (!user) {
 			return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
 		}

@@ -5,8 +5,8 @@ import { NextResponse } from "next/server";
 import { getUserFromRequest } from "@/lib/auth";
 
 // Helper to check admin
-function requireAdmin(req) {
-	const user = getUserFromRequest(req);
+async function requireAdmin(req) {
+	const user = await getUserFromRequest(req);
 	if (!user || user.role !== "admin") {
 		return false;
 	}
@@ -14,7 +14,7 @@ function requireAdmin(req) {
 }
 
 export async function GET(req) {
-	if (!requireAdmin(req)) {
+	if (!(await requireAdmin(req))) {
 		return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 	}
 	const { users } = await getCollections();
@@ -23,7 +23,7 @@ export async function GET(req) {
 }
 
 export async function PATCH(req) {
-	if (!requireAdmin(req)) {
+	if (!(await requireAdmin(req))) {
 		return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 	}
 	const { userId, action } = await req.json();
@@ -49,7 +49,7 @@ export async function PATCH(req) {
 }
 
 export async function DELETE(req) {
-	if (!requireAdmin(req)) {
+	if (!(await requireAdmin(req))) {
 		return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 	}
 	const { userId } = await req.json();
