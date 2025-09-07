@@ -6,12 +6,15 @@ export async function GET(req) {
 	const { items } = await getCollections();
 	const url = new URL(req.url, "http://localhost");
 	const uploaderId = url.searchParams.get("uploaderId");
+	const status = url.searchParams.get("status");
 
 	const pipeline = [];
 	if (uploaderId) {
 		try {
 			pipeline.push({ $match: { uploaderId: new ObjectId(uploaderId) } });
 		} catch {}
+	} else if (status === "pending") {
+		pipeline.push({ $match: { isApproved: false } });
 	} else {
 		pipeline.push({ $match: { isApproved: true, isVisible: true, status: { $ne: "pending" } } });
 	}
