@@ -1,13 +1,20 @@
 // scripts/seed-items.js
 import clientPromise from "../lib/mongodb.js";
 import { ObjectId } from "mongodb";
+import https from "node:https";
 
-// Demo images hosted in repo public/uploads or placeholders
-const demoImages = [
-  "/uploads/1752318373893-0zbgu3f18lyh.jpg",
-  "/uploads/1752318415828-pfzak19p3s.jpg",
-  "/uploads/1752318995452-hsvwmrih5ow.jpg",
-  "/uploads/1752344430155-y4hzw3293y.jpg",
+// Remote demo images to fetch and store as base64 data URIs (so they don't rely on your uploads)
+const demoImageUrls = [
+  "https://images.unsplash.com/photo-1520975922284-8b456906c813?q=80&w=800",
+  "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?q=80&w=800",
+  "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?q=80&w=800",
+  "https://images.unsplash.com/photo-1520975918311-1f8c1959b1f2?q=80&w=800",
+  "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=800",
+  "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=800",
+  "https://images.unsplash.com/photo-1503341504253-dff4815485f1?q=80&w=800",
+  "https://images.unsplash.com/photo-1521577352947-9bb58764b69a?q=80&w=800",
+  "https://images.unsplash.com/photo-1542060748-10c28b62716f?q=80&w=800",
+  "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=800",
 ];
 
 const demoCategories = [
@@ -23,7 +30,40 @@ function pick(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function generateItems(seedOwnerId, count = 20) {
+async function fetchAsDataUri(url) {
+  return new Promise((resolve, reject) => {
+    https.get(url, (res) => {
+      const statusCode = res.statusCode ?? 0;
+      if (statusCode >= 400) {
+        res.resume();
+        return resolve(null);
+      }
+      const chunks = [];
+      res.on("data", (d) => chunks.push(d));
+      res.on("end", () => {
+        const buffer = Buffer.concat(chunks);
+        const contentType = res.headers["content-type"] || "image/jpeg";
+        const base64 = buffer.toString("base64");
+        resolve(`data:${contentType};base64,${base64}`);
+      });
+    }).on("error", () => resolve(null));
+  });
+}
+
+async function prefetchDemoImages() {
+  const results = [];
+  for (const url of demoImageUrls) {
+    const dataUri = await fetchAsDataUri(url);
+    if (dataUri) results.push(dataUri);
+  }
+  // Fallback to default.jpg data uri if none fetched
+  if (results.length === 0) {
+    results.push("/images/default.jpg");
+  }
+  return results;
+}
+
+function generateItems(seedOwnerId, count = 20, demoImages = []) {
   const items = [];
   for (let i = 0; i < count; i++) {
     const category = pick(demoCategories);
@@ -61,7 +101,15 @@ async function main() {
     process.exit(1);
   }
 
-  const items = generateItems(user._id.toString(), 20);
+  // Clean up previous demo items for this user (base64-seeded)
+  const cleanup = await itemsCol.deleteMany({
+    uploaderId: user._id,
+    image: { $regex: '^data:' }
+  });
+  console.log(`Removed ${(cleanup?.deletedCount ?? 0)} previous demo items for`, seedOwnerEmail);
+
+  const imagesAsDataUri = await prefetchDemoImages();
+  const items = generateItems(user._id.toString(), 20, imagesAsDataUri);
   const result = await itemsCol.insertMany(items);
   console.log(`Inserted ${result.insertedCount || items.length} demo items for`, seedOwnerEmail);
   process.exit(0);

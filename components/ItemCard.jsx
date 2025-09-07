@@ -38,17 +38,17 @@ export default function ItemCard({ item }) {
 				transition: 'var(--transition)'
 			}}
 		>
-			{/* Image Container */}
+			{/* Image Container with fixed aspect ratio */}
 			<div 
-				className="relative w-full h-48 flex items-center justify-center overflow-hidden"
+				className="relative w-full"
 				style={{
-					background: 'linear-gradient(135deg, var(--bg-secondary), var(--accent))',
-					borderRadius: 'var(--radius) var(--radius) 0 0'
+					paddingTop: '75%', // 4:3 aspect ratio
+					background: 'linear-gradient(135deg, var(--bg-secondary), var(--accent))'
 				}}
 			>
 				{isImageMissing ? (
 					<div 
-						className="flex flex-col items-center justify-center h-full"
+						className="absolute inset-0 flex flex-col items-center justify-center"
 						style={{ color: 'var(--text-secondary)' }}
 					>
 						<svg
@@ -72,7 +72,7 @@ export default function ItemCard({ item }) {
 						src={getImageSrc()}
 						alt={item.title || "Item image"}
 						fill
-						className="object-cover transition-transform duration-300 group-hover:scale-105"
+						className="absolute inset-0 object-cover transition-transform duration-300 group-hover:scale-105"
 						onError={handleImageError}
 						unoptimized={
 							item.image?.startsWith("data:") || item.image?.startsWith("http")
@@ -81,7 +81,7 @@ export default function ItemCard({ item }) {
 						style={{ borderRadius: 'var(--radius) var(--radius) 0 0' }}
 					/>
 				)}
-				
+
 				{/* Status Badge */}
 				{typeof item.isApproved !== "undefined" ? (
 					<div
@@ -169,7 +169,7 @@ export default function ItemCard({ item }) {
 							</span>
 						</div>
 					)}
-
+					
 					{item.size && (
 						<div className="flex items-center gap-2">
 							<span 
@@ -186,7 +186,7 @@ export default function ItemCard({ item }) {
 							</span>
 						</div>
 					)}
-
+					
 					{item.condition && (
 						<div className="flex items-center gap-2">
 							<span 
@@ -219,7 +219,7 @@ export default function ItemCard({ item }) {
 							</span>
 						</div>
 					)}
-
+					
 					{item.pointsValue !== undefined && item.pointsValue !== null && (
 						<div className="flex items-center gap-2">
 							<span 

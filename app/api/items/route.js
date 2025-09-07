@@ -4,9 +4,10 @@ import { ObjectId } from "mongodb";
 
 export async function GET() {
 	const { items, users } = await getCollections();
-	// Use aggregation to join owner info, fallback to uploaderId if owner is missing
+	// Only return approved and visible items; join owner info; newest first
 	const allItems = await items
 		.aggregate([
+			{ $match: { isApproved: true, isVisible: true, status: { $ne: "pending" } } },
 			{
 				$addFields: {
 					lookupUserId: { $ifNull: ["$owner", "$uploaderId"] },
@@ -26,6 +27,7 @@ export async function GET() {
 					ownerName: { $arrayElemAt: ["$ownerInfo.name", 0] },
 				},
 			},
+			{ $sort: { createdAt: -1 } },
 			{ $project: { ownerInfo: 0, lookupUserId: 0 } },
 		])
 		.toArray();
