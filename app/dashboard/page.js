@@ -149,22 +149,30 @@ export default function DashboardPage() {
 						Your Listings
 					</h2>
 					{/* Listings grid or list here */}
-					<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-						{userListings.map((item) => (
-							<ItemCard key={item._id} item={item} />
-						))}
-					</div>
+					{userListings.length === 0 ? (
+						<p className="text-secondary">You have no listings yet.</p>
+					) : (
+						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+							{userListings.map((item) => (
+								<ItemCard key={item._id} item={item} />
+							))}
+						</div>
+					)}
 				</div>
 				<div className="card p-6">
 					<h2 className="text-2xl font-semibold text-primary mb-4">
 						Swap Requests
 					</h2>
 					{/* Swap requests list here */}
-					<div className="space-y-4">
-						{swapRequests.map((req) => (
-							<SwapRequestForm key={req._id} request={req} />
-						))}
-					</div>
+					{swapRequests.length === 0 ? (
+						<p className="text-secondary">No swap requests yet.</p>
+					) : (
+						<div className="space-y-4">
+							{swapRequests.map((req) => (
+								<SwapRequestForm key={req._id} request={req} />
+							))}
+						</div>
+					)}
 				</div>
 			</div>
 		</div>
