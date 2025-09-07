@@ -13,7 +13,17 @@ function isStrongPassword(password) {
 
 export async function POST(req) {
 	const { username, email, password } = await req.json();
+	console.log("[REGISTER] Received:", {
+		username,
+		email,
+		password: password ? "[MASKED]" : undefined,
+	});
 	if (!username || !email || !password) {
+		console.log("[REGISTER] Missing fields", {
+			hasUsername: !!username,
+			hasEmail: !!email,
+			hasPassword: !!password,
+		});
 		return NextResponse.json(
 			{ message: "All fields are required" },
 			{ status: 400 }
@@ -23,12 +33,21 @@ export async function POST(req) {
 	const cleanEmail = email.trim().toLowerCase();
 	const cleanPassword = password.trim();
 	if (!isValidEmail(cleanEmail)) {
+		console.log("[REGISTER] Invalid email format", { cleanEmail });
 		return NextResponse.json(
 			{ message: "Invalid email format" },
 			{ status: 400 }
 		);
 	}
+	const hasMinLength = cleanPassword.length >= 8;
+	const hasLetter = /[A-Za-z]/.test(cleanPassword);
+	const hasNumber = /\d/.test(cleanPassword);
 	if (!isStrongPassword(cleanPassword)) {
+		console.log("[REGISTER] Weak password", {
+			hasMinLength,
+			hasLetter,
+			hasNumber,
+		});
 		return NextResponse.json(
 			{
 				message:
@@ -41,6 +60,7 @@ export async function POST(req) {
 		const { users } = await getCollections();
 		const existingEmail = await users.findOne({ email: cleanEmail });
 		if (existingEmail) {
+			console.log("[REGISTER] Email already exists", { cleanEmail });
 			return NextResponse.json(
 				{ message: "User with this email already exists" },
 				{ status: 409 }
@@ -48,6 +68,7 @@ export async function POST(req) {
 		}
 		const existingUsername = await users.findOne({ username: cleanUsername });
 		if (existingUsername) {
+			console.log("[REGISTER] Username already taken", { cleanUsername });
 			return NextResponse.json(
 				{ message: "Username already taken" },
 				{ status: 409 }
@@ -64,6 +85,7 @@ export async function POST(req) {
 			points: 2,
 		};
 		const result = await users.insertOne(user);
+		console.log("[REGISTER] User created", { _id: result.insertedId, email: user.email });
 		// Auto-login after registration
 		const jwt = require("jsonwebtoken");
 		const { cookies } = require("next/headers");
@@ -93,6 +115,7 @@ export async function POST(req) {
 			maxAge: 60 * 60 * 24 * 7, // 7 days
 			path: "/",
 		});
+		console.log("[REGISTER] Tokens set and response ready", { _id: userId });
 		return NextResponse.json(
 			{
 				user: {
@@ -107,7 +130,7 @@ export async function POST(req) {
 			{ status: 201 }
 		);
 	} catch (err) {
-		console.error("Register error:", err);
+		console.error("[REGISTER] Internal error:", err);
 		return NextResponse.json(
 			{ message: "Internal server error" },
 			{ status: 500 }

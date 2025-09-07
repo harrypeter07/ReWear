@@ -9,11 +9,9 @@ export default function RegisterPage() {
 		username: "",
 		email: "",
 		password: "",
-		confirmPassword: "",
 	});
 	const [error, setError] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
-	const [agreeTerms, setAgreeTerms] = useState(false);
 	const router = useRouter();
 	const { setUser } = useContext(UserContext);
 
@@ -27,12 +25,13 @@ export default function RegisterPage() {
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
-		if (!agreeTerms) {
-			setError("You must agree to the terms and conditions");
-			return;
-		}
-		if (formData.password !== formData.confirmPassword) {
-			setError("Passwords do not match");
+		// Client-side password checks for UX; server enforces too
+		const hasMinLength = formData.password.length >= 8;
+		const hasLetter = /[A-Za-z]/.test(formData.password);
+		const hasNumber = /\d/.test(formData.password);
+		console.log("[REGISTER UI] Password checks:", { hasMinLength, hasLetter, hasNumber });
+		if (!hasMinLength || !hasLetter || !hasNumber) {
+			setError("Password must be 8+ chars with a letter and number");
 			return;
 		}
 		setIsLoading(true);
@@ -46,16 +45,20 @@ export default function RegisterPage() {
 				},
 				body: JSON.stringify(formData),
 			});
+			console.log("[REGISTER UI] Response status:", response.status);
 
 			if (response.ok) {
 				const data = await response.json();
+				console.log("[REGISTER UI] Success for:", { email: data.user?.email });
 				setUser(data.user);
 				router.push("/dashboard");
 			} else {
 				const data = await response.json();
+				console.log("[REGISTER UI] Error:", data);
 				setError(data.message || "Registration failed");
 			}
 		} catch (err) {
+			console.log("[REGISTER UI] Network error:", err);
 			setError("An error occurred during registration");
 		} finally {
 			setIsLoading(false);
@@ -111,23 +114,7 @@ export default function RegisterPage() {
 							required
 						/>
 					</div>
-					<div>
-						<label className="block text-primary font-semibold mb-1">
-							Confirm Password
-						</label>
-						<input
-							type="password"
-							name="confirmPassword"
-							value={formData.confirmPassword}
-							onChange={handleChange}
-							className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition text-primary bg-white"
-							required
-						/>
-					</div>
-					<div className="flex items-center gap-2">
-						<input id="agree" type="checkbox" checked={agreeTerms} onChange={(e) => setAgreeTerms(e.target.checked)} className="h-4 w-4" />
-						<label htmlFor="agree" className="text-sm text-secondary">I agree to the Terms and Conditions</label>
-					</div>
+					{/* Simplified: removed confirm password and checkbox */}
 					{error && (
 						<p className="text-red-600 text-sm" role="alert">{error}</p>
 					)}
