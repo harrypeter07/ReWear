@@ -76,11 +76,15 @@ export default function AdminPanel() {
 		setError("");
 		fetch("/api/admin/users", { credentials: "include" })
 			.then(async (res) => {
-				if (!res.ok) throw new Error("Failed to fetch users");
+				if (res.status === 404) {
+					setUsers([]);
+					return;
+				}
+				if (!res.ok) throw new Error("Failed to fetch");
 				const data = await res.json();
 				setUsers(data.users || []);
 			})
-			.catch((err) => setError(err.message || "Failed to fetch users"))
+			.catch(() => setError("Failed to fetch users"))
 			.finally(() => setLoading(false));
 	}, [activeTab, isAdminVerified]);
 
@@ -91,11 +95,15 @@ export default function AdminPanel() {
 		setError("");
 		fetch("/api/items?status=pending", { credentials: "include" })
 			.then(async (res) => {
-				if (!res.ok) throw new Error("Failed to fetch listings");
+				if (res.status === 404) {
+					setListings([]);
+					return;
+				}
+				if (!res.ok) throw new Error("Failed to fetch");
 				const data = await res.json();
 				setListings(Array.isArray(data) ? data : []);
 			})
-			.catch((err) => setError(err.message || "Failed to fetch listings"))
+			.catch(() => setError("Failed to fetch listings"))
 			.finally(() => setLoading(false));
 	}, [activeTab, isAdminVerified]);
 
@@ -106,11 +114,15 @@ export default function AdminPanel() {
 		setError("");
 		fetch("/api/swaps", { credentials: "include" })
 			.then(async (res) => {
-				if (!res.ok) throw new Error("Failed to fetch orders");
+				if (res.status === 404) {
+					setOrders([]);
+					return;
+				}
+				if (!res.ok) throw new Error("Failed to fetch");
 				const data = await res.json();
 				setOrders(Array.isArray(data.swaps) ? data.swaps : []);
 			})
-			.catch((err) => setError(err.message || "Failed to fetch orders"))
+			.catch(() => setError("Failed to fetch orders"))
 			.finally(() => setLoading(false));
 	}, [activeTab, isAdminVerified]);
 
@@ -362,7 +374,7 @@ export default function AdminPanel() {
 								<div className="flex justify-center items-center mx-auto mb-4 w-16 h-16 rounded-full bg-stone-100">
 									<span className="text-2xl">🤷</span>
 								</div>
-								No users found
+								Not yet
 							</div>
 						) : (
 							<div className="grid gap-6">
@@ -621,7 +633,7 @@ export default function AdminPanel() {
 										<div className="flex justify-center items-center mx-auto mb-4 w-16 h-16 rounded-full bg-stone-100">
 											<span className="text-2xl">📭</span>
 										</div>
-										No orders found
+										Not yet
 									</div>
 								)}
 							</div>
