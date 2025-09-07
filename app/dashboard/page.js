@@ -30,13 +30,13 @@ export default function DashboardPage() {
 					setUserListings(
 						Array.isArray(items)
 							? items.filter((i) => {
-									const uploaderId =
-										typeof i.uploaderId === "object" &&
-										i.uploaderId !== null &&
-										i.uploaderId.toString
-											? i.uploaderId.toString()
-											: String(i.uploaderId);
-									return uploaderId === String(userData.user._id);
+								const uploaderId =
+									typeof i.uploaderId === "object" &&
+									i.uploaderId !== null &&
+									i.uploaderId.toString
+										? i.uploaderId.toString()
+										: String(i.uploaderId);
+								return uploaderId === String(userData.user._id);
 							  })
 							: []
 					);
@@ -51,7 +51,7 @@ export default function DashboardPage() {
 						swaps.filter(
 							(s) =>
 								s.status === "accepted" && s.requester === userData.user._id
-						)
+							)
 					);
 				} else {
 					setUser(null);
@@ -68,10 +68,10 @@ export default function DashboardPage() {
 	if (loading) {
 		return (
 			<div
-				className="min-h-screen flex items-center justify-center"
+				className="flex justify-center items-center min-h-screen"
 				style={{ background: "var(--bg-primary)" }}
 			>
-				<div className="card text-center">
+				<div className="text-center card">
 					<div className="loader"></div>
 					<p style={{ color: "var(--text-secondary)", marginTop: "1rem" }}>
 						Loading dashboard...
@@ -84,12 +84,12 @@ export default function DashboardPage() {
 	if (!user) {
 		return (
 			<div
-				className="min-h-screen flex items-center justify-center"
+				className="flex justify-center items-center min-h-screen"
 				style={{ background: "var(--bg-primary)" }}
 			>
-				<div className="card text-center max-w-md">
+				<div className="max-w-md text-center card">
 					<div
-						className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full"
+						className="flex justify-center items-center mx-auto mb-4 w-16 h-16 rounded-full"
 						style={{ background: "var(--accent)" }}
 					>
 						<svg
@@ -108,7 +108,7 @@ export default function DashboardPage() {
 						</svg>
 					</div>
 					<h2
-						className="text-xl font-semibold mb-2"
+						className="mb-2 text-xl font-semibold"
 						style={{ color: "var(--text-primary)" }}
 					>
 						Authentication Required
@@ -116,7 +116,7 @@ export default function DashboardPage() {
 					<p className="mb-6" style={{ color: "var(--text-secondary)" }}>
 						Please log in to access your dashboard.
 					</p>
-					<Link href="/login" className="btn inline-block">
+					<Link href="/login" className="inline-block btn">
 						Go to Login
 					</Link>
 				</div>
@@ -124,43 +124,73 @@ export default function DashboardPage() {
 		);
 	}
 
+	// Compute stats (align with items page header widgets)
+	const stats = {
+		listings: userListings.length,
+		purchases: userPurchases.length,
+		swaps: swapRequests.length,
+		points: user?.points ?? 0,
+	};
+
 	return (
-		<div className="min-h-screen gradient-bg py-8 px-2">
-			<div className="container mx-auto max-w-5xl">
-				<h1 className="text-4xl font-bold gradient-text mb-6 text-center">
-					Your Dashboard
-				</h1>
-				{(() => {
-					const stats = {
-						listings: userListings.length,
-						purchases: userPurchases.length,
-						swaps: swapRequests.length,
-						points: user?.points ?? 0,
-					};
-					return (
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-					{/* Dashboard widgets */}
-					<DashboardWidgets stats={stats} />
+		<div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
+			{/* Header Section */}
+			<div className="container">
+				<div className="mb-8 text-center card">
+					<h1 className="mb-4 text-4xl font-bold md:text-5xl" style={{ color: 'var(--text-primary)' }}>
+						Your Dashboard
+					</h1>
+					<p className="mb-6 text-lg" style={{ color: 'var(--text-secondary)' }}>
+						Overview of your activity and stats
+					</p>
+					<div className="flex flex-col gap-4 justify-center mb-6 sm:flex-row">
+						<div className="px-4 py-3 border-0 backdrop-blur-sm card bg-white/50">
+							<span className="block text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+								{stats.listings}
+							</span>
+							<p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+								Your Listings
+							</p>
+						</div>
+						<div className="px-4 py-3 border-0 backdrop-blur-sm card bg-white/50">
+							<span className="block text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+								{stats.swaps}
+							</span>
+							<p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+								Swap Requests
+							</p>
+						</div>
+						<div className="px-4 py-3 border-0 backdrop-blur-sm card bg-white/50">
+							<span className="block text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+								{stats.points}
+							</span>
+							<p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+								Points
+							</p>
+						</div>
+					</div>
 				</div>
-					);
-				})()}
-				<div className="card p-6 mb-8">
-					<h2 className="text-2xl font-semibold text-primary mb-4">
+			</div>
+
+			{/* Main Content */}
+			<div className="container">
+				<div className="p-6 mb-8 card">
+					<h2 className="mb-4 text-2xl font-semibold text-primary">
 						Your Listings
 					</h2>
 					{/* Listings grid or list here */}
 					{userListings.length === 0 ? (
 						<p className="text-secondary">You have no listings yet.</p>
 					) : (
-						<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+						<div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 							{userListings.map((item) => (
 								<ItemCard key={item._id} item={item} />
 							))}
 						</div>
 					)}
 				</div>
-				<div className="card p-6">
-					<h2 className="text-2xl font-semibold text-primary mb-4">
+				<div className="p-6 card">
+					<h2 className="mb-4 text-2xl font-semibold text-primary">
 						Swap Requests
 					</h2>
 					{/* Swap requests list here */}
