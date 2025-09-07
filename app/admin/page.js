@@ -29,12 +29,12 @@ export default function AdminPanel() {
 			.finally(() => setLoading(false));
 	}, [activeTab]);
 
-	// Fetch listings (items)
+	// Fetch listings (only pending)
 	useEffect(() => {
 		if (activeTab !== "listings") return;
 		setLoading(true);
 		setError("");
-		fetch("/api/items", { credentials: "include" })
+		fetch("/api/items?status=pending", { credentials: "include" })
 			.then(async (res) => {
 				if (!res.ok) throw new Error("Failed to fetch listings");
 				const data = await res.json();
@@ -123,13 +123,7 @@ export default function AdminPanel() {
 				body: JSON.stringify({ itemId }),
 			});
 			if (!res.ok) throw new Error("Failed to approve listing");
-			setListings((prev) =>
-				prev.map((l) =>
-					l._id === itemId
-						? { ...l, isApproved: true, isVisible: true, status: "available" }
-						: l
-				)
-			);
+			setListings((prev) => prev.filter((l) => l._id !== itemId));
 		} catch (err) {
 			setActionError(err.message || "Failed to approve listing");
 		} finally {
@@ -148,11 +142,7 @@ export default function AdminPanel() {
 				body: JSON.stringify({ isVisible: false, status: "cancelled" }),
 			});
 			if (!res.ok) throw new Error("Failed to cancel listing");
-			setListings((prev) =>
-				prev.map((l) =>
-					l._id === itemId ? { ...l, isVisible: false, status: "cancelled" } : l
-				)
-			);
+			setListings((prev) => prev.filter((l) => l._id !== itemId));
 		} catch (err) {
 			setActionError(err.message || "Failed to cancel listing");
 		} finally {
@@ -241,13 +231,13 @@ export default function AdminPanel() {
 							onClick={() => setActiveTab("listings")}
 							className={tabStyle(activeTab === "listings")}
 						>
-							📝 Manage Listings
+							📝 Review Listings
 						</button>
 						<button
 							onClick={() => setActiveTab("orders")}
 							className={tabStyle(activeTab === "orders")}
 						>
-							📦 Manage Orders
+							📦 Orders
 						</button>
 					</div>
 				</div>
@@ -397,7 +387,7 @@ export default function AdminPanel() {
 								<span className="text-sm text-green-600">📝</span>
 							</div>
 							<h2 className="text-2xl font-semibold text-stone-800">
-								Listings Management
+								Pending Listings
 							</h2>
 						</div>
 
@@ -412,51 +402,33 @@ export default function AdminPanel() {
 							</div>
 						) : (
 							<div className="grid gap-6">
-								{listings
-									.filter((l) => !l.isApproved)
-									.map((item) => (
-										<div
-											key={item._id}
-											className="p-6 bg-gradient-to-r to-green-50 rounded-2xl border transition-all duration-300 from-stone-50 border-stone-200 hover:shadow-md"
-										>
-											<div className="flex justify-between items-center">
-												<div className="flex-1">
-													<h3 className="mb-2 text-lg font-semibold text-stone-800">
-														{item.title}
-													</h3>
-													<div className="flex items-center mb-2 space-x-4">
-														<span className="px-3 py-1 text-xs font-medium rounded-full bg-stone-100 text-stone-700">
-															{item.category}
-														</span>
-													</div>
-													<p className="text-sm text-stone-600">
-														{item.description}
-													</p>
+								{listings.map((item) => (
+									<div
+										key={item._id}
+										className="p-6 bg-gradient-to-r to-green-50 rounded-2xl border transition-all duration-300 from-stone-50 border-stone-200 hover:shadow-md"
+									>
+										<div className="flex justify-between items-start gap-6">
+											<div className="flex-1">
+												<h3 className="mb-2 text-lg font-semibold text-stone-800">{item.title}</h3>
+												<div className="flex flex-wrap items-center mb-2 gap-2">
+													<span className="px-3 py-1 text-xs font-medium rounded-full bg-stone-100 text-stone-700">{item.category}</span>
+													<span className="px-3 py-1 text-xs font-medium rounded-full bg-amber-100 text-amber-700">Points: {item.pointsValue}</span>
+													<span className="px-3 py-1 text-xs font-medium rounded-full bg-stone-100 text-stone-700">Owner: {item.ownerUsername || item.ownerName || 'Unknown'}</span>
 												</div>
-												<div className="flex ml-6 space-x-3">
-													<button
-														onClick={() => handleApproveListing(item._id)}
-														className={buttonStyle("approve")}
-														disabled={actionLoading === item._id + "approve"}
-													>
-														{actionLoading === item._id + "approve"
-															? "Approving..."
-															: "Approve"}
-													</button>
-													<button
-														onClick={() => handleCancelListing(item._id)}
-														className={buttonStyle("danger")}
-														disabled={actionLoading === item._id + "cancel"}
-													>
-														{actionLoading === item._id + "cancel"
-															? "Canceling..."
-															: "Reject"}
-													</button>
-												</div>
-											</div>
+											<p className="text-sm text-stone-600">{item.description}</p>
 										</div>
-									))}
-								{listings.filter((l) => !l.isApproved).length === 0 && (
+										<div className="flex ml-6 space-x-3">
+											<button onClick={() => handleApproveListing(item._id)} className={buttonStyle("approve")} disabled={actionLoading === item._id + "approve"}>
+												{actionLoading === item._id + "approve" ? "Approving..." : "Approve"}
+											</button>
+											<button onClick={() => handleCancelListing(item._id)} className={buttonStyle("danger")} disabled={actionLoading === item._id + "cancel"}>
+												{actionLoading === item._id + "cancel" ? "Rejecting..." : "Reject"}
+											</button>
+										</div>
+									</div>
+								</div>
+								))}
+								{listings.length === 0 && (
 									<div className="py-16 text-center text-stone-500">
 										<div className="flex justify-center items-center mx-auto mb-4 w-16 h-16 rounded-full bg-stone-100">
 											<span className="text-2xl">✅</span>
