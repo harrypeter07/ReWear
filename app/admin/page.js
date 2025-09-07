@@ -4,6 +4,11 @@ import Image from "next/image";
 
 export default function AdminPanel() {
 	const [activeTab, setActiveTab] = useState("users");
+	const [isAdminVerified, setIsAdminVerified] = useState(false);
+	const [checkingAdmin, setCheckingAdmin] = useState(true);
+	const [adminCode, setAdminCode] = useState("");
+	const [adminCodeError, setAdminCodeError] = useState("");
+	const [adminSubmitting, setAdminSubmitting] = useState(false);
 	const [users, setUsers] = useState([]);
 	const [listings, setListings] = useState([]);
 	const [orders, setOrders] = useState([]);
@@ -14,9 +19,59 @@ export default function AdminPanel() {
 	const [actionError, setActionError] = useState("");
 	const [deleteConfirm, setDeleteConfirm] = useState(null);
 
+	// Determine if admin access is verified by probing an admin-only endpoint
+	useEffect(() => {
+		let cancelled = false;
+		(async () => {
+			try {
+				setCheckingAdmin(true);
+				const res = await fetch("/api/admin/users", { credentials: "include" });
+				if (!cancelled) setIsAdminVerified(res.ok);
+			} catch (_) {
+				if (!cancelled) setIsAdminVerified(false);
+			} finally {
+				if (!cancelled) setCheckingAdmin(false);
+			}
+		})();
+		return () => {
+			cancelled = true;
+		};
+	}, []);
+
+	const submitAdminCode = async (e) => {
+		e.preventDefault();
+		setAdminCodeError("");
+		setAdminSubmitting(true);
+		try {
+			const res = await fetch('/api/auth/admin-code', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ code: adminCode }),
+			});
+			if (!res.ok) {
+				const data = await res.json().catch(() => ({}));
+				setAdminCodeError(data.message || 'Invalid code');
+				return;
+			}
+			try {
+				await fetch('/api/auth/admin-login', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ code: adminCode }),
+				});
+			} catch (_) {}
+			setIsAdminVerified(true);
+			setActiveTab((prev) => prev);
+		} catch (err) {
+			setAdminCodeError('Something went wrong');
+		} finally {
+			setAdminSubmitting(false);
+		}
+	};
+
 	// Fetch users from API
 	useEffect(() => {
-		if (activeTab !== "users") return;
+		if (activeTab !== "users" || !isAdminVerified) return;
 		setLoading(true);
 		setError("");
 		fetch("/api/admin/users", { credentials: "include" })
@@ -27,11 +82,11 @@ export default function AdminPanel() {
 			})
 			.catch((err) => setError(err.message || "Failed to fetch users"))
 			.finally(() => setLoading(false));
-	}, [activeTab]);
+	}, [activeTab, isAdminVerified]);
 
 	// Fetch listings (only pending)
 	useEffect(() => {
-		if (activeTab !== "listings") return;
+		if (activeTab !== "listings" || !isAdminVerified) return;
 		setLoading(true);
 		setError("");
 		fetch("/api/items?status=pending", { credentials: "include" })
@@ -42,11 +97,11 @@ export default function AdminPanel() {
 			})
 			.catch((err) => setError(err.message || "Failed to fetch listings"))
 			.finally(() => setLoading(false));
-	}, [activeTab]);
+	}, [activeTab, isAdminVerified]);
 
 	// Fetch orders (swaps)
 	useEffect(() => {
-		if (activeTab !== "orders") return;
+		if (activeTab !== "orders" || !isAdminVerified) return;
 		setLoading(true);
 		setError("");
 		fetch("/api/swaps", { credentials: "include" })
@@ -57,7 +112,7 @@ export default function AdminPanel() {
 			})
 			.catch((err) => setError(err.message || "Failed to fetch orders"))
 			.finally(() => setLoading(false));
-	}, [activeTab]);
+	}, [activeTab, isAdminVerified]);
 
 	// Admin actions
 	const handleUserAction = async (userId, action) => {
@@ -206,6 +261,45 @@ export default function AdminPanel() {
 		};
 		return `${variants[variant]} px-4 py-2 rounded-2xl text-xs font-medium transition-all duration-300 ease-in-out hover:shadow-md hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100`;
 	};
+
+	// Gate: show code form until admin is verified
+	if (!isAdminVerified) {
+		return (
+			<div className="p-4 min-h-screen bg-gradient-to-br via-orange-50 to-amber-50 from-stone-50">
+				<div className="mx-auto max-w-7xl">
+					<div className="p-8 mb-8 bg-gradient-to-r to-orange-100 rounded-3xl border shadow-lg from-stone-100 border-stone-200">
+						<h1 className="mb-2 text-4xl font-bold text-stone-800">Admin Panel</h1>
+						<p className="text-stone-600">Enter admin access code to continue</p>
+					</div>
+					<div className="flex justify-center items-center">
+						<div className="p-8 w-full max-w-md bg-white rounded-3xl border shadow-2xl border-stone-200">
+							<h2 className="mb-4 text-2xl font-semibold text-center text-stone-800">Admin Access</h2>
+							{adminCodeError && (
+								<div className="p-3 mb-4 text-center text-red-700 bg-red-50 rounded-2xl border border-red-200">{adminCodeError}</div>
+							)}
+							<form onSubmit={submitAdminCode} className="space-y-4">
+								<input
+									type="password"
+									value={adminCode}
+									onChange={(e) => setAdminCode(e.target.value)}
+									placeholder="Access Code"
+									className="px-4 py-3 w-full rounded-xl border"
+									style={{ background: '#fffdf9', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
+									required
+								/>
+								<button className="py-3 w-full btn" disabled={adminSubmitting || checkingAdmin} style={{ background: 'var(--accent)' }}>
+									{adminSubmitting ? 'Verifying...' : 'Continue'}
+								</button>
+							</form>
+							<p className="mt-3 text-sm text-center" style={{ color: 'var(--text-secondary)' }}>
+								Tip: If admin APIs still show 403 after this, re-enter the code or ask for admin password.
+							</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		);
+	}
 
 	return (
 		<div className="p-4 min-h-screen bg-gradient-to-br via-orange-50 to-amber-50 from-stone-50">
