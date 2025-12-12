@@ -148,13 +148,21 @@ export default function ProfilePage() {
 	}
 
 	return (
-		<div className="min-h-screen gradient-bg flex items-center justify-center py-12 px-4">
-			<div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
-				<h1 className="text-2xl font-bold mb-6 text-center text-blue-800">
+		<div className="min-h-screen flex items-center justify-center py-12 px-4 pt-24" style={{ background: 'var(--bg-primary)' }}>
+			<div className="card w-full max-w-md" style={{
+				background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
+				backdropFilter: 'blur(20px)',
+				border: '1px solid rgba(99, 102, 241, 0.1)',
+				boxShadow: '0 20px 60px rgba(99, 102, 241, 0.15)'
+			}}>
+				<h1 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
 					My Profile
 				</h1>
 				{!user.username && (
-					<div className="bg-red-100 text-red-700 p-2 rounded text-center mb-4">
+					<div className="bg-red-50 text-red-700 p-3 rounded-xl text-center mb-4 border border-red-200 flex items-center justify-center gap-2">
+						<svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+							<path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+						</svg>
 						Username not found
 					</div>
 				)}
@@ -271,7 +279,13 @@ export default function ProfilePage() {
 					)}
 					<button
 						type="submit"
-						className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl"
+						className="btn w-full py-3.5 font-semibold text-base disabled:opacity-70 disabled:cursor-not-allowed"
+						style={{
+							background: editing ? 'rgba(99, 102, 241, 0.5)' : 'var(--accent-gradient)',
+							color: 'white',
+							border: 'none',
+							boxShadow: editing ? 'none' : '0 8px 24px rgba(99, 102, 241, 0.3)'
+						}}
 						disabled={editing}
 					>
 						{editing ? "Saving..." : "Save Changes"}

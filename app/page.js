@@ -62,36 +62,42 @@ export default function Home() {
 	};
 
 	return (
-		<div className="min-h-screen pt-20" style={{ background: 'var(--bg-primary)' }}>
+		<div className="min-h-screen pt-24 pb-12" style={{ background: 'var(--bg-primary)' }}>
 			{/* Hero Section */}
 			<section className="container">
-				<div className="card text-center py-16 md:py-24 min-h-[60vh] flex flex-col items-center justify-center">
-					<h1 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
+				<div className="card text-center py-16 md:py-24 min-h-[60vh] flex flex-col items-center justify-center" style={{
+					background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
+					backdropFilter: 'blur(20px)',
+					border: '1px solid rgba(99, 102, 241, 0.1)'
+				}}>
+					<h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
 						Sustainable Fashion Through Swapping
 					</h1>
-					<p className="text-xl mb-8 max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
+					<p className="text-xl md:text-2xl mb-10 max-w-2xl mx-auto font-medium" style={{ color: 'var(--text-secondary)' }}>
 						Refresh your wardrobe sustainably by swapping clothes with our community
 					</p>
 					<div className="flex justify-center gap-4 flex-wrap">
 						<button
 							onClick={handleStartSwapping}
-							className="btn"
+							className="btn px-8 py-4 text-lg font-semibold"
 							style={{ 
-								background: 'linear-gradient(135deg, #e8f5e8, #d4edda)',
-								color: 'var(--text-primary)',
-								fontWeight: '600'
+								background: 'var(--accent-gradient)',
+								color: 'white',
+								boxShadow: '0 8px 24px rgba(99, 102, 241, 0.3)'
 							}}
 						>
 							Start Swapping
 						</button>
 						<Link
 							href="/items"
-							className="btn"
+							className="btn px-8 py-4 text-lg font-semibold"
 							style={{ 
-								background: 'var(--bg-secondary)',
-								color: 'var(--text-primary)',
+								background: 'rgba(255, 255, 255, 0.9)',
+								color: 'var(--accent)',
+								border: '2px solid var(--accent)',
 								textDecoration: 'none',
-								display: 'inline-block'
+								display: 'inline-block',
+								boxShadow: '0 4px 16px rgba(99, 102, 241, 0.15)'
 							}}
 						>
 							Browse Items
@@ -102,8 +108,12 @@ export default function Home() {
 
 			{/* Featured Items Carousel */}
 			<section className="container">
-				<div className="card">
-					<h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--text-primary)' }}>
+				<div className="card" style={{
+					background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
+					backdropFilter: 'blur(20px)',
+					border: '1px solid rgba(99, 102, 241, 0.1)'
+				}}>
+					<h2 className="text-3xl md:text-4xl font-bold text-center mb-12 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
 						Featured Items
 					</h2>
 					<div className="relative">
@@ -168,26 +178,42 @@ export default function Home() {
 
 			{/* Impact Metrics */}
 			<section className="container">
-				<div className="card">
-					<h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--text-primary)' }}>
+				<div className="card" style={{
+					background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
+					backdropFilter: 'blur(20px)',
+					border: '1px solid rgba(99, 102, 241, 0.1)'
+				}}>
+					<h2 className="text-3xl md:text-4xl font-bold text-center mb-12 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
 						Our Community Impact
 					</h2>
 					<div className="bento-grid">
-						<div className="card text-center" style={{ background: 'var(--bg-secondary)' }}>
-							<div className="text-4xl font-bold mb-2" style={{ color: '#6b8e6b' }}>1,200+</div>
-							<div style={{ color: 'var(--text-secondary)' }}>Items Swapped</div>
+						<div className="card text-center transition-all duration-300 hover:scale-105" style={{ 
+							background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
+							border: '1px solid rgba(99, 102, 241, 0.2)'
+						}}>
+							<div className="text-4xl font-bold mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">1,200+</div>
+							<div className="font-medium" style={{ color: 'var(--text-secondary)' }}>Items Swapped</div>
 						</div>
-						<div className="card text-center" style={{ background: 'var(--bg-secondary)' }}>
-							<div className="text-4xl font-bold mb-2" style={{ color: '#6b8e6b' }}>500+</div>
-							<div style={{ color: 'var(--text-secondary)' }}>Active Members</div>
+						<div className="card text-center transition-all duration-300 hover:scale-105" style={{ 
+							background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
+							border: '1px solid rgba(99, 102, 241, 0.2)'
+						}}>
+							<div className="text-4xl font-bold mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">500+</div>
+							<div className="font-medium" style={{ color: 'var(--text-secondary)' }}>Active Members</div>
 						</div>
-						<div className="card text-center" style={{ background: 'var(--bg-secondary)' }}>
-							<div className="text-4xl font-bold mb-2" style={{ color: '#6b8e6b' }}>2.5K+</div>
-							<div style={{ color: 'var(--text-secondary)' }}>Textile Waste Saved (kg)</div>
+						<div className="card text-center transition-all duration-300 hover:scale-105" style={{ 
+							background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
+							border: '1px solid rgba(99, 102, 241, 0.2)'
+						}}>
+							<div className="text-4xl font-bold mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">2.5K+</div>
+							<div className="font-medium" style={{ color: 'var(--text-secondary)' }}>Textile Waste Saved (kg)</div>
 						</div>
-						<div className="card text-center" style={{ background: 'var(--bg-secondary)' }}>
-							<div className="text-4xl font-bold mb-2" style={{ color: '#6b8e6b' }}>$50K+</div>
-							<div style={{ color: 'var(--text-secondary)' }}>Value Exchanged</div>
+						<div className="card text-center transition-all duration-300 hover:scale-105" style={{ 
+							background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
+							border: '1px solid rgba(99, 102, 241, 0.2)'
+						}}>
+							<div className="text-4xl font-bold mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">$50K+</div>
+							<div className="font-medium" style={{ color: 'var(--text-secondary)' }}>Value Exchanged</div>
 						</div>
 					</div>
 				</div>
@@ -195,8 +221,12 @@ export default function Home() {
 
 			{/* Testimonials */}
 			<section className="container">
-				<div className="card">
-					<h2 className="text-3xl font-bold text-center mb-12" style={{ color: 'var(--text-primary)' }}>
+				<div className="card" style={{
+					background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
+					backdropFilter: 'blur(20px)',
+					border: '1px solid rgba(99, 102, 241, 0.1)'
+				}}>
+					<h2 className="text-3xl md:text-4xl font-bold text-center mb-12 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
 						What Our Community Says
 					</h2>
 					<div className="bento-grid">
@@ -223,21 +253,24 @@ export default function Home() {
 
 			{/* Call to Action */}
 			<section className="container pb-8">
-				<div className="card text-center" style={{ background: 'var(--accent)' }}>
-					<h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
+				<div className="card text-center" style={{ 
+					background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
+					border: '1px solid rgba(99, 102, 241, 0.2)',
+					backdropFilter: 'blur(20px)'
+				}}>
+					<h2 className="text-2xl md:text-3xl font-bold mb-4 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
 						Ready to Start Your Sustainable Journey?
 					</h2>
-					<p className="mb-6" style={{ color: 'var(--text-secondary)' }}>
+					<p className="mb-8 text-lg font-medium" style={{ color: 'var(--text-secondary)' }}>
 						Join thousands of fashion-conscious individuals making a positive impact
 					</p>
 					<button
 						onClick={handleStartSwapping}
-						className="btn"
+						className="btn px-8 py-4 text-lg font-semibold"
 						style={{ 
-							background: 'var(--bg-secondary)',
-							color: 'var(--text-primary)',
-							fontWeight: '600',
-							padding: '1rem 2rem'
+							background: 'var(--accent-gradient)',
+							color: 'white',
+							boxShadow: '0 8px 24px rgba(99, 102, 241, 0.3)'
 						}}
 					>
 						Get Started Today

@@ -31,11 +31,12 @@ export default function ItemCard({ item }) {
 		<div 
 			className="card flex flex-col h-full overflow-hidden group"
 			style={{
-				background: 'var(--gradient)',
-				border: '1px solid var(--border-color)',
-				borderRadius: 'var(--radius)',
-				boxShadow: 'var(--shadow)',
-				transition: 'var(--transition)'
+				background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
+				border: '1px solid rgba(99, 102, 241, 0.1)',
+				borderRadius: 'var(--radius-lg)',
+				boxShadow: '0 4px 20px rgba(99, 102, 241, 0.08)',
+				transition: 'var(--transition)',
+				backdropFilter: 'blur(20px)'
 			}}
 		>
 			{/* Image Container with fixed aspect ratio */}
@@ -255,17 +256,17 @@ export default function ItemCard({ item }) {
 				{/* Action Button */}
 				<div 
 					className="mt-auto pt-4"
-					style={{ borderTop: '1px solid var(--border-color)' }}
+					style={{ borderTop: '1px solid rgba(99, 102, 241, 0.1)' }}
 				>
 					<Link
 						href={`/items/${item._id || item.id}`}
-						className="btn w-full py-3 px-4 font-medium flex items-center justify-center gap-2 group"
+						className="btn w-full py-3 px-4 font-semibold flex items-center justify-center gap-2 group"
 						style={{
-							background: 'var(--accent)',
-							color: 'var(--text-primary)',
-							border: '1px solid var(--border-color)',
+							background: 'var(--accent-gradient)',
+							color: 'white',
+							border: 'none',
 							borderRadius: 'var(--radius)',
-							boxShadow: 'var(--shadow)',
+							boxShadow: '0 4px 14px rgba(99, 102, 241, 0.25)',
 							transition: 'var(--transition)',
 							textDecoration: 'none'
 						}}

@@ -489,7 +489,7 @@ p {
 /* Responsive Design */
 @media (max-width: 768px) {
 	.container {
-		padding: var(--spacing-md) var(--spacing-sm);
+		padding: var(--spacing-lg) var(--spacing-sm);
 	}
 	
 	.bento-grid {
@@ -499,14 +499,14 @@ p {
 	}
 	
 	.bento-card, .card {
-		padding: var(--spacing-md);
-		border-radius: var(--radius-lg);
+		padding: var(--spacing-lg);
+		border-radius: var(--radius);
 	}
 	
 	.btn {
-		padding: var(--spacing-sm) var(--spacing-md);
-		border-radius: var(--radius-sm);
-		font-size: var(--font-size-xs);
+		padding: 0.625rem 1.25rem;
+		border-radius: var(--radius);
+		font-size: var(--font-size-sm);
 	}
 	
 	.navbar {
@@ -519,6 +519,11 @@ p {
 		margin-left: 0;
 		margin-right: var(--spacing-md);
 	}
+
+	/* Mobile-specific card adjustments */
+	.card {
+		margin-bottom: var(--spacing-md);
+	}
 }
 
 @media (max-width: 480px) {
@@ -528,11 +533,17 @@ p {
 	}
 	
 	.bento-card, .card {
-		padding: var(--spacing-sm);
-		border-radius: var(--radius-md);
+		padding: var(--spacing-md);
+		border-radius: var(--radius);
 	}
 	
-	h1 { font-size: var(--font-size-2xl); }
-	h2 { font-size: var(--font-size-xl); }
-	h3 { font-size: var(--font-size-lg); }
+	h1 { font-size: var(--font-size-3xl); }
+	h2 { font-size: var(--font-size-2xl); }
+	h3 { font-size: var(--font-size-xl); }
+
+	/* Ensure buttons are touch-friendly on mobile */
+	.btn {
+		min-height: 44px;
+		padding: 0.75rem 1.5rem;
+	}
 }
