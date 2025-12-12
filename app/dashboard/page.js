@@ -135,38 +135,55 @@ export default function DashboardPage() {
 	};
 
 	return (
-		<div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
+		<div className="min-h-screen pt-24 pb-12" style={{ background: 'var(--bg-primary)' }}>
 			{/* Header Section */}
 			<div className="container">
-				<div className="mb-8 text-center card">
-					<h1 className="mb-4 text-4xl font-bold md:text-5xl" style={{ color: 'var(--text-primary)' }}>
+				<div className="mb-8 text-center card" style={{
+					background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
+					backdropFilter: 'blur(20px)',
+					border: '1px solid rgba(99, 102, 241, 0.1)',
+					boxShadow: '0 8px 32px rgba(99, 102, 241, 0.1)'
+				}}>
+					<h1 className="mb-4 text-4xl font-bold md:text-5xl bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
 						Your Dashboard
 					</h1>
-					<p className="mb-6 text-lg" style={{ color: 'var(--text-secondary)' }}>
+					<p className="mb-8 text-lg font-medium" style={{ color: 'var(--text-secondary)' }}>
 						Overview of your activity and stats
 					</p>
-					<div className="flex flex-col gap-4 justify-center mb-6 sm:flex-row">
-						<div className="px-4 py-3 border-0 backdrop-blur-sm card bg-white/50">
-							<span className="block text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+					<div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+						<div className="px-6 py-5 rounded-xl backdrop-blur-sm transition-all duration-300 hover:scale-105" style={{
+							background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
+							border: '1px solid rgba(99, 102, 241, 0.2)',
+							boxShadow: '0 4px 16px rgba(99, 102, 241, 0.1)'
+						}}>
+							<span className="block text-3xl font-bold mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
 								{stats.listings}
 							</span>
-							<p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+							<p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
 								Your Listings
 							</p>
 						</div>
-						<div className="px-4 py-3 border-0 backdrop-blur-sm card bg-white/50">
-							<span className="block text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+						<div className="px-6 py-5 rounded-xl backdrop-blur-sm transition-all duration-300 hover:scale-105" style={{
+							background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
+							border: '1px solid rgba(99, 102, 241, 0.2)',
+							boxShadow: '0 4px 16px rgba(99, 102, 241, 0.1)'
+						}}>
+							<span className="block text-3xl font-bold mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
 								{stats.swaps}
 							</span>
-							<p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+							<p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
 								Swap Requests
 							</p>
 						</div>
-						<div className="px-4 py-3 border-0 backdrop-blur-sm card bg-white/50">
-							<span className="block text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+						<div className="px-6 py-5 rounded-xl backdrop-blur-sm transition-all duration-300 hover:scale-105" style={{
+							background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
+							border: '1px solid rgba(99, 102, 241, 0.2)',
+							boxShadow: '0 4px 16px rgba(99, 102, 241, 0.1)'
+						}}>
+							<span className="block text-3xl font-bold mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
 								{stats.points}
 							</span>
-							<p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+							<p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
 								Points
 							</p>
 						</div>
@@ -177,37 +194,66 @@ export default function DashboardPage() {
 			{/* Main Content */}
 			<div className="container">
 				{/* Profile Overview */}
-				<div className="p-6 mb-8 card">
-					<h2 className="mb-4 text-2xl font-semibold text-primary">Your Profile</h2>
+				<div className="p-8 mb-8 card" style={{
+					background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
+					backdropFilter: 'blur(20px)',
+					border: '1px solid rgba(99, 102, 241, 0.1)'
+				}}>
+					<h2 className="mb-6 text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Your Profile</h2>
 					<div className="flex flex-col gap-6 items-center sm:flex-row sm:items-start">
-						<div className="flex justify-center items-center w-24 h-24 rounded-full" style={{ background: 'var(--bg-secondary)' }}>
-							<span className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
+						<div className="flex justify-center items-center w-28 h-28 rounded-full shadow-lg transition-all duration-300 hover:scale-110" style={{ 
+							background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+							boxShadow: '0 8px 24px rgba(99, 102, 241, 0.3)'
+						}}>
+							<span className="text-3xl font-bold text-white">
 								{(user?.name || user?.username || 'U')?.slice(0,1).toUpperCase()}
 							</span>
 						</div>
-						<div className="flex-1">
-							<p className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
+						<div className="flex-1 text-center sm:text-left">
+							<p className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
 								{user?.name || user?.username}
 							</p>
-							<p className="mb-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+							<p className="mb-4 text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
 								{user?.email}
 							</p>
-							<div className="flex flex-wrap gap-3">
-								<span className="px-3 py-1 text-sm" style={{ background: 'var(--bg-secondary)', borderRadius: 'var(--radius)', color: 'var(--text-primary)' }}>Role: {user?.role || 'user'}</span>
-								<span className="px-3 py-1 text-sm" style={{ background: 'var(--bg-secondary)', borderRadius: 'var(--radius)', color: 'var(--text-primary)' }}>Points: {user?.points ?? 0}</span>
-								<span className="px-3 py-1 text-sm" style={{ background: 'var(--bg-secondary)', borderRadius: 'var(--radius)', color: 'var(--text-primary)' }}>Listings: {userListings.length}</span>
+							<div className="flex flex-wrap gap-3 justify-center sm:justify-start">
+								<span className="px-4 py-2 text-sm font-medium rounded-lg" style={{ 
+									background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
+									border: '1px solid rgba(99, 102, 241, 0.2)',
+									color: 'var(--text-primary)'
+								}}>Role: {user?.role || 'user'}</span>
+								<span className="px-4 py-2 text-sm font-medium rounded-lg" style={{ 
+									background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
+									border: '1px solid rgba(99, 102, 241, 0.2)',
+									color: 'var(--text-primary)'
+								}}>Points: {user?.points ?? 0}</span>
+								<span className="px-4 py-2 text-sm font-medium rounded-lg" style={{ 
+									background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
+									border: '1px solid rgba(99, 102, 241, 0.2)',
+									color: 'var(--text-primary)'
+								}}>Listings: {userListings.length}</span>
 							</div>
 						</div>
 					</div>
 				</div>
 
-				<div className="p-6 mb-8 card">
-					<h2 className="mb-4 text-2xl font-semibold text-primary">
-						Your Listings
-					</h2>
-					<div className="flex gap-3 mb-4">
-						<button className="btn" onClick={() => router.push("/items/new")}>Add Item</button>
-						<button className="btn" onClick={() => router.push("/items")}>Browse Items</button>
+				<div className="p-8 mb-8 card" style={{
+					background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
+					backdropFilter: 'blur(20px)',
+					border: '1px solid rgba(99, 102, 241, 0.1)'
+				}}>
+					<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
+						<h2 className="mb-4 sm:mb-0 text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+							Your Listings
+						</h2>
+						<div className="flex flex-col sm:flex-row gap-3">
+							<button className="btn" onClick={() => router.push("/items/new")}>Add Item</button>
+							<button className="btn btn-outline" onClick={() => router.push("/items")} style={{
+								background: 'transparent',
+								border: '2px solid var(--accent)',
+								color: 'var(--accent)'
+							}}>Browse Items</button>
+						</div>
 					</div>
 					{/* Listings grid or list here */}
 					{userListings.length === 0 ? (
@@ -220,8 +266,12 @@ export default function DashboardPage() {
 						</div>
 					)}
 				</div>
-				<div className="p-6 card">
-					<h2 className="mb-4 text-2xl font-semibold text-primary">
+				<div className="p-8 card" style={{
+					background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
+					backdropFilter: 'blur(20px)',
+					border: '1px solid rgba(99, 102, 241, 0.1)'
+				}}>
+					<h2 className="mb-6 text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
 						Swap Requests
 					</h2>
 					{/* Swap requests list here */}
@@ -240,8 +290,12 @@ export default function DashboardPage() {
 				</div>
 
 				{/* Recent Activity */}
-				<div className="p-6 mt-8 card">
-					<h2 className="mb-4 text-2xl font-semibold text-primary">Recent Activity</h2>
+				<div className="p-8 mt-8 card" style={{
+					background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
+					backdropFilter: 'blur(20px)',
+					border: '1px solid rgba(99, 102, 241, 0.1)'
+				}}>
+					<h2 className="mb-6 text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Recent Activity</h2>
 					{(swapRequests && swapRequests.length > 0) || (userListings && userListings.length > 0) ? (
 						<ul className="space-y-2">
 							{swapRequests.slice(0,5).map((s) => (

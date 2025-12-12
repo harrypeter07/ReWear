@@ -42,15 +42,20 @@ export default function LoginPage() {
 	};
 
 	return (
-		<div className="min-h-screen flex items-center justify-center p-4" style={{ background: 'var(--bg-primary)' }}>
-			<div className="container max-w-md">
-				<div className="card">
+		<div className="min-h-screen flex items-center justify-center p-4 pt-24" style={{ background: 'var(--bg-primary)' }}>
+			<div className="container max-w-md w-full">
+				<div className="card" style={{
+					background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
+					backdropFilter: 'blur(20px)',
+					border: '1px solid rgba(99, 102, 241, 0.1)',
+					boxShadow: '0 20px 60px rgba(99, 102, 241, 0.15)'
+				}}>
 					{/* Header */}
 					<div className="text-center mb-8">
-						<h1 className="text-3xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+						<h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
 							Welcome to ReWear
 						</h1>
-						<p style={{ color: 'var(--text-secondary)' }}>
+						<p className="text-base font-medium" style={{ color: 'var(--text-secondary)' }}>
 							Sign in to your account
 						</p>
 					</div>
@@ -58,13 +63,17 @@ export default function LoginPage() {
 					{/* Error Message */}
 					{error && (
 						<div 
-							className="p-4 mb-6 rounded-lg border-l-4"
+							className="p-4 mb-6 rounded-xl border-l-4 flex items-center gap-3"
 							style={{ 
-								background: '#fef2f2',
-								borderColor: '#fca5a5',
-								color: '#dc2626'
+								background: 'linear-gradient(135deg, rgba(254, 242, 242, 0.8) 0%, rgba(254, 226, 226, 0.8) 100%)',
+								borderColor: '#ef4444',
+								color: '#dc2626',
+								backdropFilter: 'blur(10px)'
 							}}
 						>
+							<svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+								<path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+							</svg>
 							<p className="text-sm font-medium">{error}</p>
 						</div>
 					)}
@@ -86,13 +95,10 @@ export default function LoginPage() {
 								value={email}
 								onChange={(e) => setEmail(e.target.value)}
 								required
+								className="w-full px-4 py-3 rounded-xl border transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
 								style={{
-									background: '#fffdf9',
-									border: '1px solid var(--border-color)',
-									borderRadius: 'var(--radius)',
-									padding: '0.75rem 1rem',
-									width: '100%',
-									transition: 'var(--transition)',
+									background: 'rgba(255, 255, 255, 0.8)',
+									borderColor: 'var(--border-color)',
 									color: 'var(--text-primary)'
 								}}
 							/>
@@ -125,13 +131,10 @@ export default function LoginPage() {
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
 								required
+								className="w-full px-4 py-3 rounded-xl border transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
 								style={{
-									background: '#fffdf9',
-									border: '1px solid var(--border-color)',
-									borderRadius: 'var(--radius)',
-									padding: '0.75rem 1rem',
-									width: '100%',
-									transition: 'var(--transition)',
+									background: 'rgba(255, 255, 255, 0.8)',
+									borderColor: 'var(--border-color)',
 									color: 'var(--text-primary)'
 								}}
 							/>
@@ -160,16 +163,12 @@ export default function LoginPage() {
 						<button
 							type="submit"
 							disabled={isLoading}
-							className="btn w-full py-3 text-center font-medium"
+							className="btn w-full py-3.5 text-center font-semibold text-base disabled:opacity-70 disabled:cursor-not-allowed"
 							style={{
-								background: isLoading ? '#f0e6da' : 'var(--accent)',
-								color: 'var(--text-primary)',
+								background: isLoading ? 'rgba(99, 102, 241, 0.5)' : 'var(--accent-gradient)',
+								color: 'white',
 								border: 'none',
-								borderRadius: 'var(--radius)',
-								boxShadow: 'var(--shadow)',
-								transition: 'var(--transition)',
-								cursor: isLoading ? 'not-allowed' : 'pointer',
-								opacity: isLoading ? 0.7 : 1
+								boxShadow: isLoading ? 'none' : '0 8px 24px rgba(99, 102, 241, 0.3)'
 							}}
 						>
 							{isLoading ? "Signing in..." : "Sign in"}
@@ -198,31 +197,27 @@ export default function LoginPage() {
 					</div>
 
 					{/* Social Login Buttons */}
-					<div className="bento-grid grid-cols-2 gap-4">
+					<div className="grid grid-cols-2 gap-4">
 						<button
 							type="button"
-							className="btn text-center py-3 font-medium"
+							className="px-4 py-3 rounded-xl font-medium text-sm transition-all duration-300 hover:scale-105"
 							style={{
-								background: 'var(--bg-secondary)',
+								background: 'rgba(255, 255, 255, 0.8)',
 								color: 'var(--text-primary)',
 								border: '1px solid var(--border-color)',
-								borderRadius: 'var(--radius)',
-								boxShadow: 'var(--shadow)',
-								transition: 'var(--transition)'
+								boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)'
 							}}
 						>
 							Google
 						</button>
 						<button
 							type="button"
-							className="btn text-center py-3 font-medium"
+							className="px-4 py-3 rounded-xl font-medium text-sm transition-all duration-300 hover:scale-105"
 							style={{
-								background: 'var(--bg-secondary)',
+								background: 'rgba(255, 255, 255, 0.8)',
 								color: 'var(--text-primary)',
 								border: '1px solid var(--border-color)',
-								borderRadius: 'var(--radius)',
-								boxShadow: 'var(--shadow)',
-								transition: 'var(--transition)'
+								boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)'
 							}}
 						>
 							Facebook

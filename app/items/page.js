@@ -16,30 +16,42 @@ export default async function ItemsPage() {
 	const items = await getItems();
 
 	return (
-		<div className="min-h-screen pt-20" style={{ background: 'var(--bg-primary)' }}>
+		<div className="min-h-screen pt-24 pb-12" style={{ background: 'var(--bg-primary)' }}>
 			{/* Header Section */}
 			<div className="container">
-				<div className="card text-center mb-8">
-					<h1 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
+				<div className="card text-center mb-8" style={{
+					background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
+					backdropFilter: 'blur(20px)',
+					border: '1px solid rgba(99, 102, 241, 0.1)'
+				}}>
+					<h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
 						Discover Amazing Items
 					</h1>
-					<p className="text-lg mb-6" style={{ color: 'var(--text-secondary)' }}>
+					<p className="text-lg mb-8 font-medium" style={{ color: 'var(--text-secondary)' }}>
 						Find unique treasures and swap with our community
 					</p>
-					<div className="flex flex-col sm:flex-row justify-center gap-4 mb-6">
-						<div className="card bg-white/50 backdrop-blur-sm px-4 py-3 border-0">
-							<span className="text-2xl font-bold block" style={{ color: 'var(--text-primary)' }}>
+					<div className="flex flex-col sm:flex-row justify-center gap-6 mb-6">
+						<div className="px-6 py-5 rounded-xl transition-all duration-300 hover:scale-105" style={{
+							background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
+							border: '1px solid rgba(99, 102, 241, 0.2)',
+							boxShadow: '0 4px 16px rgba(99, 102, 241, 0.1)'
+						}}>
+							<span className="text-3xl font-bold block mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
 								{items.length}
 							</span>
-							<p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+							<p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
 								Items Available
 							</p>
 						</div>
-						<div className="card bg-white/50 backdrop-blur-sm px-4 py-3 border-0">
-							<span className="text-2xl font-bold block" style={{ color: 'var(--text-primary)' }}>
+						<div className="px-6 py-5 rounded-xl transition-all duration-300 hover:scale-105" style={{
+							background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
+							border: '1px solid rgba(99, 102, 241, 0.2)',
+							boxShadow: '0 4px 16px rgba(99, 102, 241, 0.1)'
+						}}>
+							<span className="text-3xl font-bold block mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
 								24/7
 							</span>
-							<p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+							<p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
 								Active Trading
 							</p>
 						</div>
@@ -49,7 +61,11 @@ export default async function ItemsPage() {
 
 			{/* Filter Section */}
 			<div className="container">
-				<div className="card mb-8">
+				<div className="card mb-8" style={{
+					background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
+					backdropFilter: 'blur(20px)',
+					border: '1px solid rgba(99, 102, 241, 0.1)'
+				}}>
 					<div className="flex flex-col md:flex-row gap-4 items-center justify-between">
 						<div className="flex items-center gap-4 flex-wrap">
 							<div className="flex items-center gap-2">
