@@ -86,7 +86,7 @@ export default function ItemCard({ item }) {
 				{/* Status Badge */}
 				{typeof item.isApproved !== "undefined" ? (
 					<div
-						className="absolute top-3 right-3 px-5 py-2.5 rounded-full text-xs font-semibold"
+						className="absolute top-3 right-3 rounded-full text-xs font-semibold"
 						style={{
 							background: item.isApproved 
 								? 'rgba(220, 252, 231, 0.95)' 
@@ -96,7 +96,8 @@ export default function ItemCard({ item }) {
 								? '1px solid #a7f3d0' 
 								: '1px solid #fcd34d',
 							backdropFilter: 'blur(8px)',
-							boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+							boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+							padding: '0.625rem 1.25rem'
 						}}
 					>
 						{item.isApproved ? "Approved" : "Pending Approval"}
@@ -104,7 +105,7 @@ export default function ItemCard({ item }) {
 				) : (
 					item.status && (
 						<div
-							className="absolute top-3 right-3 px-5 py-2.5 rounded-full text-xs font-semibold"
+							className="absolute top-3 right-3 rounded-full text-xs font-semibold"
 							style={{
 								background: item.status === "available"
 									? 'rgba(220, 252, 231, 0.95)'
@@ -122,7 +123,8 @@ export default function ItemCard({ item }) {
 									? '1px solid #fcd34d'
 									: '1px solid var(--border-color)',
 								backdropFilter: 'blur(8px)',
-								boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+								boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+								padding: '0.625rem 1.25rem'
 							}}
 						>
 							{item.status}
@@ -159,12 +161,13 @@ export default function ItemCard({ item }) {
 								Category:
 							</span>
 							<span 
-								className="px-5 py-2.5 rounded-full text-xs font-semibold"
+								className="rounded-full text-xs font-semibold"
 								style={{
 									background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%)',
 									color: 'var(--accent)',
 									border: '1px solid rgba(99, 102, 241, 0.25)',
-									boxShadow: '0 2px 6px rgba(99, 102, 241, 0.1)'
+									boxShadow: '0 2px 6px rgba(99, 102, 241, 0.1)',
+									padding: '0.75rem 1.5rem'
 								}}
 							>
 								{item.category}
@@ -198,7 +201,7 @@ export default function ItemCard({ item }) {
 								Condition:
 							</span>
 							<span
-								className="px-5 py-2.5 rounded-full text-xs font-semibold"
+								className="rounded-full text-xs font-semibold"
 								style={{
 									background: item.condition.toLowerCase() === "new"
 										? 'rgba(220, 252, 231, 0.95)'
@@ -215,7 +218,8 @@ export default function ItemCard({ item }) {
 										? '#92400e'
 										: 'var(--text-primary)',
 									border: '1px solid rgba(99, 102, 241, 0.2)',
-									boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)'
+									boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)',
+									padding: '0.75rem 1.5rem'
 								}}
 							>
 								{item.condition}
@@ -232,12 +236,13 @@ export default function ItemCard({ item }) {
 								Points:
 							</span>
 							<span 
-								className="px-5 py-2.5 rounded-full text-xs font-bold"
+								className="rounded-full text-xs font-bold"
 								style={{
 									background: 'linear-gradient(135deg, #fef3c7, #fed7aa)',
 									color: '#92400e',
 									border: '1px solid #fcd34d',
-									boxShadow: '0 2px 8px rgba(146, 64, 14, 0.15)'
+									boxShadow: '0 2px 8px rgba(146, 64, 14, 0.15)',
+									padding: '0.75rem 1.5rem'
 								}}
 							>
 								💰 {item.pointsValue}

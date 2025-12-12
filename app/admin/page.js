@@ -420,11 +420,12 @@ export default function AdminPanel() {
 													</div>
 													<div className="mt-2">
 														<span
-															className={`px-6 py-3 text-xs font-semibold rounded-full ${
+															className={`text-xs font-semibold rounded-full ${
 																user.status === "active"
 																	? "bg-emerald-100 text-emerald-700"
 																	: "bg-red-100 text-red-700"
 															}`}
+															style={{ padding: '0.875rem 1.75rem' }}
 														>
 															{user.status}
 														</span>
@@ -517,9 +518,9 @@ export default function AdminPanel() {
 											<div className="flex-1">
 												<h3 className="mb-2 text-lg font-semibold text-stone-800">{item.title}</h3>
 												<div className="flex flex-wrap gap-2 items-center mb-2">
-													<span className="px-6 py-3 text-xs font-semibold rounded-full bg-stone-100 text-stone-700">{item.category}</span>
-													<span className="px-6 py-3 text-xs font-semibold text-amber-700 bg-amber-100 rounded-full">Points: {item.pointsValue}</span>
-													<span className="px-6 py-3 text-xs font-semibold rounded-full bg-stone-100 text-stone-700">Owner: {item.ownerUsername || item.ownerName || 'Unknown'}</span>
+													<span className="text-xs font-semibold rounded-full bg-stone-100 text-stone-700" style={{ padding: '0.875rem 1.75rem' }}>{item.category}</span>
+													<span className="text-xs font-semibold text-amber-700 bg-amber-100 rounded-full" style={{ padding: '0.875rem 1.75rem' }}>Points: {item.pointsValue}</span>
+													<span className="text-xs font-semibold rounded-full bg-stone-100 text-stone-700" style={{ padding: '0.875rem 1.75rem' }}>Owner: {item.ownerUsername || item.ownerName || 'Unknown'}</span>
 												</div>
 											<p className="text-sm text-stone-600">{item.description}</p>
 										</div>
@@ -586,17 +587,18 @@ export default function AdminPanel() {
 													Order for Item: {order.item}
 												</h3>
 												<div className="flex items-center mb-2 space-x-4">
-													<span className="px-6 py-3 text-xs font-semibold rounded-full bg-stone-100 text-stone-700">
+													<span className="text-xs font-semibold rounded-full bg-stone-100 text-stone-700" style={{ padding: '0.875rem 1.75rem' }}>
 														{order.type}
 													</span>
 													<span
-														className={`px-6 py-3 text-xs font-semibold rounded-full ${
+														className={`text-xs font-semibold rounded-full ${
 															order.status === "accepted"
 																? "bg-emerald-100 text-emerald-700"
 																: order.status === "rejected"
 																? "bg-red-100 text-red-700"
 																: "bg-amber-100 text-amber-700"
 														}`}
+														style={{ padding: '0.875rem 1.75rem' }}
 													>
 														{order.status}
 													</span>
@@ -682,11 +684,12 @@ export default function AdminPanel() {
 								<div className="p-4 bg-gradient-to-r to-orange-50 rounded-2xl from-stone-50">
 									<p className="mb-1 text-xs text-stone-500">Account Status</p>
 									<span
-										className={`inline-flex px-6 py-3 text-xs font-semibold rounded-full ${
+										className={`inline-flex text-xs font-semibold rounded-full ${
 											selectedUser.status === "active"
 												? "bg-emerald-100 text-emerald-700"
 												: "bg-red-100 text-red-700"
 										}`}
+										style={{ padding: '0.875rem 1.75rem' }}
 									>
 										{selectedUser.status}
 									</span>

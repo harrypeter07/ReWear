@@ -37,7 +37,7 @@ export default function UserCard({ user }) {
 
 				{/* Points Badge */}
 				{user.points !== undefined && (
-					<div className="inline-flex items-center gap-2.5 px-6 py-3 bg-gradient-to-r from-[#e8f5e8] to-[#d4edda] text-[#2d5a2d] text-xs font-semibold rounded-full border border-[#c3e6cb] shadow-sm mt-3">
+					<div className="inline-flex items-center gap-2.5 bg-gradient-to-r from-[#e8f5e8] to-[#d4edda] text-[#2d5a2d] text-xs font-semibold rounded-full border border-[#c3e6cb] shadow-sm mt-3" style={{ padding: '0.875rem 1.75rem' }}>
 						<svg
 							className="w-4 h-4"
 							fill="currentColor"
@@ -55,7 +55,7 @@ export default function UserCard({ user }) {
 
 				{/* Optional Role Badge */}
 				{user.role && user.role !== 'user' && (
-					<div className="inline-flex items-center gap-2.5 px-6 py-3 bg-gradient-to-r from-[#fff3cd] to-[#ffeaa7] text-[#856404] text-xs font-semibold rounded-full border border-[#ffeaa7] shadow-sm">
+					<div className="inline-flex items-center gap-2.5 bg-gradient-to-r from-[#fff3cd] to-[#ffeaa7] text-[#856404] text-xs font-semibold rounded-full border border-[#ffeaa7] shadow-sm" style={{ padding: '0.875rem 1.75rem' }}>
 						<svg
 							className="w-4 h-4"
 							fill="currentColor"

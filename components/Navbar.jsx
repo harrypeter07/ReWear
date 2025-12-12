@@ -69,7 +69,7 @@ export default function Navbar() {
 								<li key={link.name}>
 									<Link
 										href={link.href}
-										className={`px-5 py-2.5 rounded-lg transition-all duration-200 font-semibold text-sm whitespace-nowrap ${
+										className={`px-5 py-2.5 rounded-lg transition-all duration-200 font-semibold text-base whitespace-nowrap ${
 											pathname === link.href
 												? "text-white bg-gradient-to-r from-indigo-600 to-purple-600 shadow-md"
 												: "text-slate-700 hover:text-indigo-600 hover:bg-indigo-50"
@@ -83,7 +83,7 @@ export default function Navbar() {
 								<li>
 									<Link
 										href="/admin"
-										className={`px-5 py-2.5 rounded-lg transition-all duration-200 font-semibold text-sm whitespace-nowrap ${
+										className={`px-5 py-2.5 rounded-lg transition-all duration-200 font-semibold text-base whitespace-nowrap ${
 											pathname === "/admin"
 												? "text-white bg-gradient-to-r from-indigo-600 to-purple-600 shadow-md"
 												: "text-slate-700 hover:text-indigo-600 hover:bg-indigo-50"
@@ -126,19 +126,19 @@ export default function Navbar() {
 										</div>
 									)}
 								</button>
-								<div className="flex flex-col text-xs min-w-0 hidden lg:block gap-0.5">
-									<span className="truncate max-w-[140px] font-semibold" style={{ color: 'var(--text-primary)' }}>
+								<div className="flex flex-col min-w-0 hidden lg:block">
+									<span className="truncate max-w-[160px] font-semibold text-sm block" style={{ color: 'var(--text-primary)', marginBottom: '0.375rem' }}>
 										{user.username || user.name || user.email}
 									</span>
 									{user.email && (user.username || user.name) && (
-										<span className="text-xs truncate max-w-[140px]" style={{ color: 'var(--text-secondary)' }}>
+										<span className="text-xs truncate max-w-[160px] block" style={{ color: 'var(--text-secondary)', marginTop: '0.375rem' }}>
 											{user.email}
 										</span>
 									)}
 								</div>
 								<button
 									onClick={handleLogout}
-									className="px-5 py-2.5 text-sm rounded-lg font-semibold transition-all duration-200 whitespace-nowrap flex-shrink-0 hover:scale-105"
+									className="px-5 py-2.5 text-base rounded-lg font-semibold transition-all duration-200 whitespace-nowrap flex-shrink-0 hover:scale-105"
 									style={{
 										background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
 										color: 'var(--accent)',
@@ -151,7 +151,7 @@ export default function Navbar() {
 						) : (
 							<Link
 								href="/login"
-								className={`px-5 py-2.5 rounded-lg transition-all duration-200 font-semibold text-sm whitespace-nowrap ${
+								className={`px-5 py-2.5 rounded-lg transition-all duration-200 font-semibold text-base whitespace-nowrap ${
 									pathname === "/login"
 										? "text-white bg-gradient-to-r from-indigo-600 to-purple-600 shadow-md"
 										: "text-slate-700 hover:text-indigo-600 hover:bg-indigo-50"
@@ -304,12 +304,12 @@ export default function Navbar() {
 												<span className="text-sm">{(user.username || user.name || 'U')?.slice(0,1).toUpperCase()}</span>
 											</div>
 										)}
-										<div className="text-sm min-w-0 flex-1">
-											<div className="truncate font-semibold" style={{ color: 'var(--text-primary)' }}>
+										<div className="text-sm min-w-0 flex-1 flex flex-col">
+											<div className="truncate font-semibold block" style={{ color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
 												{user.username || user.name || user.email}
 											</div>
 											{user.email && (user.username || user.name) && (
-												<div className="truncate text-xs" style={{ color: 'var(--text-secondary)' }}>
+												<div className="truncate text-xs block" style={{ color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
 													{user.email}
 												</div>
 											)}
