@@ -135,7 +135,7 @@ export default function DashboardPage() {
 	};
 
 	return (
-		<div className="min-h-screen pt-24 pb-12" style={{ background: 'var(--bg-primary)' }}>
+		<div className="min-h-screen pt-28 pb-12" style={{ background: 'var(--bg-primary)' }}>
 			{/* Header Section */}
 			<div className="container">
 				<div className="mb-8 text-center card" style={{

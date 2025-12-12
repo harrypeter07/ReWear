@@ -148,7 +148,7 @@ export default function ProfilePage() {
 	}
 
 	return (
-		<div className="min-h-screen flex items-center justify-center py-12 px-4 pt-24" style={{ background: 'var(--bg-primary)' }}>
+		<div className="min-h-screen flex items-center justify-center py-12 px-4 pt-28" style={{ background: 'var(--bg-primary)' }}>
 			<div className="card w-full max-w-md" style={{
 				background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
 				backdropFilter: 'blur(20px)',

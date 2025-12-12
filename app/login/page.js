@@ -42,20 +42,20 @@ export default function LoginPage() {
 	};
 
 	return (
-		<div className="min-h-screen flex items-center justify-center p-4 pt-24" style={{ background: 'var(--bg-primary)' }}>
-			<div className="container max-w-md w-full">
-				<div className="card" style={{
-					background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
+		<div className="min-h-screen flex items-center justify-center p-4 pt-28 pb-12" style={{ background: 'var(--bg-primary)' }}>
+			<div className="w-full max-w-[420px] mx-auto">
+				<div className="card p-8 sm:p-10" style={{
+					background: 'linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(248,250,252,0.98) 100%)',
 					backdropFilter: 'blur(20px)',
-					border: '1px solid rgba(99, 102, 241, 0.1)',
-					boxShadow: '0 20px 60px rgba(99, 102, 241, 0.15)'
+					border: '1px solid rgba(99, 102, 241, 0.15)',
+					boxShadow: '0 20px 60px rgba(99, 102, 241, 0.12)'
 				}}>
 					{/* Header */}
 					<div className="text-center mb-8">
-						<h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+						<h1 className="text-3xl sm:text-4xl font-bold mb-3 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
 							Welcome to ReWear
 						</h1>
-						<p className="text-base font-medium" style={{ color: 'var(--text-secondary)' }}>
+						<p className="text-sm sm:text-base font-medium" style={{ color: 'var(--text-secondary)' }}>
 							Sign in to your account
 						</p>
 					</div>
@@ -79,7 +79,7 @@ export default function LoginPage() {
 					)}
 
 					{/* Login Form */}
-					<form onSubmit={handleSubmit} className="space-y-6">
+					<form onSubmit={handleSubmit} className="space-y-5">
 						<div>
 							<label 
 								htmlFor="email" 

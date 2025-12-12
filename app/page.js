@@ -62,7 +62,7 @@ export default function Home() {
 	};
 
 	return (
-		<div className="min-h-screen pt-24 pb-12" style={{ background: 'var(--bg-primary)' }}>
+		<div className="min-h-screen pt-28 pb-12" style={{ background: 'var(--bg-primary)' }}>
 			{/* Hero Section */}
 			<section className="container">
 				<div className="card text-center py-16 md:py-24 min-h-[60vh] flex flex-col items-center justify-center" style={{
