@@ -86,17 +86,17 @@ export default function ItemCard({ item }) {
 				{/* Status Badge */}
 				{typeof item.isApproved !== "undefined" ? (
 					<div
-						className="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold"
+						className="absolute top-3 right-3 px-5 py-2.5 rounded-full text-xs font-semibold"
 						style={{
 							background: item.isApproved 
-								? 'rgba(220, 252, 231, 0.9)' 
-								: 'rgba(254, 243, 199, 0.9)',
+								? 'rgba(220, 252, 231, 0.95)' 
+								: 'rgba(254, 243, 199, 0.95)',
 							color: item.isApproved ? '#065f46' : '#92400e',
 							border: item.isApproved 
 								? '1px solid #a7f3d0' 
 								: '1px solid #fcd34d',
 							backdropFilter: 'blur(8px)',
-							boxShadow: 'var(--shadow)'
+							boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
 						}}
 					>
 						{item.isApproved ? "Approved" : "Pending Approval"}
@@ -104,13 +104,13 @@ export default function ItemCard({ item }) {
 				) : (
 					item.status && (
 						<div
-							className="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-semibold"
+							className="absolute top-3 right-3 px-5 py-2.5 rounded-full text-xs font-semibold"
 							style={{
 								background: item.status === "available"
-									? 'rgba(220, 252, 231, 0.9)'
+									? 'rgba(220, 252, 231, 0.95)'
 									: item.status === "pending"
-									? 'rgba(254, 243, 199, 0.9)'
-									: 'rgba(245, 245, 244, 0.9)',
+									? 'rgba(254, 243, 199, 0.95)'
+									: 'rgba(245, 245, 244, 0.95)',
 								color: item.status === "available"
 									? '#065f46'
 									: item.status === "pending"
@@ -122,7 +122,7 @@ export default function ItemCard({ item }) {
 									? '1px solid #fcd34d'
 									: '1px solid var(--border-color)',
 								backdropFilter: 'blur(8px)',
-								boxShadow: 'var(--shadow)'
+								boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
 							}}
 						>
 							{item.status}
@@ -159,11 +159,12 @@ export default function ItemCard({ item }) {
 								Category:
 							</span>
 							<span 
-								className="px-2 py-1 rounded-full text-xs font-medium"
+								className="px-5 py-2.5 rounded-full text-xs font-semibold"
 								style={{
-									background: 'var(--accent)',
-									color: 'var(--text-primary)',
-									border: '1px solid var(--border-color)'
+									background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%)',
+									color: 'var(--accent)',
+									border: '1px solid rgba(99, 102, 241, 0.25)',
+									boxShadow: '0 2px 6px rgba(99, 102, 241, 0.1)'
 								}}
 							>
 								{item.category}
@@ -197,15 +198,15 @@ export default function ItemCard({ item }) {
 								Condition:
 							</span>
 							<span
-								className="px-2 py-1 rounded-full text-xs font-medium"
+								className="px-5 py-2.5 rounded-full text-xs font-semibold"
 								style={{
 									background: item.condition.toLowerCase() === "new"
-										? 'rgba(220, 252, 231, 0.8)'
+										? 'rgba(220, 252, 231, 0.95)'
 										: item.condition.toLowerCase() === "like new"
-										? 'rgba(219, 234, 254, 0.8)'
+										? 'rgba(219, 234, 254, 0.95)'
 										: item.condition.toLowerCase() === "good"
-										? 'rgba(254, 243, 199, 0.8)'
-										: 'var(--bg-secondary)',
+										? 'rgba(254, 243, 199, 0.95)'
+										: 'rgba(248, 250, 252, 0.95)',
 									color: item.condition.toLowerCase() === "new"
 										? '#065f46'
 										: item.condition.toLowerCase() === "like new"
@@ -213,7 +214,8 @@ export default function ItemCard({ item }) {
 										: item.condition.toLowerCase() === "good"
 										? '#92400e'
 										: 'var(--text-primary)',
-									border: '1px solid var(--border-color)'
+									border: '1px solid rgba(99, 102, 241, 0.2)',
+									boxShadow: '0 2px 6px rgba(0, 0, 0, 0.1)'
 								}}
 							>
 								{item.condition}
@@ -230,11 +232,12 @@ export default function ItemCard({ item }) {
 								Points:
 							</span>
 							<span 
-								className="px-2 py-1 rounded-full text-xs font-bold"
+								className="px-5 py-2.5 rounded-full text-xs font-bold"
 								style={{
 									background: 'linear-gradient(135deg, #fef3c7, #fed7aa)',
 									color: '#92400e',
-									border: '1px solid #fcd34d'
+									border: '1px solid #fcd34d',
+									boxShadow: '0 2px 8px rgba(146, 64, 14, 0.15)'
 								}}
 							>
 								💰 {item.pointsValue}

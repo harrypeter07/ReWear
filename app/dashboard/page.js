@@ -216,21 +216,24 @@ export default function DashboardPage() {
 							<p className="mb-4 text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
 								{user?.email}
 							</p>
-							<div className="flex flex-wrap gap-3 justify-center sm:justify-start">
-								<span className="px-4 py-2 text-sm font-medium rounded-lg" style={{ 
-									background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
-									border: '1px solid rgba(99, 102, 241, 0.2)',
-									color: 'var(--text-primary)'
+							<div className="flex flex-wrap gap-4 justify-center sm:justify-start">
+								<span className="px-6 py-3 text-sm font-semibold rounded-lg" style={{ 
+									background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%)',
+									border: '1px solid rgba(99, 102, 241, 0.25)',
+									color: 'var(--text-primary)',
+									boxShadow: '0 2px 8px rgba(99, 102, 241, 0.12)'
 								}}>Role: {user?.role || 'user'}</span>
-								<span className="px-4 py-2 text-sm font-medium rounded-lg" style={{ 
-									background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
-									border: '1px solid rgba(99, 102, 241, 0.2)',
-									color: 'var(--text-primary)'
+								<span className="px-6 py-3 text-sm font-semibold rounded-lg" style={{ 
+									background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%)',
+									border: '1px solid rgba(99, 102, 241, 0.25)',
+									color: 'var(--text-primary)',
+									boxShadow: '0 2px 8px rgba(99, 102, 241, 0.12)'
 								}}>Points: {user?.points ?? 0}</span>
-								<span className="px-4 py-2 text-sm font-medium rounded-lg" style={{ 
-									background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
-									border: '1px solid rgba(99, 102, 241, 0.2)',
-									color: 'var(--text-primary)'
+								<span className="px-6 py-3 text-sm font-semibold rounded-lg" style={{ 
+									background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%)',
+									border: '1px solid rgba(99, 102, 241, 0.25)',
+									color: 'var(--text-primary)',
+									boxShadow: '0 2px 8px rgba(99, 102, 241, 0.12)'
 								}}>Listings: {userListings.length}</span>
 							</div>
 						</div>

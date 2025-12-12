@@ -182,9 +182,10 @@ export default async function ItemsPage() {
 									<div className="absolute top-0 right-0 w-32 h-32 bg-white/20 rounded-full -mr-16 -mt-16"></div>
 									<div className="absolute bottom-0 left-0 w-24 h-24 bg-white/20 rounded-full -ml-12 -mb-12"></div>
 									<div className="relative z-10">
-										<div className="bg-white/30 backdrop-blur-sm px-3 py-1 text-xs font-medium mb-4 w-fit" style={{
+										<div className="bg-white/40 backdrop-blur-sm px-4 py-2 text-xs font-semibold mb-4 w-fit rounded-full" style={{
 											borderRadius: 'var(--radius)',
-											color: 'var(--text-primary)'
+											color: 'var(--text-primary)',
+											boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
 										}}>
 											🔥 TRENDING
 										</div>

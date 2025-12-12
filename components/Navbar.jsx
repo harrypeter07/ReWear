@@ -55,21 +55,21 @@ export default function Navbar() {
 			borderColor: 'rgba(99, 102, 241, 0.1)',
 			boxShadow: '0 4px 20px rgba(99, 102, 241, 0.08)'
 		}}>
-			<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
-				<div className="flex justify-between items-center h-full gap-4">
-					<Link href="/" className="flex items-center gap-2 flex-shrink-0 group">
+			<div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12 h-full">
+				<div className="flex justify-between items-center h-full gap-6">
+					<Link href="/" className="flex items-center gap-2 flex-shrink-0 group pl-2 sm:pl-0">
 						<span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 font-bold text-xl sm:text-2xl whitespace-nowrap transition-all duration-300 group-hover:scale-105">
 							ReWear
 						</span>
 					</Link>
 
 					<div className="hidden md:flex items-center gap-2 flex-1 justify-center">
-						<ul className="flex items-center gap-1">
+						<ul className="flex items-center gap-3">
 							{navLinks.map((link) => (
 								<li key={link.name}>
 									<Link
 										href={link.href}
-										className={`px-4 py-2.5 rounded-lg transition-all duration-200 font-semibold text-sm whitespace-nowrap ${
+										className={`px-5 py-2.5 rounded-lg transition-all duration-200 font-semibold text-sm whitespace-nowrap ${
 											pathname === link.href
 												? "text-white bg-gradient-to-r from-indigo-600 to-purple-600 shadow-md"
 												: "text-slate-700 hover:text-indigo-600 hover:bg-indigo-50"
@@ -83,7 +83,7 @@ export default function Navbar() {
 								<li>
 									<Link
 										href="/admin"
-										className={`px-4 py-2.5 rounded-lg transition-all duration-200 font-semibold text-sm whitespace-nowrap ${
+										className={`px-5 py-2.5 rounded-lg transition-all duration-200 font-semibold text-sm whitespace-nowrap ${
 											pathname === "/admin"
 												? "text-white bg-gradient-to-r from-indigo-600 to-purple-600 shadow-md"
 												: "text-slate-700 hover:text-indigo-600 hover:bg-indigo-50"
@@ -96,9 +96,9 @@ export default function Navbar() {
 						</ul>
 					</div>
 
-					<div className="hidden md:flex items-center gap-3 flex-shrink-0">
+					<div className="hidden md:flex items-center gap-4 flex-shrink-0">
 						{user ? (
-							<div className="flex items-center gap-3">
+							<div className="flex items-center gap-4">
 								<button
 									onClick={() => router.push("/profile")}
 									className={`relative w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110 flex-shrink-0 ${
@@ -126,7 +126,7 @@ export default function Navbar() {
 										</div>
 									)}
 								</button>
-								<div className="flex flex-col text-xs min-w-0 hidden lg:block">
+								<div className="flex flex-col text-xs min-w-0 hidden lg:block gap-0.5">
 									<span className="truncate max-w-[140px] font-semibold" style={{ color: 'var(--text-primary)' }}>
 										{user.username || user.name || user.email}
 									</span>
@@ -138,7 +138,7 @@ export default function Navbar() {
 								</div>
 								<button
 									onClick={handleLogout}
-									className="px-4 py-2 text-sm rounded-lg font-semibold transition-all duration-200 whitespace-nowrap flex-shrink-0 hover:scale-105"
+									className="px-5 py-2.5 text-sm rounded-lg font-semibold transition-all duration-200 whitespace-nowrap flex-shrink-0 hover:scale-105"
 									style={{
 										background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
 										color: 'var(--accent)',

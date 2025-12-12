@@ -65,7 +65,7 @@ export default function ItemDetailPage() {
 
 	if (loading) {
 		return (
-			<div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
+			<div className="min-h-screen pt-28" style={{ background: 'var(--bg-primary)' }}>
 				<div className="container">
 					<div className="flex items-center justify-center min-h-[60vh]">
 						<div className="loader"></div>
@@ -77,10 +77,14 @@ export default function ItemDetailPage() {
 
 	if (!item) {
 		return (
-			<div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
+			<div className="min-h-screen pt-28" style={{ background: 'var(--bg-primary)' }}>
 				<div className="container">
 					<div className="flex items-center justify-center min-h-[60vh]">
-						<div className="card text-center max-w-md">
+						<div className="card text-center max-w-md" style={{
+							background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
+							backdropFilter: 'blur(20px)',
+							border: '1px solid rgba(99, 102, 241, 0.1)'
+						}}>
 							<div className="w-16 h-16 mx-auto mb-4 flex items-center justify-center rounded-full" style={{ background: 'var(--accent)' }}>
 								<svg className="w-8 h-8" style={{ color: 'var(--text-secondary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -133,10 +137,14 @@ export default function ItemDetailPage() {
 	};
 
 	return (
-		<div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
+		<div className="min-h-screen pt-28 pb-12" style={{ background: 'var(--bg-primary)' }}>
 			<div className="container">
 				{/* Main Item Card */}
-				<div className="card mb-8">
+				<div className="card mb-8" style={{
+					background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
+					backdropFilter: 'blur(20px)',
+					border: '1px solid rgba(99, 102, 241, 0.1)'
+				}}>
 					<div className="bento-grid" style={{ gridTemplateColumns: '1fr 1fr' }}>
 						{/* Image Section */}
 						<div className="flex items-center justify-center p-4">
@@ -176,16 +184,27 @@ export default function ItemDetailPage() {
 								<h1 className="text-3xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
 									{item.title}
 								</h1>
-								<div className="flex flex-wrap gap-2 mb-4">
-									<span className="px-3 py-1 rounded-full text-sm font-medium" style={getStatusColor(item.status)}>
+								<div className="flex flex-wrap gap-4 mb-4">
+									<span className="px-6 py-3 rounded-full text-sm font-semibold" style={{
+										...getStatusColor(item.status),
+										boxShadow: '0 2px 10px rgba(0, 0, 0, 0.12)'
+									}}>
 										{item.status}
 									</span>
-									<span className="px-3 py-1 rounded-full text-sm font-medium" style={getConditionColor(item.condition)}>
+									<span className="px-6 py-3 rounded-full text-sm font-semibold" style={{
+										...getConditionColor(item.condition),
+										boxShadow: '0 2px 10px rgba(0, 0, 0, 0.12)'
+									}}>
 										{item.condition}
 									</span>
 									{item.isApproved && (
-										<span className="px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1" style={{ background: '#e8f4f8', color: '#2d4a5d' }}>
-											<svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+										<span className="px-6 py-3 rounded-full text-sm font-semibold flex items-center gap-2.5" style={{ 
+											background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%)',
+											color: '#4f46e5',
+											border: '1px solid rgba(99, 102, 241, 0.3)',
+											boxShadow: '0 2px 10px rgba(99, 102, 241, 0.15)'
+										}}>
+											<svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
 												<path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
 											</svg>
 											Approved
@@ -264,8 +283,12 @@ export default function ItemDetailPage() {
 				</div>
 
 				{/* Previous Listings Section */}
-				<div className="card">
-					<h2 className="text-2xl font-bold mb-6 flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+				<div className="card" style={{
+					background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
+					backdropFilter: 'blur(20px)',
+					border: '1px solid rgba(99, 102, 241, 0.1)'
+				}}>
+					<h2 className="text-2xl font-bold mb-6 flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
 						<svg className="w-6 h-6" style={{ color: 'var(--text-secondary)' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
 						</svg>
