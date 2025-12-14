@@ -81,7 +81,20 @@ export async function PATCH(req) {
 			);
 		}
 		
-		const { items } = await getCollections();
+		const { items, users } = await getCollections();
+		
+		// Get item first to check if already approved and get uploaderId
+		const item = await items.findOne({ _id: new ObjectId(itemId) });
+		if (!item) {
+			return Response.json(
+				{ error: "Item not found" },
+				{ status: 404 }
+			);
+		}
+		
+		// Check if item is already approved to avoid giving points twice
+		const wasAlreadyApproved = item.isApproved === true;
+		
 		const result = await items.updateOne(
 			{ _id: new ObjectId(itemId) },
 			{
@@ -100,6 +113,16 @@ export async function PATCH(req) {
 				{ error: "Item not found or not updated" },
 				{ status: 404 }
 			);
+		}
+		
+		// Give points to user when item is approved (only if not already approved)
+		if (item.uploaderId && !wasAlreadyApproved) {
+			const pointsToAward = item.pointsValue || 10; // Use item's pointsValue, default to 10 if not set
+			await users.updateOne(
+				{ _id: item.uploaderId },
+				{ $inc: { points: pointsToAward } }
+			);
+			console.log(`[ITEMS] PATCH - Awarded ${pointsToAward} points to user ${item.uploaderId} for approved item ${itemId}`);
 		}
 		
 		console.log("[ITEMS] PATCH - Item approved successfully", { 

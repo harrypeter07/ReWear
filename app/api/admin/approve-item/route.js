@@ -38,6 +38,9 @@ export async function PATCH(req) {
 			);
 		}
 
+		// Check if item is already approved to avoid giving points twice
+		const wasAlreadyApproved = item.isApproved === true;
+
 		await items.updateOne(
 			{ _id: item._id },
 			{
@@ -50,11 +53,14 @@ export async function PATCH(req) {
 			}
 		);
 
-		if (item.uploaderId) {
+		// Give points to user when item is approved (only if not already approved)
+		if (item.uploaderId && !wasAlreadyApproved) {
+			const pointsToAward = item.pointsValue || 10; // Use item's pointsValue, default to 10 if not set
 			await users.updateOne(
 				{ _id: item.uploaderId },
-				{ $inc: { points: 10 } }
+				{ $inc: { points: pointsToAward } }
 			);
+			console.log(`[ADMIN] Awarded ${pointsToAward} points to user ${item.uploaderId} for approved item ${itemId}`);
 		}
 
 		return NextResponse.json({ message: "Item approved" });

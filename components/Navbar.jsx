@@ -126,6 +126,9 @@ export default function Navbar() {
 											{user.email}
 										</span>
 									)}
+									<span className="text-xs font-semibold mt-0.5" style={{ color: 'var(--accent)' }}>
+										{user.points ?? 0} points
+									</span>
 								</div>
 								<Button
 									variant="outline"
@@ -173,6 +176,9 @@ export default function Navbar() {
 										{user.email}
 									</span>
 								)}
+								<span className="truncate block font-semibold mt-0.5" style={{ color: 'var(--accent)' }}>
+									{user.points ?? 0} pts
+								</span>
 							</div>
 						</div>
 					)}
@@ -259,6 +265,9 @@ export default function Navbar() {
 													{user.email}
 												</div>
 											)}
+											<div className="truncate text-xs font-semibold mt-1" style={{ color: 'var(--accent)' }}>
+												{user.points ?? 0} points
+											</div>
 										</div>
 									</div>
 									<Button
