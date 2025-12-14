@@ -8,7 +8,7 @@ export default function DashboardWidgets({ stats }) {
 				</p>
 			</div>
 			<div className="card p-6">
-				<h3 className="text-lg font-bold text-primary mb-2">Swaps</h3>
+				<h3 className="text-lg font-bold text-primary mb-2">Redeem Requests</h3>
 				<p className="text-secondary text-2xl font-semibold">{stats.swaps}</p>
 			</div>
 			<div className="card p-6">

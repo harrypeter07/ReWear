@@ -1,34 +1,68 @@
 // app/api/admin/approve-item/route.js
 import { getCollections } from "@/lib/db";
 import { ObjectId } from "mongodb";
-import withAuth from "@/middlewares/withAuth";
+import { NextResponse } from "next/server";
+import { getUserFromRequest } from "@/lib/auth";
 
-async function approveItemHandler(req, res) {
-	console.log("[ADMIN] PATCH /api/admin/approve-item called");
-	const { itemId } = req.body || (await req.json());
-	if (!itemId) return res.status(400).json({ error: "itemId is required" });
-	const { items, users } = await getCollections();
-
-	const item = await items.findOne({ _id: new ObjectId(itemId) });
-	if (!item) return res.status(404).json({ error: "Item not found" });
-
-	await items.updateOne(
-		{ _id: item._id },
-		{
-			$set: {
-				isApproved: true,
-				isVisible: true,
-				status: "available",
-				updatedAt: new Date(),
-			},
-		}
-	);
-
-	if (item.uploaderId) {
-		await users.updateOne({ _id: item.uploaderId }, { $inc: { points: 10 } });
+async function requireAdmin(req) {
+	const user = await getUserFromRequest(req);
+	if (!user || user.role !== "admin") {
+		return false;
 	}
-
-	return res.json({ message: "Item approved" });
+	return true;
 }
 
-export const PATCH = withAuth(approveItemHandler, "admin");
+export async function PATCH(req) {
+	try {
+		if (!(await requireAdmin(req))) {
+			return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+		}
+
+		const body = await req.json();
+		const { itemId } = body;
+
+		if (!itemId) {
+			return NextResponse.json(
+				{ error: "itemId is required" },
+				{ status: 400 }
+			);
+		}
+
+		const { items, users } = await getCollections();
+
+		const item = await items.findOne({ _id: new ObjectId(itemId) });
+		if (!item) {
+			return NextResponse.json(
+				{ error: "Item not found" },
+				{ status: 404 }
+			);
+		}
+
+		await items.updateOne(
+			{ _id: item._id },
+			{
+				$set: {
+					isApproved: true,
+					isVisible: true,
+					status: "available",
+					updatedAt: new Date(),
+				},
+			}
+		);
+
+		if (item.uploaderId) {
+			await users.updateOne(
+				{ _id: item.uploaderId },
+				{ $inc: { points: 10 } }
+			);
+		}
+
+		return NextResponse.json({ message: "Item approved" });
+	} catch (error) {
+		console.error("[ADMIN] Error approving item:", error);
+		return NextResponse.json(
+			{ error: "Internal server error" },
+			{ status: 500 }
+		);
+	}
+}

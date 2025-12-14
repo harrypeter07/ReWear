@@ -62,10 +62,10 @@ export default function Home() {
 	};
 
 	return (
-		<div className="min-h-screen pt-28 pb-12" style={{ background: 'var(--bg-primary)' }}>
+		<div className="min-h-screen pt-40 pb-12" style={{ background: 'var(--bg-primary)' }}>
 			{/* Hero Section */}
-			<section className="container">
-				<div className="card text-center py-16 md:py-24 min-h-[60vh] flex flex-col items-center justify-center" style={{
+			<section className="container px-4 sm:px-6 lg:px-8">
+				<div className="card text-center py-16 md:py-24 px-6 sm:px-8 min-h-[60vh] flex flex-col items-center justify-center" style={{
 					background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
 					backdropFilter: 'blur(20px)',
 					border: '1px solid rgba(99, 102, 241, 0.1)'
@@ -79,18 +79,27 @@ export default function Home() {
 					<div className="flex justify-center gap-4 flex-wrap">
 						<button
 							onClick={handleStartSwapping}
-							className="btn px-8 py-4 text-lg font-semibold"
+							className="px-8 py-4 text-lg font-semibold rounded-lg transition-all duration-200"
 							style={{ 
 								background: 'var(--accent-gradient)',
 								color: 'white',
-								boxShadow: '0 8px 24px rgba(99, 102, 241, 0.3)'
+								boxShadow: '0 8px 24px rgba(99, 102, 241, 0.3)',
+								border: 'none'
+							}}
+							onMouseEnter={(e) => {
+								e.currentTarget.style.transform = 'translateY(-2px)';
+								e.currentTarget.style.boxShadow = '0 12px 32px rgba(99, 102, 241, 0.4)';
+							}}
+							onMouseLeave={(e) => {
+								e.currentTarget.style.transform = 'translateY(0)';
+								e.currentTarget.style.boxShadow = '0 8px 24px rgba(99, 102, 241, 0.3)';
 							}}
 						>
 							Start Swapping
 						</button>
 						<Link
 							href="/items"
-							className="btn px-8 py-4 text-lg font-semibold"
+							className="px-8 py-4 text-lg font-semibold rounded-lg transition-all duration-200"
 							style={{ 
 								background: 'rgba(255, 255, 255, 0.9)',
 								color: 'var(--accent)',
@@ -98,6 +107,16 @@ export default function Home() {
 								textDecoration: 'none',
 								display: 'inline-block',
 								boxShadow: '0 4px 16px rgba(99, 102, 241, 0.15)'
+							}}
+							onMouseEnter={(e) => {
+								e.currentTarget.style.transform = 'translateY(-2px)';
+								e.currentTarget.style.boxShadow = '0 8px 24px rgba(99, 102, 241, 0.25)';
+								e.currentTarget.style.background = 'rgba(255, 255, 255, 1)';
+							}}
+							onMouseLeave={(e) => {
+								e.currentTarget.style.transform = 'translateY(0)';
+								e.currentTarget.style.boxShadow = '0 4px 16px rgba(99, 102, 241, 0.15)';
+								e.currentTarget.style.background = 'rgba(255, 255, 255, 0.9)';
 							}}
 						>
 							Browse Items
@@ -132,6 +151,7 @@ export default function Home() {
 												alt={item.title}
 												width={600}
 												height={400}
+												sizes="(max-width: 768px) 100vw, 50vw"
 												className="w-full h-64 object-cover"
 												style={{ borderRadius: 'var(--radius)' }}
 											/>

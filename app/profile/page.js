@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
 export default function ProfilePage() {
@@ -148,18 +149,18 @@ export default function ProfilePage() {
 	}
 
 	return (
-		<div className="min-h-screen flex items-center justify-center py-12 px-4 pt-28" style={{ background: 'var(--bg-primary)' }}>
-			<div className="card w-full max-w-md" style={{
+		<div className="min-h-screen flex items-center justify-center py-12 px-4 pt-40" style={{ background: 'var(--bg-primary)' }}>
+			<div className="card w-full max-w-md p-8" style={{
 				background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
 				backdropFilter: 'blur(20px)',
 				border: '1px solid rgba(99, 102, 241, 0.1)',
 				boxShadow: '0 20px 60px rgba(99, 102, 241, 0.15)'
 			}}>
-				<h1 className="text-3xl font-bold mb-6 text-center bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+				<h1 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
 					My Profile
 				</h1>
 				{!user.username && (
-					<div className="bg-red-50 text-red-700 p-3 rounded-xl text-center mb-4 border border-red-200 flex items-center justify-center gap-2">
+					<div className="bg-red-50 text-red-700 p-4 rounded-xl text-center mb-6 border border-red-200 flex items-center justify-center gap-2">
 						<svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
 							<path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
 						</svg>
@@ -167,16 +168,20 @@ export default function ProfilePage() {
 					</div>
 				)}
 				<form onSubmit={handleSubmit} className="space-y-6">
-					<div className="flex flex-col items-center">
+					<div className="flex flex-col items-center mb-6">
 						<label htmlFor="avatar-upload" className="cursor-pointer group">
 							{form.avatar ? (
-								<img
-									src={form.avatar}
-									alt="Avatar"
-									className="w-24 h-24 rounded-full border-4 border-blue-200 shadow mb-2 object-cover group-hover:opacity-80"
-								/>
+								<div className="relative w-24 h-24 mb-3">
+									<Image
+										src={form.avatar}
+										alt="Avatar"
+										fill
+										className="rounded-full border-4 border-blue-200 shadow-lg object-cover group-hover:opacity-80 transition-opacity"
+										sizes="96px"
+									/>
+								</div>
 							) : (
-								<div className="w-24 h-24 rounded-full border-4 border-blue-200 shadow mb-2 flex items-center justify-center bg-gray-100">
+								<div className="w-24 h-24 rounded-full border-4 border-blue-200 shadow-lg mb-3 flex items-center justify-center bg-gray-100">
 									<svg
 										className="w-10 h-10 text-gray-400"
 										fill="none"
@@ -200,42 +205,42 @@ export default function ProfilePage() {
 								onChange={handleAvatarChange}
 								disabled={editing}
 							/>
-							<span className="block text-xs text-blue-600 hover:underline cursor-pointer">
+							<span className="block text-sm text-blue-600 hover:underline cursor-pointer font-medium">
 								Change Avatar
 							</span>
 						</label>
 					</div>
-					<div>
-						<label className="block text-sm font-medium text-gray-700 mb-1">
+					<div className="space-y-2">
+						<label className="block text-sm font-medium text-gray-700">
 							Username
 						</label>
 						{!changingUsername ? (
-							<div className="flex items-center gap-2">
-								<span className="font-mono px-2 py-1 bg-gray-100 rounded text-gray-700">
+							<div className="flex items-center gap-3">
+								<span className="font-mono px-4 py-2 bg-gray-100 rounded-lg text-gray-700 border border-gray-200">
 									{user.username}
 								</span>
 								<button
 									type="button"
-									className="text-xs text-blue-600 hover:underline ml-2"
+									className="text-sm text-blue-600 hover:underline font-medium"
 									onClick={() => setChangingUsername(true)}
 								>
 									Change
 								</button>
 							</div>
 						) : (
-							<div className="flex gap-2 items-center mt-2">
+							<div className="flex gap-2 items-center">
 								<input
 									type="text"
 									value={newUsername}
 									onChange={(e) => setNewUsername(e.target.value)}
-									className="border rounded px-2 py-1 text-sm"
+									className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
 									minLength={2}
 									required
 									disabled={editing}
 								/>
 								<button
 									type="button"
-									className="text-xs text-green-600 hover:underline"
+									className="text-sm text-green-600 hover:underline font-medium px-3 py-2"
 									disabled={editing}
 									onClick={handleUsernameChange}
 								>
@@ -243,7 +248,7 @@ export default function ProfilePage() {
 								</button>
 								<button
 									type="button"
-									className="text-xs text-gray-400 hover:underline"
+									className="text-sm text-gray-600 hover:underline font-medium px-3 py-2"
 									onClick={() => setChangingUsername(false)}
 									disabled={editing}
 								>
@@ -252,8 +257,8 @@ export default function ProfilePage() {
 							</div>
 						)}
 					</div>
-					<div>
-						<label className="block text-sm font-medium text-gray-700 mb-1">
+					<div className="space-y-2">
+						<label className="block text-sm font-medium text-gray-700">
 							Name
 						</label>
 						<input
@@ -261,27 +266,27 @@ export default function ProfilePage() {
 							name="name"
 							value={form.name}
 							onChange={handleChange}
-							className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+							className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
 							minLength={2}
 							required
 							disabled={editing}
 						/>
 					</div>
 					{success && (
-						<div className="bg-green-100 text-green-700 p-2 rounded text-center">
+						<div className="bg-green-50 text-green-700 p-4 rounded-lg text-center border border-green-200">
 							{success}
 						</div>
 					)}
 					{error && (
-						<div className="bg-red-100 text-red-700 p-2 rounded text-center">
+						<div className="bg-red-50 text-red-700 p-4 rounded-lg text-center border border-red-200">
 							{error}
 						</div>
 					)}
 					<button
 						type="submit"
-						className="btn w-full py-3.5 font-semibold text-base disabled:opacity-70 disabled:cursor-not-allowed"
+						className="w-full px-6 py-3.5 font-semibold text-base rounded-lg disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
 						style={{
-							background: editing ? 'rgba(99, 102, 241, 0.5)' : 'var(--accent-gradient)',
+							background: editing ? 'rgba(99, 102, 241, 0.5)' : 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
 							color: 'white',
 							border: 'none',
 							boxShadow: editing ? 'none' : '0 8px 24px rgba(99, 102, 241, 0.3)'

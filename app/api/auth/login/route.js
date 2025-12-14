@@ -52,6 +52,12 @@ export async function POST(req) {
 		);
 		console.log("[LOGIN] Tokens created");
 		const cookieStore = await cookies();
+		
+		// Clear any existing tokens first (including old admin tokens)
+		cookieStore.delete("accessToken");
+		cookieStore.delete("refreshToken");
+		
+		// Set new tokens
 		cookieStore.set("accessToken", accessToken, {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",

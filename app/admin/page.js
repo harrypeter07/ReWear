@@ -1,25 +1,36 @@
 "use client";
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { AlertCircle, Users, FileText, Package, Loader2, Shield, X } from "lucide-react";
+import { useUser } from "@/hooks/useUser";
+import useSWR from "swr";
+
+const fetcher = (url) => fetch(url, { credentials: "include" }).then(res => res.json());
 
 export default function AdminPanel() {
+	const { user: currentUser } = useUser();
 	const [activeTab, setActiveTab] = useState("users");
 	const [isAdminVerified, setIsAdminVerified] = useState(false);
 	const [checkingAdmin, setCheckingAdmin] = useState(true);
 	const [adminCode, setAdminCode] = useState("");
 	const [adminCodeError, setAdminCodeError] = useState("");
 	const [adminSubmitting, setAdminSubmitting] = useState(false);
-	const [users, setUsers] = useState([]);
-	const [listings, setListings] = useState([]);
-	const [orders, setOrders] = useState([]);
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState("");
 	const [selectedUser, setSelectedUser] = useState(null);
+	const [deleteConfirm, setDeleteConfirm] = useState(null);
 	const [actionLoading, setActionLoading] = useState("");
 	const [actionError, setActionError] = useState("");
-	const [deleteConfirm, setDeleteConfirm] = useState(null);
 
-	// Determine if admin access is verified by probing an admin-only endpoint
+	// Check admin access
 	useEffect(() => {
 		let cancelled = false;
 		(async () => {
@@ -33,10 +44,26 @@ export default function AdminPanel() {
 				if (!cancelled) setCheckingAdmin(false);
 			}
 		})();
-		return () => {
-			cancelled = true;
-		};
+		return () => { cancelled = true; };
 	}, []);
+
+	// Fetch data with SWR
+	const { data: usersData, mutate: mutateUsers } = useSWR(
+		isAdminVerified && activeTab === "users" ? "/api/admin/users" : null,
+		fetcher
+	);
+	const { data: listingsData, mutate: mutateListings } = useSWR(
+		isAdminVerified && activeTab === "listings" ? "/api/items?status=pending" : null,
+		fetcher
+	);
+	const { data: ordersData, mutate: mutateOrders } = useSWR(
+		isAdminVerified && activeTab === "orders" ? "/api/swaps" : null,
+		fetcher
+	);
+
+	const users = usersData?.users || [];
+	const listings = Array.isArray(listingsData) ? listingsData : [];
+	const orders = Array.isArray(ordersData?.swaps) ? ordersData.swaps : (Array.isArray(ordersData) ? ordersData : []);
 
 	const submitAdminCode = async (e) => {
 		e.preventDefault();
@@ -46,6 +73,7 @@ export default function AdminPanel() {
 			const res = await fetch('/api/auth/admin-code', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
+				credentials: 'include',
 				body: JSON.stringify({ code: adminCode }),
 			});
 			if (!res.ok) {
@@ -57,11 +85,11 @@ export default function AdminPanel() {
 				await fetch('/api/auth/admin-login', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
+					credentials: 'include',
 					body: JSON.stringify({ code: adminCode }),
 				});
 			} catch (_) {}
 			setIsAdminVerified(true);
-			setActiveTab((prev) => prev);
 		} catch (err) {
 			setAdminCodeError('Something went wrong');
 		} finally {
@@ -69,64 +97,6 @@ export default function AdminPanel() {
 		}
 	};
 
-	// Fetch users from API
-	useEffect(() => {
-		if (activeTab !== "users" || !isAdminVerified) return;
-		setLoading(true);
-		setError("");
-		fetch("/api/admin/users", { credentials: "include" })
-			.then(async (res) => {
-				if (res.status === 404) {
-					setUsers([]);
-					return;
-				}
-				if (!res.ok) throw new Error("Failed to fetch");
-				const data = await res.json();
-				setUsers(data.users || []);
-			})
-			.catch(() => setError("Failed to fetch users"))
-			.finally(() => setLoading(false));
-	}, [activeTab, isAdminVerified]);
-
-	// Fetch listings (only pending)
-	useEffect(() => {
-		if (activeTab !== "listings" || !isAdminVerified) return;
-		setLoading(true);
-		setError("");
-		fetch("/api/items?status=pending", { credentials: "include" })
-			.then(async (res) => {
-				if (res.status === 404) {
-					setListings([]);
-					return;
-				}
-				if (!res.ok) throw new Error("Failed to fetch");
-				const data = await res.json();
-				setListings(Array.isArray(data) ? data : []);
-			})
-			.catch(() => setError("Failed to fetch listings"))
-			.finally(() => setLoading(false));
-	}, [activeTab, isAdminVerified]);
-
-	// Fetch orders (swaps)
-	useEffect(() => {
-		if (activeTab !== "orders" || !isAdminVerified) return;
-		setLoading(true);
-		setError("");
-		fetch("/api/swaps", { credentials: "include" })
-			.then(async (res) => {
-				if (res.status === 404) {
-					setOrders([]);
-					return;
-				}
-				if (!res.ok) throw new Error("Failed to fetch");
-				const data = await res.json();
-				setOrders(Array.isArray(data.swaps) ? data.swaps : []);
-			})
-			.catch(() => setError("Failed to fetch orders"))
-			.finally(() => setLoading(false));
-	}, [activeTab, isAdminVerified]);
-
-	// Admin actions
 	const handleUserAction = async (userId, action) => {
 		setActionLoading(userId + action);
 		setActionError("");
@@ -141,13 +111,7 @@ export default function AdminPanel() {
 				const data = await res.json();
 				throw new Error(data.error || "Action failed");
 			}
-			setUsers((prev) =>
-				prev.map((u) =>
-					u._id === userId
-						? { ...u, status: action === "suspend" ? "suspended" : "active" }
-						: u
-				)
-			);
+			await mutateUsers();
 		} catch (err) {
 			setActionError(err.message || "Action failed");
 		} finally {
@@ -169,7 +133,7 @@ export default function AdminPanel() {
 				const data = await res.json();
 				throw new Error(data.error || "Delete failed");
 			}
-			setUsers((prev) => prev.filter((u) => u._id !== userId));
+			await mutateUsers();
 			setDeleteConfirm(null);
 		} catch (err) {
 			setActionError(err.message || "Delete failed");
@@ -178,7 +142,6 @@ export default function AdminPanel() {
 		}
 	};
 
-	// Listing actions
 	const handleApproveListing = async (itemId) => {
 		setActionLoading(itemId + "approve");
 		setActionError("");
@@ -190,7 +153,7 @@ export default function AdminPanel() {
 				body: JSON.stringify({ itemId }),
 			});
 			if (!res.ok) throw new Error("Failed to approve listing");
-			setListings((prev) => prev.filter((l) => l._id !== itemId));
+			await mutateListings();
 		} catch (err) {
 			setActionError(err.message || "Failed to approve listing");
 		} finally {
@@ -209,7 +172,7 @@ export default function AdminPanel() {
 				body: JSON.stringify({ isVisible: false, status: "cancelled" }),
 			});
 			if (!res.ok) throw new Error("Failed to cancel listing");
-			setListings((prev) => prev.filter((l) => l._id !== itemId));
+			await mutateListings();
 		} catch (err) {
 			setActionError(err.message || "Failed to cancel listing");
 		} finally {
@@ -217,7 +180,6 @@ export default function AdminPanel() {
 		}
 	};
 
-	// Order actions
 	const handleOrderAction = async (swapId, action) => {
 		setActionLoading(swapId + action);
 		setActionError("");
@@ -229,21 +191,7 @@ export default function AdminPanel() {
 				body: JSON.stringify({ swapId, action }),
 			});
 			if (!res.ok) throw new Error("Failed to update order");
-			setOrders((prev) =>
-				prev.map((o) =>
-					o._id === swapId
-						? {
-								...o,
-								status:
-									action === "accept"
-										? "accepted"
-										: action === "reject"
-										? "rejected"
-										: o.status,
-						  }
-						: o
-				)
-			);
+			await mutateOrders();
 		} catch (err) {
 			setActionError(err.message || "Failed to update order");
 		} finally {
@@ -251,533 +199,461 @@ export default function AdminPanel() {
 		}
 	};
 
-	const tabStyle = (isActive) => `
-		px-6 py-3 text-sm font-medium rounded-full transition-all duration-300 ease-in-out
-		${
-			isActive
-				? "bg-gradient-to-r from-orange-100 to-amber-50 text-amber-800 shadow-md transform scale-105"
-				: "text-stone-600 hover:text-stone-800 hover:bg-stone-50"
-		}
-	`;
-
-	const buttonStyle = (variant = "primary") => {
-		const variants = {
-			primary:
-				"bg-gradient-to-r from-stone-100 to-stone-50 text-stone-700 hover:from-stone-200 hover:to-stone-100 border border-stone-200",
-			approve:
-				"bg-gradient-to-r from-emerald-50 to-green-50 text-emerald-700 hover:from-emerald-100 hover:to-green-100 border border-emerald-200",
-			warning:
-				"bg-gradient-to-r from-amber-50 to-orange-50 text-amber-700 hover:from-amber-100 hover:to-orange-100 border border-amber-200",
-			danger:
-				"bg-gradient-to-r from-red-50 to-rose-50 text-red-700 hover:from-red-100 hover:to-rose-100 border border-red-200",
-		};
-		return `${variants[variant]} px-4 py-2 rounded-2xl text-xs font-medium transition-all duration-300 ease-in-out hover:shadow-md hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100`;
-	};
-
-	// Gate: show code form until admin is verified
+	// Admin code gate
 	if (!isAdminVerified) {
 		return (
-			<div className="p-4 min-h-screen bg-gradient-to-br via-orange-50 to-amber-50 from-stone-50">
-				<div className="mx-auto max-w-7xl">
-					<div className="p-8 mb-8 bg-gradient-to-r to-orange-100 rounded-3xl border shadow-lg from-stone-100 border-stone-200">
-						<h1 className="mb-2 text-4xl font-bold text-stone-800">Admin Panel</h1>
-						<p className="text-stone-600">Enter admin access code to continue</p>
-					</div>
-					<div className="flex justify-center items-center">
-						<div className="p-8 w-full max-w-md bg-white rounded-3xl border shadow-2xl border-stone-200">
-							<h2 className="mb-4 text-2xl font-semibold text-center text-stone-800">Admin Access</h2>
+			<div className="min-h-screen flex items-center justify-center p-4 pt-40 pb-12 bg-gradient-to-br from-slate-50 to-slate-100">
+				<div className="w-full max-w-[420px] mx-auto">
+					<Card className="shadow-xl">
+						<CardHeader className="text-center">
+							<div className="flex justify-center mb-4">
+								<Shield className="h-12 w-12 text-primary" />
+							</div>
+							<CardTitle className="text-3xl sm:text-4xl">Admin Panel</CardTitle>
+							<CardDescription className="text-base">Enter admin access code to continue</CardDescription>
+						</CardHeader>
+						<CardContent>
 							{adminCodeError && (
-								<div className="p-3 mb-4 text-center text-red-700 bg-red-50 rounded-2xl border border-red-200">{adminCodeError}</div>
+								<Alert variant="destructive" className="mb-6">
+									<AlertCircle className="h-4 w-4" />
+									<AlertDescription>{adminCodeError}</AlertDescription>
+								</Alert>
 							)}
 							<form onSubmit={submitAdminCode} className="space-y-4">
-								<input
-									type="password"
-									value={adminCode}
-									onChange={(e) => setAdminCode(e.target.value)}
-									placeholder="Access Code"
-									className="px-4 py-3 w-full rounded-xl border"
-									style={{ background: '#fffdf9', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
-									required
-								/>
-								<button className="py-3 w-full btn" disabled={adminSubmitting || checkingAdmin} style={{ background: 'var(--accent)' }}>
-									{adminSubmitting ? 'Verifying...' : 'Continue'}
-								</button>
+								<div className="space-y-2">
+									<Label htmlFor="adminCode">Access Code</Label>
+									<Input
+										id="adminCode"
+										type="password"
+										placeholder="Enter admin code"
+										value={adminCode}
+										onChange={(e) => setAdminCode(e.target.value)}
+										required
+									/>
+								</div>
+								<Button type="submit" disabled={adminSubmitting || checkingAdmin} className="w-full">
+									{adminSubmitting ? (
+										<>
+											<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+											Verifying...
+										</>
+									) : (
+										"Continue"
+									)}
+								</Button>
 							</form>
-							<p className="mt-3 text-sm text-center" style={{ color: 'var(--text-secondary)' }}>
-								Tip: If admin APIs still show 403 after this, re-enter the code or ask for admin password.
+							<p className="mt-4 text-xs text-center text-muted-foreground">
+								Tip: If admin APIs still show 403 after this, re-enter the code.
 							</p>
-						</div>
-					</div>
+						</CardContent>
+					</Card>
 				</div>
 			</div>
 		);
 	}
 
 	return (
-		<div className="p-4 min-h-screen bg-gradient-to-br via-orange-50 to-amber-50 from-stone-50">
-			<div className="mx-auto max-w-7xl">
+		<div className="min-h-screen pt-40 pb-12 bg-gradient-to-br from-slate-50 to-slate-100">
+			<div className="container mx-auto px-4">
 				{/* Header */}
-				<div className="p-8 mb-8 bg-gradient-to-r to-orange-100 rounded-3xl border shadow-lg from-stone-100 border-stone-200">
-					<h1 className="mb-2 text-4xl font-bold text-stone-800">
-						Admin Panel
-					</h1>
-					<p className="text-stone-600">Manage your platform with elegance</p>
-				</div>
+				<Card className="mb-8 shadow-lg">
+					<CardHeader>
+						<CardTitle className="text-4xl font-bold">Admin Panel</CardTitle>
+						<CardDescription className="text-lg">Manage your platform with elegance</CardDescription>
+					</CardHeader>
+				</Card>
 
-				{/* Tab Navigation */}
-				<div className="p-6 mb-8 rounded-2xl border shadow-lg backdrop-blur-sm bg-white/80 border-stone-200">
-					<div className="flex flex-wrap gap-4 justify-center">
-						<button
-							onClick={() => setActiveTab("users")}
-							className={tabStyle(activeTab === "users")}
-						>
-							👥 Manage Users
-						</button>
-						<button
-							onClick={() => setActiveTab("listings")}
-							className={tabStyle(activeTab === "listings")}
-						>
-							📝 Review Listings
-						</button>
-						<button
-							onClick={() => setActiveTab("orders")}
-							className={tabStyle(activeTab === "orders")}
-						>
-							📦 Orders
-						</button>
-					</div>
-				</div>
+				{/* Tabs */}
+				<Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+					<TabsList className="grid w-full grid-cols-3">
+						<TabsTrigger value="users" className="flex items-center gap-2">
+							<Users className="h-4 w-4" />
+							Manage Users
+						</TabsTrigger>
+						<TabsTrigger value="listings" className="flex items-center gap-2">
+							<FileText className="h-4 w-4" />
+							Review Listings
+						</TabsTrigger>
+						<TabsTrigger value="orders" className="flex items-center gap-2">
+							<Package className="h-4 w-4" />
+							Orders
+						</TabsTrigger>
+					</TabsList>
 
-				{/* Users Tab */}
-				{activeTab === "users" && (
-					<div className="p-8 rounded-3xl border shadow-lg backdrop-blur-sm bg-white/80 border-stone-200">
-						<div className="flex items-center mb-6">
-							<div className="flex justify-center items-center mr-3 w-8 h-8 bg-gradient-to-r from-blue-100 to-indigo-100 rounded-full">
-								<span className="text-sm text-blue-600">👥</span>
-							</div>
-							<h2 className="text-2xl font-semibold text-stone-800">
-								User Management
-							</h2>
-						</div>
+					{actionError && (
+						<Alert variant="destructive">
+							<AlertCircle className="h-4 w-4" />
+							<AlertDescription>{actionError}</AlertDescription>
+						</Alert>
+					)}
 
-						{loading ? (
-							<div className="flex justify-center items-center py-16">
-								<div className="w-8 h-8 rounded-full border-4 animate-spin border-stone-200 border-t-amber-400"></div>
-								<span className="ml-3 text-stone-600">Loading users...</span>
-							</div>
-						) : error ? (
-							<div className="p-4 text-center text-red-700 bg-red-50 rounded-2xl border border-red-200">
-								{error}
-							</div>
-						) : users.length === 0 ? (
-							<div className="py-16 text-center text-stone-500">
-								<div className="flex justify-center items-center mx-auto mb-4 w-16 h-16 rounded-full bg-stone-100">
-									<span className="text-2xl">🤷</span>
-								</div>
-								Not yet
-							</div>
-						) : (
-							<div className="grid gap-6">
-								{users.map((user) => (
-									<div
-										key={user._id}
-										className="p-6 bg-gradient-to-r to-orange-50 rounded-2xl border transition-all duration-300 from-stone-50 border-stone-200 hover:shadow-md"
-									>
-										<div className="flex justify-between items-center">
-											<div className="flex items-center space-x-4">
-												<div className="flex overflow-hidden justify-center items-center w-16 h-16 bg-gradient-to-r from-amber-100 to-orange-100 rounded-full">
-													{user.avatar && typeof user.avatar === 'string' ? (
-														<Image
-															src={user.avatar}
-															alt={user.name || user.username || "User Avatar"}
-															width={64}
-															height={64}
-															className="object-cover rounded-full"
-															onError={(e) => { e.currentTarget.style.display = 'none'; }}
-														/>
-													) : (
-														<span className="text-2xl text-amber-600">👤</span>
-													)}
-												</div>
-												<div>
-													<h3 className="text-lg font-semibold text-stone-800">
-														{user.name || user.username}
-													</h3>
-													<p className="text-sm text-stone-600">{user.email}</p>
-													<div className="flex items-center mt-2 space-x-4">
-														<span className="text-xs text-stone-500">
-															Joined:{" "}
-															{user.createdAt
-																? new Date(user.createdAt).toLocaleDateString()
-																: "-"}
-														</span>
-														<span className="text-xs text-stone-500">
-															Items: {user.itemsListed ?? "-"}
-														</span>
-														<span className="text-xs text-stone-500">
-															Swaps: {user.swapsCompleted ?? "-"}
-														</span>
+					{/* Users Tab */}
+					<TabsContent value="users" className="space-y-4">
+						<Card>
+							<CardHeader>
+								<CardTitle className="flex items-center gap-2">
+									<Users className="h-5 w-5" />
+									User Management
+								</CardTitle>
+							</CardHeader>
+							<CardContent>
+								{!usersData ? (
+									<div className="flex justify-center items-center py-16">
+										<Loader2 className="h-8 w-8 animate-spin text-primary" />
+									</div>
+								) : users.length === 0 ? (
+									<div className="py-16 text-center text-muted-foreground">
+										<Users className="h-16 w-16 mx-auto mb-4 opacity-50" />
+										<p>No users found</p>
+									</div>
+								) : (
+									<Table>
+										<TableHeader>
+											<TableRow>
+												<TableHead>User</TableHead>
+												<TableHead>Email</TableHead>
+												<TableHead>Status</TableHead>
+												<TableHead>Joined</TableHead>
+												<TableHead className="text-right">Actions</TableHead>
+											</TableRow>
+										</TableHeader>
+										<TableBody>
+											{users.map((user) => (
+												<TableRow key={user._id}>
+													<TableCell>
+														<div className="flex items-center gap-3">
+															<Avatar>
+																{user.avatar && <AvatarImage src={user.avatar} alt={user.name || user.username} />}
+																<AvatarFallback>
+																	{(user.name || user.username || 'U')?.slice(0,1).toUpperCase()}
+																</AvatarFallback>
+															</Avatar>
+															<span className="font-medium">{user.name || user.username}</span>
+														</div>
+													</TableCell>
+													<TableCell>{user.email}</TableCell>
+													<TableCell>
+														<Badge variant={user.status === "active" ? "default" : "destructive"}>
+															{user.status || "active"}
+														</Badge>
+													</TableCell>
+													<TableCell>
+														{user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "-"}
+													</TableCell>
+													<TableCell className="text-right">
+														<div className="flex justify-end gap-2">
+															<Button
+																variant="outline"
+																size="sm"
+																onClick={() => setSelectedUser(user)}
+															>
+																View
+															</Button>
+															{user.status === "active" ? (
+																<Button
+																	variant="outline"
+																	size="sm"
+																	onClick={() => handleUserAction(user._id, "suspend")}
+																	disabled={actionLoading === user._id + "suspend"}
+																>
+																	{actionLoading === user._id + "suspend" ? (
+																		<Loader2 className="h-4 w-4 animate-spin" />
+																	) : (
+																		"Suspend"
+																	)}
+																</Button>
+															) : (
+																<Button
+																	variant="outline"
+																	size="sm"
+																	onClick={() => handleUserAction(user._id, "activate")}
+																	disabled={actionLoading === user._id + "activate"}
+																>
+																	{actionLoading === user._id + "activate" ? (
+																		<Loader2 className="h-4 w-4 animate-spin" />
+																	) : (
+																		"Activate"
+																	)}
+																</Button>
+															)}
+															<Button
+																variant="destructive"
+																size="sm"
+																onClick={() => setDeleteConfirm(user)}
+																disabled={actionLoading === user._id + "delete"}
+															>
+																Delete
+															</Button>
+														</div>
+													</TableCell>
+												</TableRow>
+											))}
+										</TableBody>
+									</Table>
+								)}
+							</CardContent>
+						</Card>
+					</TabsContent>
+
+					{/* Listings Tab */}
+					<TabsContent value="listings" className="space-y-4">
+						<Card>
+							<CardHeader>
+								<CardTitle className="flex items-center gap-2">
+									<FileText className="h-5 w-5" />
+									Pending Listings
+								</CardTitle>
+							</CardHeader>
+							<CardContent>
+								{!listingsData ? (
+									<div className="flex justify-center items-center py-16">
+										<Loader2 className="h-8 w-8 animate-spin text-primary" />
+									</div>
+								) : listings.length === 0 ? (
+									<div className="py-16 text-center text-muted-foreground">
+										<FileText className="h-16 w-16 mx-auto mb-4 opacity-50" />
+										<p>All listings have been reviewed</p>
+									</div>
+								) : (
+									<div className="space-y-4">
+										{listings.map((item) => (
+											<Card key={item._id}>
+												<CardContent className="pt-6">
+													<div className="flex justify-between items-start gap-4">
+														<div className="flex-1">
+															<h3 className="text-lg font-semibold mb-2">{item.title}</h3>
+															<div className="flex flex-wrap gap-2 mb-2">
+																<Badge>{item.category}</Badge>
+																<Badge variant="secondary">Points: {item.pointsValue}</Badge>
+																<Badge variant="outline">Owner: {item.ownerUsername || item.ownerName || 'Unknown'}</Badge>
+															</div>
+															<p className="text-sm text-muted-foreground">{item.description}</p>
+														</div>
+														<div className="flex gap-2">
+															<Button
+																variant="default"
+																size="sm"
+																onClick={() => handleApproveListing(item._id)}
+																disabled={actionLoading === item._id + "approve"}
+															>
+																{actionLoading === item._id + "approve" ? (
+																	<Loader2 className="h-4 w-4 animate-spin" />
+																) : (
+																	"Approve"
+																)}
+															</Button>
+															<Button
+																variant="destructive"
+																size="sm"
+																onClick={() => handleCancelListing(item._id)}
+																disabled={actionLoading === item._id + "cancel"}
+															>
+																{actionLoading === item._id + "cancel" ? (
+																	<Loader2 className="h-4 w-4 animate-spin" />
+																) : (
+																	"Reject"
+																)}
+															</Button>
+														</div>
 													</div>
-													<div className="mt-2">
-														<span
-															className={`text-xs font-semibold rounded-full ${
-																user.status === "active"
-																	? "bg-emerald-100 text-emerald-700"
-																	: "bg-red-100 text-red-700"
-															}`}
-															style={{ padding: '0.875rem 1.75rem' }}
+												</CardContent>
+											</Card>
+										))}
+									</div>
+								)}
+							</CardContent>
+						</Card>
+					</TabsContent>
+
+					{/* Orders Tab */}
+					<TabsContent value="orders" className="space-y-4">
+						<Card>
+							<CardHeader>
+								<CardTitle className="flex items-center gap-2">
+									<Package className="h-5 w-5" />
+									Orders Management
+								</CardTitle>
+							</CardHeader>
+							<CardContent>
+								{!ordersData ? (
+									<div className="flex justify-center items-center py-16">
+										<Loader2 className="h-8 w-8 animate-spin text-primary" />
+									</div>
+								) : orders.length === 0 ? (
+									<div className="py-16 text-center text-muted-foreground">
+										<Package className="h-16 w-16 mx-auto mb-4 opacity-50" />
+										<p>No orders yet</p>
+									</div>
+								) : (
+									<Table>
+										<TableHeader>
+											<TableRow>
+												<TableHead>Item</TableHead>
+												<TableHead>Type</TableHead>
+												<TableHead>Status</TableHead>
+												<TableHead>Message</TableHead>
+												<TableHead className="text-right">Actions</TableHead>
+											</TableRow>
+										</TableHeader>
+										<TableBody>
+											{orders.map((order) => (
+												<TableRow key={order._id}>
+													<TableCell className="font-medium">{order.item || "N/A"}</TableCell>
+													<TableCell>
+														<Badge variant="outline">{order.type}</Badge>
+													</TableCell>
+													<TableCell>
+														<Badge
+															variant={
+																order.status === "accepted"
+																	? "default"
+																	: order.status === "rejected"
+																	? "destructive"
+																	: "secondary"
+															}
 														>
-															{user.status}
-														</span>
-													</div>
-												</div>
-											</div>
-											<div className="flex flex-col space-y-2">
-												<button
-													onClick={() => setSelectedUser(user)}
-													className={buttonStyle("primary")}
-													disabled={!!actionLoading}
-												>
-													View Details
-												</button>
-												{user.status === "active" ? (
-													<button
-														onClick={() =>
-															handleUserAction(user._id, "suspend")
-														}
-														className={buttonStyle("warning")}
-														disabled={actionLoading === user._id + "suspend"}
-													>
-														{actionLoading === user._id + "suspend"
-															? "Suspending..."
-															: "Suspend"}
-													</button>
-												) : (
-													<button
-														onClick={() =>
-															handleUserAction(user._id, "activate")
-														}
-														className={buttonStyle("approve")}
-														disabled={actionLoading === user._id + "activate"}
-													>
-														{actionLoading === user._id + "activate"
-															? "Activating..."
-															: "Activate"}
-													</button>
-												)}
-												<button
-													onClick={() => setDeleteConfirm(user)}
-													className={buttonStyle("danger")}
-													disabled={actionLoading === user._id + "delete"}
-												>
-													Delete
-												</button>
-											</div>
-										</div>
-									</div>
-								))}
-								{actionError && (
-									<div className="p-4 mt-4 text-center text-red-700 bg-red-50 rounded-2xl border border-red-200">
-										{actionError}
-									</div>
+															{order.status}
+														</Badge>
+													</TableCell>
+													<TableCell className="max-w-xs truncate">{order.message}</TableCell>
+													<TableCell className="text-right">
+														<div className="flex justify-end gap-2">
+															<Button
+																variant="default"
+																size="sm"
+																onClick={() => handleOrderAction(order._id, "accept")}
+																disabled={actionLoading === order._id + "accept"}
+															>
+																{actionLoading === order._id + "accept" ? (
+																	<Loader2 className="h-4 w-4 animate-spin" />
+																) : (
+																	"Accept"
+																)}
+															</Button>
+															<Button
+																variant="destructive"
+																size="sm"
+																onClick={() => handleOrderAction(order._id, "reject")}
+																disabled={actionLoading === order._id + "reject"}
+															>
+																{actionLoading === order._id + "reject" ? (
+																	<Loader2 className="h-4 w-4 animate-spin" />
+																) : (
+																	"Reject"
+																)}
+															</Button>
+														</div>
+													</TableCell>
+												</TableRow>
+											))}
+										</TableBody>
+									</Table>
 								)}
-							</div>
-						)}
-					</div>
-				)}
+							</CardContent>
+						</Card>
+					</TabsContent>
+				</Tabs>
 
-				{/* Listings Tab */}
-				{activeTab === "listings" && (
-					<div className="p-8 rounded-3xl border shadow-lg backdrop-blur-sm bg-white/80 border-stone-200">
-						<div className="flex items-center mb-6">
-							<div className="flex justify-center items-center mr-3 w-8 h-8 bg-gradient-to-r from-green-100 to-emerald-100 rounded-full">
-								<span className="text-sm text-green-600">📝</span>
-							</div>
-							<h2 className="text-2xl font-semibold text-stone-800">
-								Pending Listings
-							</h2>
-						</div>
-
-						{loading ? (
-							<div className="flex justify-center items-center py-16">
-								<div className="w-8 h-8 rounded-full border-4 animate-spin border-stone-200 border-t-emerald-400"></div>
-								<span className="ml-3 text-stone-600">Loading listings...</span>
-							</div>
-						) : error ? (
-							<div className="p-4 text-center text-red-700 bg-red-50 rounded-2xl border border-red-200">
-								{error}
-							</div>
-						) : (
-							<div className="grid gap-6">
-								{listings.map((item) => (
-									<div
-										key={item._id}
-										className="p-6 bg-gradient-to-r to-green-50 rounded-2xl border transition-all duration-300 from-stone-50 border-stone-200 hover:shadow-md"
-									>
-										<div className="flex gap-6 justify-between items-start">
-											<div className="flex-1">
-												<h3 className="mb-2 text-lg font-semibold text-stone-800">{item.title}</h3>
-												<div className="flex flex-wrap gap-2 items-center mb-2">
-													<span className="text-xs font-semibold rounded-full bg-stone-100 text-stone-700" style={{ padding: '0.875rem 1.75rem' }}>{item.category}</span>
-													<span className="text-xs font-semibold text-amber-700 bg-amber-100 rounded-full" style={{ padding: '0.875rem 1.75rem' }}>Points: {item.pointsValue}</span>
-													<span className="text-xs font-semibold rounded-full bg-stone-100 text-stone-700" style={{ padding: '0.875rem 1.75rem' }}>Owner: {item.ownerUsername || item.ownerName || 'Unknown'}</span>
-												</div>
-											<p className="text-sm text-stone-600">{item.description}</p>
-										</div>
-										<div className="flex ml-6 space-x-3">
-											<button onClick={() => handleApproveListing(item._id)} className={buttonStyle("approve")} disabled={actionLoading === item._id + "approve"}>
-												{actionLoading === item._id + "approve" ? "Approving..." : "Approve"}
-											</button>
-											<button onClick={() => handleCancelListing(item._id)} className={buttonStyle("danger")} disabled={actionLoading === item._id + "cancel"}>
-												{actionLoading === item._id + "cancel" ? "Rejecting..." : "Reject"}
-											</button>
-										</div>
-									</div>
+				{/* User Detail Dialog */}
+				<Dialog open={!!selectedUser} onOpenChange={() => setSelectedUser(null)}>
+					<DialogContent>
+						<DialogHeader>
+							<DialogTitle>{selectedUser?.name || selectedUser?.username}</DialogTitle>
+							<DialogDescription>User Details</DialogDescription>
+						</DialogHeader>
+						{selectedUser && (
+							<div className="space-y-4">
+								<div className="space-y-2">
+									<Label>Email Address</Label>
+									<p className="text-sm font-medium">{selectedUser.email}</p>
 								</div>
-								))}
-								{listings.length === 0 && (
-									<div className="py-16 text-center text-stone-500">
-										<div className="flex justify-center items-center mx-auto mb-4 w-16 h-16 rounded-full bg-stone-100">
-											<span className="text-2xl">✅</span>
-										</div>
-										All listings have been reviewed
-									</div>
-								)}
-							</div>
-						)}
-						{actionError && (
-							<div className="p-4 mt-4 text-center text-red-700 bg-red-50 rounded-2xl border border-red-200">
-								{actionError}
-							</div>
-						)}
-					</div>
-				)}
-
-				{/* Orders Tab */}
-				{activeTab === "orders" && (
-					<div className="p-8 rounded-3xl border shadow-lg backdrop-blur-sm bg-white/80 border-stone-200">
-						<div className="flex items-center mb-6">
-							<div className="flex justify-center items-center mr-3 w-8 h-8 bg-gradient-to-r from-purple-100 to-pink-100 rounded-full">
-								<span className="text-sm text-purple-600">📦</span>
-							</div>
-							<h2 className="text-2xl font-semibold text-stone-800">
-								Orders Management
-							</h2>
-						</div>
-
-						{loading ? (
-							<div className="flex justify-center items-center py-16">
-								<div className="w-8 h-8 rounded-full border-4 animate-spin border-stone-200 border-t-purple-400"></div>
-								<span className="ml-3 text-stone-600">Loading orders...</span>
-							</div>
-						) : error ? (
-							<div className="p-4 text-center text-red-700 bg-red-50 rounded-2xl border border-red-200">
-								{error}
-							</div>
-						) : (
-							<div className="grid gap-6">
-								{orders.map((order) => (
-									<div
-										key={order._id}
-										className="p-6 bg-gradient-to-r to-purple-50 rounded-2xl border transition-all duration-300 from-stone-50 border-stone-200 hover:shadow-md"
-									>
-										<div className="flex justify-between items-center">
-											<div className="flex-1">
-												<h3 className="mb-2 text-lg font-semibold text-stone-800">
-													Order for Item: {order.item}
-												</h3>
-												<div className="flex items-center mb-2 space-x-4">
-													<span className="text-xs font-semibold rounded-full bg-stone-100 text-stone-700" style={{ padding: '0.875rem 1.75rem' }}>
-														{order.type}
-													</span>
-													<span
-														className={`text-xs font-semibold rounded-full ${
-															order.status === "accepted"
-																? "bg-emerald-100 text-emerald-700"
-																: order.status === "rejected"
-																? "bg-red-100 text-red-700"
-																: "bg-amber-100 text-amber-700"
-														}`}
-														style={{ padding: '0.875rem 1.75rem' }}
-													>
-														{order.status}
-													</span>
-												</div>
-												<p className="text-sm text-stone-600">
-													{order.message}
-												</p>
-											</div>
-											<div className="flex ml-6 space-x-3">
-												<button
-													onClick={() => handleOrderAction(order._id, "accept")}
-													className={buttonStyle("approve")}
-													disabled={actionLoading === order._id + "accept"}
-												>
-													{actionLoading === order._id + "accept"
-														? "Accepting..."
-														: "Accept"}
-												</button>
-												<button
-													onClick={() => handleOrderAction(order._id, "reject")}
-													className={buttonStyle("danger")}
-													disabled={actionLoading === order._id + "reject"}
-												>
-													{actionLoading === order._id + "reject"
-														? "Rejecting..."
-														: "Reject"}
-												</button>
-											</div>
-										</div>
-									</div>
-								))}
-								{orders.length === 0 && (
-									<div className="py-16 text-center text-stone-500">
-										<div className="flex justify-center items-center mx-auto mb-4 w-16 h-16 rounded-full bg-stone-100">
-											<span className="text-2xl">📭</span>
-										</div>
-										Not yet
-									</div>
-								)}
-							</div>
-						)}
-						{actionError && (
-							<div className="p-4 mt-4 text-center text-red-700 bg-red-50 rounded-2xl border border-red-200">
-								{actionError}
-							</div>
-						)}
-					</div>
-				)}
-
-				{/* User Detail Modal */}
-				{selectedUser && (
-					<div className="flex fixed inset-0 z-50 justify-center items-center p-4 backdrop-blur-sm bg-black/20">
-						<div className="p-8 w-full max-w-md bg-white rounded-3xl border shadow-2xl border-stone-200">
-							<div className="flex justify-between items-start mb-6">
-								<div>
-									<h3 className="text-2xl font-bold text-stone-800">
-										{selectedUser.name || selectedUser.username}
-									</h3>
-									<p className="text-sm text-stone-600">User Details</p>
-								</div>
-								<button
-									onClick={() => setSelectedUser(null)}
-									className="flex justify-center items-center w-8 h-8 rounded-full transition-colors bg-stone-100 text-stone-600 hover:bg-stone-200"
-								>
-									✕
-								</button>
-							</div>
-							<div className="space-y-6">
-								<div className="p-4 bg-gradient-to-r to-orange-50 rounded-2xl from-stone-50">
-									<p className="mb-1 text-xs text-stone-500">Email Address</p>
-									<p className="font-medium text-stone-800">
-										{selectedUser.email}
-									</p>
-								</div>
-								<div className="p-4 bg-gradient-to-r to-orange-50 rounded-2xl from-stone-50">
-									<p className="mb-1 text-xs text-stone-500">Member Since</p>
-									<p className="font-medium text-stone-800">
+								<div className="space-y-2">
+									<Label>Member Since</Label>
+									<p className="text-sm font-medium">
 										{selectedUser.createdAt
 											? new Date(selectedUser.createdAt).toLocaleDateString()
 											: "-"}
 									</p>
 								</div>
-								<div className="p-4 bg-gradient-to-r to-orange-50 rounded-2xl from-stone-50">
-									<p className="mb-1 text-xs text-stone-500">Account Status</p>
-									<span
-										className={`inline-flex text-xs font-semibold rounded-full ${
-											selectedUser.status === "active"
-												? "bg-emerald-100 text-emerald-700"
-												: "bg-red-100 text-red-700"
-										}`}
-										style={{ padding: '0.875rem 1.75rem' }}
-									>
-										{selectedUser.status}
-									</span>
+								<div className="space-y-2">
+									<Label>Account Status</Label>
+									<Badge variant={selectedUser.status === "active" ? "default" : "destructive"}>
+										{selectedUser.status || "active"}
+									</Badge>
 								</div>
-								<div className="pt-4 space-y-3 border-t border-stone-200">
+								<DialogFooter>
 									{selectedUser.status === "active" ? (
-										<button
-											className="px-4 py-3 w-full font-medium text-amber-700 bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl border border-amber-200 transition-all duration-300 hover:from-amber-100 hover:to-orange-100"
-											onClick={() =>
-												handleUserAction(selectedUser._id, "suspend")
-											}
+										<Button
+											variant="outline"
+											onClick={() => handleUserAction(selectedUser._id, "suspend")}
 											disabled={actionLoading === selectedUser._id + "suspend"}
 										>
-											{actionLoading === selectedUser._id + "suspend"
-												? "Suspending..."
-												: "Suspend User"}
-										</button>
+											{actionLoading === selectedUser._id + "suspend" ? (
+												<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+											) : null}
+											Suspend User
+										</Button>
 									) : (
-										<button
-											className="px-4 py-3 w-full font-medium text-emerald-700 bg-gradient-to-r from-emerald-50 to-green-50 rounded-2xl border border-emerald-200 transition-all duration-300 hover:from-emerald-100 hover:to-green-100"
-											onClick={() =>
-												handleUserAction(selectedUser._id, "activate")
-											}
+										<Button
+											variant="default"
+											onClick={() => handleUserAction(selectedUser._id, "activate")}
 											disabled={actionLoading === selectedUser._id + "activate"}
 										>
-											{actionLoading === selectedUser._id + "activate"
-												? "Activating..."
-												: "Activate User"}
-										</button>
+											{actionLoading === selectedUser._id + "activate" ? (
+												<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+											) : null}
+											Activate User
+										</Button>
 									)}
-									<button
-										className="px-4 py-3 w-full font-medium text-red-700 bg-gradient-to-r from-red-50 to-rose-50 rounded-2xl border border-red-200 transition-all duration-300 hover:from-red-100 hover:to-rose-100"
-										onClick={() => setDeleteConfirm(selectedUser)}
-										disabled={actionLoading === selectedUser._id + "delete"}
+									<Button
+										variant="destructive"
+										onClick={() => {
+											setSelectedUser(null);
+											setDeleteConfirm(selectedUser);
+										}}
 									>
 										Delete User
-									</button>
-								</div>
+									</Button>
+								</DialogFooter>
 							</div>
-						</div>
-					</div>
-				)}
+						)}
+					</DialogContent>
+				</Dialog>
 
-				{/* Delete Confirmation Modal */}
-				{deleteConfirm && (
-					<div className="flex fixed inset-0 z-50 justify-center items-center p-4 backdrop-blur-sm bg-black/20">
-						<div className="p-8 w-full max-w-md bg-white rounded-3xl border shadow-2xl border-stone-200">
-							<div className="mb-6 text-center">
-								<div className="flex justify-center items-center mx-auto mb-4 w-16 h-16 bg-red-100 rounded-full">
-									<span className="text-2xl text-red-600">⚠️</span>
-								</div>
-								<h3 className="mb-2 text-xl font-bold text-stone-800">
-									Delete User
-								</h3>
-								<p className="text-stone-600">
-									Are you sure you want to delete{" "}
-									<span className="font-semibold text-stone-800">
-										{deleteConfirm.name || deleteConfirm.username}
-									</span>
-									? This action cannot be undone.
-								</p>
-							</div>
-							<div className="flex space-x-4">
-								<button
-									className="flex-1 py-3 font-medium bg-gradient-to-r rounded-2xl border transition-all duration-300 from-stone-100 to-stone-50 text-stone-700 hover:from-stone-200 hover:to-stone-100 border-stone-200"
-									onClick={() => setDeleteConfirm(null)}
-									disabled={!!actionLoading}
-								>
-									Cancel
-								</button>
-								<button
-									className="flex-1 py-3 font-medium text-red-700 bg-gradient-to-r from-red-50 to-rose-50 rounded-2xl border border-red-200 transition-all duration-300 hover:from-red-100 hover:to-rose-100"
-									onClick={() => handleDeleteUser(deleteConfirm._id)}
-									disabled={actionLoading === deleteConfirm._id + "delete"}
-								>
-									{actionLoading === deleteConfirm._id + "delete"
-										? "Deleting..."
-										: "Delete"}
-								</button>
-							</div>
-							{actionError && (
-								<div className="p-4 mt-4 text-center text-red-700 bg-red-50 rounded-2xl border border-red-200">
-									{actionError}
-								</div>
-							)}
-						</div>
-					</div>
-				)}
+				{/* Delete Confirmation Dialog */}
+				<Dialog open={!!deleteConfirm} onOpenChange={() => setDeleteConfirm(null)}>
+					<DialogContent>
+						<DialogHeader>
+							<DialogTitle>Delete User</DialogTitle>
+							<DialogDescription>
+								Are you sure you want to delete{" "}
+								<span className="font-semibold">
+									{deleteConfirm?.name || deleteConfirm?.username}
+								</span>
+								? This action cannot be undone.
+							</DialogDescription>
+						</DialogHeader>
+						<DialogFooter>
+							<Button variant="outline" onClick={() => setDeleteConfirm(null)}>
+								Cancel
+							</Button>
+							<Button
+								variant="destructive"
+								onClick={() => deleteConfirm && handleDeleteUser(deleteConfirm._id)}
+								disabled={actionLoading === deleteConfirm?._id + "delete"}
+							>
+								{actionLoading === deleteConfirm?._id + "delete" ? (
+									<>
+										<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+										Deleting...
+									</>
+								) : (
+									"Delete"
+								)}
+							</Button>
+						</DialogFooter>
+					</DialogContent>
+				</Dialog>
 			</div>
 		</div>
 	);

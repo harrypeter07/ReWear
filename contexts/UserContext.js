@@ -1,28 +1,29 @@
 "use client";
-import { createContext, useState, useEffect } from "react";
+import { createContext, useMemo, useCallback } from "react";
+import { useUser } from "@/hooks/useUser";
 
-export const UserContext = createContext({ user: null, setUser: () => {} });
+export const UserContext = createContext({ user: null, setUser: () => {}, isLoading: true, refetchUser: async () => {} });
 
 export function UserProvider({ children }) {
-	const [user, setUser] = useState(null);
-	useEffect(() => {
-		async function fetchUser() {
-			try {
-				const res = await fetch("/api/auth/me", { credentials: "include" });
-				if (res.ok) {
-					const data = await res.json();
-					setUser(data.user);
-				} else {
-					setUser(null);
-				}
-			} catch {
-				setUser(null);
-			}
-		}
-		fetchUser();
-	}, []);
+	const { user, isLoading, mutate } = useUser();
+	
+	const setUser = useCallback((newUser) => {
+		mutate({ user: newUser }, false);
+	}, [mutate]);
+	
+	const refetchUser = useCallback(async () => {
+		await mutate();
+	}, [mutate]);
+	
+	const value = useMemo(() => ({
+		user,
+		setUser,
+		isLoading,
+		refetchUser
+	}), [user, isLoading, setUser, refetchUser]);
+	
 	return (
-		<UserContext.Provider value={{ user, setUser }}>
+		<UserContext.Provider value={value}>
 			{children}
 		</UserContext.Provider>
 	);

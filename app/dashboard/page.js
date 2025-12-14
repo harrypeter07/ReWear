@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import ItemCard from "@/components/ItemCard";
@@ -7,9 +7,11 @@ import Image from "next/image";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import DashboardWidgets from "@/components/DashboardWidgets";
 import SwapRequestForm from "@/components/SwapRequestForm";
+import { UserContext } from "@/contexts/UserContext";
 
 export default function DashboardPage() {
 	const [activeTab, setActiveTab] = useState("listings");
+	const { user: contextUser, isLoading: userLoading, refetchUser } = useContext(UserContext);
 	const [user, setUser] = useState(null);
 	const [userListings, setUserListings] = useState([]);
 	const [userPurchases, setUserPurchases] = useState([]);
@@ -17,57 +19,86 @@ export default function DashboardPage() {
 	const [loading, setLoading] = useState(true);
 	const router = useRouter();
 
+	// Use user from context
+	useEffect(() => {
+		if (contextUser) {
+			setUser(contextUser);
+		} else if (!userLoading && !contextUser) {
+			// User context loaded but no user found
+			setUser(null);
+		}
+	}, [contextUser, userLoading]);
+
 	useEffect(() => {
 		async function fetchDashboard() {
+			// Wait for user context to load
+			if (userLoading) {
+				return;
+			}
+			
+			// Use context user
+			const currentUser = contextUser;
+			if (!currentUser) {
+				setLoading(false);
+				setUser(null);
+				return;
+			}
+			
+			setUser(currentUser);
 			setLoading(true);
 			try {
-				const userRes = await fetch("/api/auth/me", { credentials: "include" });
-				if (userRes.ok) {
-					const userData = await userRes.json();
-					setUser(userData.user);
-					const itemsRes = await fetch(
-						`/api/items?uploaderId=${userData.user._id}`
-					);
-					const items = itemsRes.ok ? await itemsRes.json() : [];
-					setUserListings(
-						Array.isArray(items)
-							? items.filter((i) => {
-								const uploaderId =
-									typeof i.uploaderId === "object" &&
-									i.uploaderId !== null &&
-									i.uploaderId.toString
-										? i.uploaderId.toString()
-										: String(i.uploaderId);
-								return uploaderId === String(userData.user._id);
-							  })
-							: []
-					);
-					const swapsRes = await fetch(
-						`/api/swaps?userId=${userData.user._id}`
-					);
-					let swaps = swapsRes.ok ? await swapsRes.json() : [];
-					if (swaps && swaps.swaps) swaps = swaps.swaps;
-					if (!Array.isArray(swaps)) swaps = [];
-					setSwapRequests(swaps);
-					setUserPurchases(
-						swaps.filter(
-							(s) =>
-								s.status === "accepted" && s.requester === userData.user._id
+					
+					// Skip fetching user-specific data for admin user (has _id: 'admin', not a valid ObjectId)
+					const isAdminUser = currentUser._id === 'admin' || currentUser.role === 'admin';
+					const isValidObjectId = /^[0-9a-fA-F]{24}$/.test(String(currentUser._id));
+					
+					if (!isAdminUser && isValidObjectId) {
+						const itemsRes = await fetch(
+							`/api/items?uploaderId=${currentUser._id}`
+						);
+						const items = itemsRes.ok ? await itemsRes.json() : [];
+						setUserListings(
+							Array.isArray(items)
+								? items.filter((i) => {
+									const uploaderId =
+										typeof i.uploaderId === "object" &&
+										i.uploaderId !== null &&
+										i.uploaderId.toString
+											? i.uploaderId.toString()
+											: String(i.uploaderId);
+									return uploaderId === String(currentUser._id);
+								  })
+								: []
+						);
+						const swapsRes = await fetch(
+							`/api/swaps?userId=${currentUser._id}`
+						);
+						let swaps = swapsRes.ok ? await swapsRes.json() : [];
+						if (swaps && swaps.swaps) swaps = swaps.swaps;
+						if (!Array.isArray(swaps)) swaps = [];
+						setSwapRequests(swaps);
+						setUserPurchases(
+							swaps.filter(
+								(s) =>
+									s.status === "accepted" && s.requester === currentUser._id
 							)
-					);
-				} else {
-					setUser(null);
+						);
+					} else {
+						// For admin user, set empty arrays
+						setUserListings([]);
+						setSwapRequests([]);
+						setUserPurchases([]);
+					}
+				} catch (err) {
+					console.error("[DASHBOARD] Error fetching data:", err);
+				} finally {
+					setLoading(false);
 				}
-			} catch (err) {
-				setUser(null);
-			} finally {
-				setLoading(false);
-			}
 		}
 		fetchDashboard();
-	}, []);
+	}, [contextUser, userLoading, user]);
 
-	if (loading) {
+	if (userLoading || loading) {
 		return (
 			<div
 				className="flex justify-center items-center min-h-screen"
@@ -83,7 +114,9 @@ export default function DashboardPage() {
 		);
 	}
 
-	if (!user) {
+	// Use contextUser if available, fallback to local user state
+	const currentUser = contextUser || user;
+	if (!currentUser) {
 		return (
 			<div
 				className="flex justify-center items-center min-h-screen"
@@ -131,32 +164,32 @@ export default function DashboardPage() {
 		listings: userListings.length,
 		purchases: userPurchases.length,
 		swaps: swapRequests.length,
-		points: user?.points ?? 0,
+		points: currentUser?.points ?? 0,
 	};
 
 	return (
-		<div className="min-h-screen pt-28 pb-12" style={{ background: 'var(--bg-primary)' }}>
+		<div className="pt-40 pb-12 min-h-screen" style={{ background: 'var(--bg-primary)', paddingTop: '160px' }}>
 			{/* Header Section */}
-			<div className="container">
-				<div className="mb-8 text-center card" style={{
+			<div className="container px-4 sm:px-6 lg:px-8">
+				<div className="mt-6 mb-8 text-center card" style={{
 					background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
 					backdropFilter: 'blur(20px)',
 					border: '1px solid rgba(99, 102, 241, 0.1)',
 					boxShadow: '0 8px 32px rgba(99, 102, 241, 0.1)'
 				}}>
-					<h1 className="mb-4 text-4xl font-bold md:text-5xl bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+					<h1 className="mt-6 mb-4 text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 md:text-5xl">
 						Your Dashboard
 					</h1>
 					<p className="mb-8 text-lg font-medium" style={{ color: 'var(--text-secondary)' }}>
 						Overview of your activity and stats
 					</p>
-					<div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+					<div className="grid grid-cols-1 gap-6 mx-auto max-w-4xl sm:grid-cols-3">
 						<div className="px-6 py-5 rounded-xl backdrop-blur-sm transition-all duration-300 hover:scale-105" style={{
 							background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
 							border: '1px solid rgba(99, 102, 241, 0.2)',
 							boxShadow: '0 4px 16px rgba(99, 102, 241, 0.1)'
 						}}>
-							<span className="block text-3xl font-bold mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+							<span className="block mb-2 text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
 								{stats.listings}
 							</span>
 							<p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
@@ -168,7 +201,7 @@ export default function DashboardPage() {
 							border: '1px solid rgba(99, 102, 241, 0.2)',
 							boxShadow: '0 4px 16px rgba(99, 102, 241, 0.1)'
 						}}>
-							<span className="block text-3xl font-bold mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+							<span className="block mb-2 text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
 								{stats.swaps}
 							</span>
 							<p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
@@ -180,7 +213,7 @@ export default function DashboardPage() {
 							border: '1px solid rgba(99, 102, 241, 0.2)',
 							boxShadow: '0 4px 16px rgba(99, 102, 241, 0.1)'
 						}}>
-							<span className="block text-3xl font-bold mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+							<span className="block mb-2 text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
 								{stats.points}
 							</span>
 							<p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
@@ -192,29 +225,29 @@ export default function DashboardPage() {
 			</div>
 
 			{/* Main Content */}
-			<div className="container">
+			<div className="container px-4 sm:px-6 lg:px-8">
 				{/* Profile Overview */}
-				<div className="p-8 mb-8 card" style={{
+				<div className="p-6 mb-6 sm:p-8 sm:mb-8 card" style={{
 					background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
 					backdropFilter: 'blur(20px)',
 					border: '1px solid rgba(99, 102, 241, 0.1)'
 				}}>
-					<h2 className="mb-6 text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Your Profile</h2>
+					<h2 className="mb-6 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">Your Profile</h2>
 					<div className="flex flex-col gap-6 items-center sm:flex-row sm:items-start">
 						<div className="flex justify-center items-center w-28 h-28 rounded-full shadow-lg transition-all duration-300 hover:scale-110" style={{ 
 							background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
 							boxShadow: '0 8px 24px rgba(99, 102, 241, 0.3)'
 						}}>
 							<span className="text-3xl font-bold text-white">
-								{(user?.name || user?.username || 'U')?.slice(0,1).toUpperCase()}
+								{(currentUser?.name || currentUser?.username || 'U')?.slice(0,1).toUpperCase()}
 							</span>
 						</div>
 						<div className="flex-1 text-center sm:text-left">
-							<p className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
-								{user?.name || user?.username}
+							<p className="mb-2 text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+								{currentUser?.name || currentUser?.username}
 							</p>
 							<p className="mb-4 text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
-								{user?.email}
+								{currentUser?.email}
 							</p>
 							<div className="flex flex-wrap gap-4 justify-center sm:justify-start">
 								<span className="text-sm font-semibold rounded-lg" style={{ 
@@ -223,14 +256,14 @@ export default function DashboardPage() {
 									color: 'var(--text-primary)',
 									boxShadow: '0 2px 8px rgba(99, 102, 241, 0.12)',
 									padding: '0.875rem 1.75rem'
-								}}>Role: {user?.role || 'user'}</span>
+								}}>Role: {currentUser?.role || 'user'}</span>
 								<span className="text-sm font-semibold rounded-lg" style={{ 
 									background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%)',
 									border: '1px solid rgba(99, 102, 241, 0.25)',
 									color: 'var(--text-primary)',
 									boxShadow: '0 2px 8px rgba(99, 102, 241, 0.12)',
 									padding: '0.875rem 1.75rem'
-								}}>Points: {user?.points ?? 0}</span>
+								}}>Points: {currentUser?.points ?? 0}</span>
 								<span className="text-sm font-semibold rounded-lg" style={{ 
 									background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(139, 92, 246, 0.12) 100%)',
 									border: '1px solid rgba(99, 102, 241, 0.25)',
@@ -243,16 +276,16 @@ export default function DashboardPage() {
 					</div>
 				</div>
 
-				<div className="p-8 mb-8 card" style={{
+				<div className="p-6 mb-6 sm:p-8 sm:mb-8 card" style={{
 					background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
 					backdropFilter: 'blur(20px)',
 					border: '1px solid rgba(99, 102, 241, 0.1)'
 				}}>
-					<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
-						<h2 className="mb-4 sm:mb-0 text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+					<div className="flex flex-col gap-4 mb-6 sm:flex-row sm:items-center sm:justify-between">
+						<h2 className="mb-4 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 sm:mb-0">
 							Your Listings
 						</h2>
-						<div className="flex flex-col sm:flex-row gap-3">
+						<div className="flex flex-col gap-3 sm:flex-row">
 							<button className="btn" onClick={() => router.push("/items/new")}>Add Item</button>
 							<button className="btn btn-outline" onClick={() => router.push("/items")} style={{
 								background: 'transparent',
@@ -272,42 +305,58 @@ export default function DashboardPage() {
 						</div>
 					)}
 				</div>
-				<div className="p-8 card" style={{
+				<div className="p-6 sm:p-8 card" style={{
 					background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
 					backdropFilter: 'blur(20px)',
 					border: '1px solid rgba(99, 102, 241, 0.1)'
 				}}>
-					<h2 className="mb-6 text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-						Swap Requests
+					<h2 className="mb-6 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
+						Redeem Requests
 					</h2>
-					{/* Swap requests list here */}
+					{/* Redeem requests list here */}
 					{swapRequests.length === 0 ? (
-						<p className="text-secondary">No swap requests yet.</p>
+						<p className="text-secondary">No redeem requests yet.</p>
 					) : (
 						<div className="space-y-4">
 							{swapRequests.map((req) => (
-								<SwapRequestForm key={req._id} request={req} />
+								<div key={req._id} className="card p-4" style={{ background: 'var(--bg-secondary)' }}>
+									<div className="flex justify-between items-start mb-2">
+										<div>
+											<p className="font-semibold" style={{ color: 'var(--text-primary)' }}>
+												Redeem Request
+											</p>
+											<p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+												Status: <span className="font-medium">{req.status}</span>
+											</p>
+											{req.message && (
+												<p className="text-sm mt-2" style={{ color: 'var(--text-secondary)' }}>
+													Message: {req.message}
+												</p>
+											)}
+										</div>
+										<span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+											{new Date(req.createdAt || Date.now()).toLocaleDateString()}
+										</span>
+									</div>
+								</div>
 							))}
 						</div>
 					)}
-					<div className="mt-4 flex gap-3">
-						<button className="btn" onClick={() => router.push("/swaps")}>View All Swaps</button>
-					</div>
 				</div>
 
 				{/* Recent Activity */}
-				<div className="p-8 mt-8 card" style={{
+				<div className="p-6 mt-6 sm:p-8 sm:mt-8 card" style={{
 					background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
 					backdropFilter: 'blur(20px)',
 					border: '1px solid rgba(99, 102, 241, 0.1)'
 				}}>
-					<h2 className="mb-6 text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">Recent Activity</h2>
+					<h2 className="mb-6 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">Recent Activity</h2>
 					{(swapRequests && swapRequests.length > 0) || (userListings && userListings.length > 0) ? (
 						<ul className="space-y-2">
 							{swapRequests.slice(0,5).map((s) => (
 								<li key={s._id} className="flex justify-between items-center">
 									<span style={{ color: 'var(--text-secondary)' }}>
-										{`Swap ${s.type || 'request'} ${s.status || ''}`}
+										{`Redeem request ${s.status || ''}`}
 									</span>
 									<span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
 										{new Date(s.createdAt || Date.now()).toLocaleString()}

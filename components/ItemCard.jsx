@@ -134,24 +134,24 @@ export default function ItemCard({ item }) {
 			</div>
 
 			{/* Content Container */}
-			<div className="p-6 flex flex-col flex-grow">
+			<div className="p-6 sm:p-8 flex flex-col flex-grow">
 				{/* Title */}
 				<h2 
-					className="font-semibold text-xl mb-3 line-clamp-2 leading-tight"
+					className="font-semibold text-xl mb-4 line-clamp-2 leading-tight"
 					style={{ color: 'var(--text-primary)' }}
 				>
 					{item.title || "Untitled Item"}
 				</h2>
 				
 				<div 
-					className="mt-2 text-sm mb-4"
+					className="text-sm mb-6"
 					style={{ color: 'var(--text-secondary)' }}
 				>
 					Owner: {item.ownerUsername || item.ownerName || item.owner || "Unknown"}
 				</div>
 
 				{/* Item Details */}
-				<div className="space-y-3 mb-4">
+				<div className="space-y-4 mb-6">
 					{item.category && (
 						<div className="flex items-center gap-2">
 							<span 
@@ -263,25 +263,32 @@ export default function ItemCard({ item }) {
 
 				{/* Action Button */}
 				<div 
-					className="mt-auto pt-4"
+					className="mt-auto pt-6"
 					style={{ borderTop: '1px solid rgba(99, 102, 241, 0.1)' }}
 				>
 					<Link
 						href={`/items/${item._id || item.id}`}
-						className="btn w-full py-3 px-4 font-semibold flex items-center justify-center gap-2 group"
+						prefetch={true}
+						className="w-full py-4 px-6 font-semibold text-base flex items-center justify-center gap-2 group rounded-lg transition-all duration-200"
 						style={{
 							background: 'var(--accent-gradient)',
 							color: 'white',
 							border: 'none',
-							borderRadius: 'var(--radius)',
 							boxShadow: '0 4px 14px rgba(99, 102, 241, 0.25)',
-							transition: 'var(--transition)',
 							textDecoration: 'none'
+						}}
+						onMouseEnter={(e) => {
+							e.currentTarget.style.transform = 'translateY(-2px)';
+							e.currentTarget.style.boxShadow = '0 6px 20px rgba(99, 102, 241, 0.35)';
+						}}
+						onMouseLeave={(e) => {
+							e.currentTarget.style.transform = 'translateY(0)';
+							e.currentTarget.style.boxShadow = '0 4px 14px rgba(99, 102, 241, 0.25)';
 						}}
 					>
 						<span>View Details</span>
 						<svg
-							className="w-4 h-4 transition-transform group-hover:translate-x-1"
+							className="w-5 h-5 transition-transform group-hover:translate-x-1"
 							fill="none"
 							stroke="currentColor"
 							viewBox="0 0 24 24"

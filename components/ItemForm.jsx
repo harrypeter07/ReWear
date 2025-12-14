@@ -55,73 +55,126 @@ export default function ItemForm({ onSubmit }) {
 
 	return (
 		<form
-			className="card p-8"
+			className="space-y-6"
 			onSubmit={handleSubmit}
 			encType="multipart/form-data"
 		>
 			{error && (
-				<div className="bg-red-100 text-red-700 p-2 rounded">{error}</div>
+				<div className="bg-red-100 text-red-700 p-4 rounded-lg border border-red-200">
+					{error}
+				</div>
 			)}
-			<input
-				type="text"
-				name="title"
-				placeholder="Title"
-				className="border p-2 rounded"
-				required
-			/>
-			<input
-				type="text"
-				name="category"
-				placeholder="Category"
-				className="border p-2 rounded"
-				required
-			/>
-			<input
-				type="text"
-				name="size"
-				placeholder="Size"
-				className="border p-2 rounded"
-				required
-			/>
-			<input
-				type="text"
-				name="condition"
-				placeholder="Condition (e.g. New, Like New, Used)"
-				className="border p-2 rounded"
-				required
-			/>
-			<textarea
-				name="description"
-				placeholder="Description"
-				className="border p-2 rounded"
-				required
-			/>
-			<input
-				type="number"
-				name="pointsValue"
-				placeholder="Points Value"
-				className="border p-2 rounded"
-				min={1}
-				required
-			/>
-			<input
-				type="file"
-				accept="image/*"
-				onChange={handleImageChange}
-				className="border p-2 rounded"
-			/>
-			{submitting && <div className="text-blue-600 text-sm">Submitting...</div>}
+			<div className="space-y-2">
+				<label htmlFor="title" className="block text-sm font-medium text-gray-700">
+					Title
+				</label>
+				<input
+					id="title"
+					type="text"
+					name="title"
+					placeholder="Enter item title"
+					className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+					required
+				/>
+			</div>
+			<div className="space-y-2">
+				<label htmlFor="category" className="block text-sm font-medium text-gray-700">
+					Category
+				</label>
+				<input
+					id="category"
+					type="text"
+					name="category"
+					placeholder="Enter category"
+					className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+					required
+				/>
+			</div>
+			<div className="space-y-2">
+				<label htmlFor="size" className="block text-sm font-medium text-gray-700">
+					Size
+				</label>
+				<input
+					id="size"
+					type="text"
+					name="size"
+					placeholder="Enter size"
+					className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+					required
+				/>
+			</div>
+			<div className="space-y-2">
+				<label htmlFor="condition" className="block text-sm font-medium text-gray-700">
+					Condition
+				</label>
+				<input
+					id="condition"
+					type="text"
+					name="condition"
+					placeholder="e.g. New, Like New, Used"
+					className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+					required
+				/>
+			</div>
+			<div className="space-y-2">
+				<label htmlFor="description" className="block text-sm font-medium text-gray-700">
+					Description
+				</label>
+				<textarea
+					id="description"
+					name="description"
+					placeholder="Enter description"
+					rows={4}
+					className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-vertical"
+					required
+				/>
+			</div>
+			<div className="space-y-2">
+				<label htmlFor="pointsValue" className="block text-sm font-medium text-gray-700">
+					Points Value
+				</label>
+				<input
+					id="pointsValue"
+					type="number"
+					name="pointsValue"
+					placeholder="Enter points value"
+					className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+					min={1}
+					required
+				/>
+			</div>
+			<div className="space-y-2">
+				<label htmlFor="file" className="block text-sm font-medium text-gray-700">
+					Image
+				</label>
+				<input
+					id="file"
+					type="file"
+					accept="image/*"
+					onChange={handleImageChange}
+					className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+				/>
+			</div>
 			{previewUrl && (
-				<div className="flex items-center gap-2 mt-2">
+				<div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
 					<img
 						src={previewUrl}
 						alt="Preview"
-						className="w-24 h-24 object-cover rounded border"
+						className="w-24 h-24 object-cover rounded-lg border-2 border-gray-300"
 					/>
-					<span className="text-xs text-gray-500">Image selected</span>
+					<span className="text-sm text-gray-600">Image selected</span>
 				</div>
 			)}
-			<button type="submit" className="btn w-full" disabled={submitting}>
+			{submitting && (
+				<div className="text-blue-600 text-sm font-medium p-3 bg-blue-50 rounded-lg border border-blue-200">
+					Submitting...
+				</div>
+			)}
+			<button 
+				type="submit" 
+				className="w-full px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed" 
+				disabled={submitting}
+			>
 				Submit
 			</button>
 		</form>

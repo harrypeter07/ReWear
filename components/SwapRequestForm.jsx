@@ -5,35 +5,27 @@ export default function SwapRequestForm({ itemId, type, onSuccess }) {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState("");
 	const [success, setSuccess] = useState("");
-	const [userItems, setUserItems] = useState([]);
-	const [offeredItemId, setOfferedItemId] = useState("");
 	const [user, setUser] = useState(null);
+	const [item, setItem] = useState(null);
 
 	useEffect(() => {
-		async function fetchUserItems() {
+		async function fetchData() {
 			try {
 				const userRes = await fetch("/api/auth/me", { credentials: "include" });
 				if (!userRes.ok) return;
 				const { user } = await userRes.json();
 				setUser(user);
-				const itemsRes = await fetch(`/api/items`);
-				if (!itemsRes.ok) return;
-				const items = await itemsRes.json();
-				const filtered = items.filter(
-					(i) =>
-						(String(i.owner) === String(user._id) ||
-							String(i.uploaderId) === String(user._id)) &&
-						i.isApproved &&
-						i.isVisible &&
-						i.status === "available" &&
-						i._id !== itemId
-				);
-				setUserItems(filtered);
-				if (filtered.length > 0) setOfferedItemId(filtered[0]._id);
+				
+				// Fetch item details to show points value
+				const itemRes = await fetch(`/api/items/${itemId}`);
+				if (itemRes.ok) {
+					const itemData = await itemRes.json();
+					setItem(itemData);
+				}
 			} catch {}
 		}
-		if (type === "swap" || type === "redeem") fetchUserItems();
-	}, [type, itemId]);
+		fetchData();
+	}, [itemId]);
 
 	async function handleSubmit(e) {
 		e.preventDefault();
@@ -41,33 +33,48 @@ export default function SwapRequestForm({ itemId, type, onSuccess }) {
 		setSuccess("");
 		setLoading(true);
 		try {
-			const body = { itemId, type, message };
-			if (user && user._id) body.requesterId = user._id;
-			if (type === "swap") {
-				if (!offeredItemId) {
-					setError(
-						"You must select one of your own approved listings to offer."
-					);
-					setLoading(false);
-					return;
-				}
-				body.offeredItemId = offeredItemId;
+			if (!user || !user._id) {
+				setError("You must be logged in to redeem items");
+				setLoading(false);
+				return;
 			}
+
+			if (!item) {
+				setError("Item information not available");
+				setLoading(false);
+				return;
+			}
+
+			// Check if user has enough points
+			if (user.points < item.pointsValue) {
+				setError(`Not enough points. You have ${user.points} points, but this item costs ${item.pointsValue} points.`);
+				setLoading(false);
+				return;
+			}
+
+			const body = { 
+				itemId, 
+				requesterId: user._id,
+				message 
+			};
+			
 			const res = await fetch("/api/swaps", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
+				credentials: "include",
 				body: JSON.stringify(body),
 			});
+			
 			if (res.ok) {
-				setSuccess("Request submitted!");
+				setSuccess("Redeem request submitted! The seller will review your request.");
 				setMessage("");
 				if (onSuccess) onSuccess();
 			} else {
 				const data = await res.json();
-				setError(data.error || "Failed to submit request");
+				setError(data.error || "Failed to submit redeem request");
 			}
-		} catch {
-			setError("Failed to submit request");
+		} catch (err) {
+			setError("Failed to submit request. Please try again.");
 		}
 		setLoading(false);
 	}
@@ -102,38 +109,27 @@ export default function SwapRequestForm({ itemId, type, onSuccess }) {
 					<p className="text-sm font-medium">{success}</p>
 				</div>
 			)}
-			{type === "swap" && (
-				<div>
-					<label className="block font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>
-						Select one of your own approved listings to offer:
-					</label>
-					{userItems.length === 0 ? (
-						<p className="text-sm mt-2 p-3 rounded-xl" style={{ 
-							color: 'var(--text-secondary)',
-							background: 'rgba(99, 102, 241, 0.05)'
+			{item && user && (
+				<div className="mb-4 p-4 rounded-xl" style={{ 
+					background: 'rgba(99, 102, 241, 0.05)',
+					border: '1px solid rgba(99, 102, 241, 0.2)'
+				}}>
+					<div className="flex justify-between items-center mb-2">
+						<span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Item Cost:</span>
+						<span className="text-xl font-bold" style={{ color: 'var(--accent)' }}>{item.pointsValue} points</span>
+					</div>
+					<div className="flex justify-between items-center">
+						<span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Your Points:</span>
+						<span className="text-lg font-semibold" style={{ 
+							color: user.points >= item.pointsValue ? '#10b981' : '#ef4444' 
 						}}>
-							You have no approved, available listings to offer.
+							{user.points} points
+						</span>
+					</div>
+					{user.points < item.pointsValue && (
+						<p className="text-sm mt-2" style={{ color: '#ef4444' }}>
+							You need {item.pointsValue - user.points} more points to redeem this item.
 						</p>
-					) : (
-						<select
-							className="w-full px-4 py-3 rounded-xl border transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-							value={offeredItemId}
-							onChange={(e) => setOfferedItemId(e.target.value)}
-							style={{
-								background: 'rgba(255, 255, 255, 0.8)',
-								borderColor: 'var(--border-color)',
-								color: 'var(--text-primary)'
-							}}
-						>
-							{userItems.map((item) => (
-								<option
-									key={item._id}
-									value={item._id}
-								>
-									{item.title} ({item.pointsValue} points)
-								</option>
-							))}
-						</select>
 					)}
 				</div>
 			)}
@@ -152,18 +148,14 @@ export default function SwapRequestForm({ itemId, type, onSuccess }) {
 				type="submit"
 				className="btn w-full py-3.5 font-semibold disabled:opacity-70 disabled:cursor-not-allowed"
 				style={{
-					background: (loading || (type === "swap" && userItems.length === 0)) ? 'rgba(99, 102, 241, 0.5)' : 'var(--accent-gradient)',
+					background: (loading || !user || !item || user.points < item.pointsValue) ? 'rgba(99, 102, 241, 0.5)' : 'var(--accent-gradient)',
 					color: 'white',
 					border: 'none',
-					boxShadow: (loading || (type === "swap" && userItems.length === 0)) ? 'none' : '0 8px 24px rgba(99, 102, 241, 0.3)'
+					boxShadow: (loading || !user || !item || user.points < item.pointsValue) ? 'none' : '0 8px 24px rgba(99, 102, 241, 0.3)'
 				}}
-				disabled={loading || (type === "swap" && userItems.length === 0)}
+				disabled={loading || !user || !item || user.points < item.pointsValue}
 			>
-				{loading
-					? "Submitting..."
-					: type === "redeem"
-					? "Redeem via Points"
-					: "Request Swap"}
+				{loading ? "Submitting..." : "Redeem with Points"}
 			</button>
 		</form>
 	);

@@ -101,6 +101,12 @@ export async function POST(req) {
 			{ expiresIn: "7d" }
 		);
 		const cookieStore = await cookies();
+		
+		// Clear any existing tokens first (including old admin tokens)
+		cookieStore.delete("accessToken");
+		cookieStore.delete("refreshToken");
+		
+		// Set new tokens
 		cookieStore.set("accessToken", accessToken, {
 			httpOnly: true,
 			secure: process.env.NODE_ENV === "production",
@@ -131,8 +137,20 @@ export async function POST(req) {
 		);
 	} catch (err) {
 		console.error("[REGISTER] Internal error:", err);
+		
+		// Provide more specific error messages
+		if (err.code === "EREFUSED" || err.message?.includes("querySrv") || err.message?.includes("EREFUSED")) {
+			return NextResponse.json(
+				{ 
+					message: "Database connection failed. Please check your MongoDB Atlas IP whitelist settings.",
+					error: "DATABASE_CONNECTION_ERROR"
+				},
+				{ status: 503 }
+			);
+		}
+		
 		return NextResponse.json(
-			{ message: "Internal server error" },
+			{ message: "Internal server error. Please try again later." },
 			{ status: 500 }
 		);
 	}

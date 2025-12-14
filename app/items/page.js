@@ -1,72 +1,66 @@
+"use client";
 import ItemCard from "@/components/ItemCard";
 import Link from "next/link";
+import { useItems } from "@/hooks/useItems";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
-async function getItems() {
-	let baseUrl =
-		process.env.NEXT_PUBLIC_BASE_URL ||
-		(process.env.VERCEL_URL
-			? `https://${process.env.VERCEL_URL}`
-			: "http://localhost:3000");
-	const res = await fetch(`${baseUrl}/api/items`, { cache: "no-store" });
-	if (!res.ok) return [];
-	return await res.json();
-}
+export default function ItemsPage() {
+	const { items, isLoading } = useItems();
 
-export default async function ItemsPage() {
-	const items = await getItems();
+	if (isLoading) {
+		return (
+			<div className="min-h-screen pt-40 pb-12 flex items-center justify-center">
+				<div className="text-center">
+					<div className="loader mx-auto mb-4"></div>
+					<p className="text-muted-foreground">Loading items...</p>
+				</div>
+			</div>
+		);
+	}
 
 	return (
-		<div className="min-h-screen pt-28 pb-12" style={{ background: 'var(--bg-primary)' }}>
+		<div className="min-h-screen pt-40 pb-12 bg-gradient-to-br from-slate-50 to-slate-100" style={{ paddingTop: '160px' }}>
 			{/* Header Section */}
-			<div className="container">
-				<div className="card text-center mb-8" style={{
-					background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
-					backdropFilter: 'blur(20px)',
-					border: '1px solid rgba(99, 102, 241, 0.1)'
-				}}>
-					<h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-						Discover Amazing Items
-					</h1>
-					<p className="text-lg mb-8 font-medium" style={{ color: 'var(--text-secondary)' }}>
-						Find unique treasures and swap with our community
-					</p>
-					<div className="flex flex-col sm:flex-row justify-center gap-6 mb-6">
-						<div className="px-6 py-5 rounded-xl transition-all duration-300 hover:scale-105" style={{
-							background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
-							border: '1px solid rgba(99, 102, 241, 0.2)',
-							boxShadow: '0 4px 16px rgba(99, 102, 241, 0.1)'
-						}}>
-							<span className="text-3xl font-bold block mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-								{items.length}
-							</span>
-							<p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
-								Items Available
-							</p>
+			<div className="container px-4 sm:px-6 lg:px-8">
+				<Card className="text-center mb-8">
+					<CardContent className="pt-8 pb-8 px-6 sm:px-8">
+						<h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+							Discover Amazing Items
+						</h1>
+						<p className="text-lg mb-8 font-medium text-muted-foreground">
+							Find unique treasures and swap with our community
+						</p>
+						<div className="flex flex-col sm:flex-row justify-center gap-6 mb-4">
+							<div className="px-8 py-6 rounded-xl transition-all duration-300 hover:scale-105 bg-primary/10 border border-primary/20">
+								<span className="text-3xl font-bold block mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+									{items.length}
+								</span>
+								<p className="text-sm font-medium text-muted-foreground">
+									Items Available
+								</p>
+							</div>
+							<div className="px-8 py-6 rounded-xl transition-all duration-300 hover:scale-105 bg-primary/10 border border-primary/20">
+								<span className="text-3xl font-bold block mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+									24/7
+								</span>
+								<p className="text-sm font-medium text-muted-foreground">
+									Active Trading
+								</p>
+							</div>
 						</div>
-						<div className="px-6 py-5 rounded-xl transition-all duration-300 hover:scale-105" style={{
-							background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%)',
-							border: '1px solid rgba(99, 102, 241, 0.2)',
-							boxShadow: '0 4px 16px rgba(99, 102, 241, 0.1)'
-						}}>
-							<span className="text-3xl font-bold block mb-2 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-								24/7
-							</span>
-							<p className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
-								Active Trading
-							</p>
-						</div>
-					</div>
-				</div>
+					</CardContent>
+				</Card>
 			</div>
 
 			{/* Filter Section */}
-			<div className="container">
-				<div className="card mb-8" style={{
+			<div className="container px-4 sm:px-6 lg:px-8">
+				<div className="card mb-8 p-6 sm:p-8" style={{
 					background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.95) 100%)',
 					backdropFilter: 'blur(20px)',
 					border: '1px solid rgba(99, 102, 241, 0.1)'
 				}}>
-					<div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+					<div className="flex flex-col md:flex-row gap-6 items-center justify-between">
 						<div className="flex items-center gap-4 flex-wrap">
 							<div className="flex items-center gap-2">
 								<svg
@@ -114,7 +108,7 @@ export default async function ItemsPage() {
 							</select>
 						</div>
 						<div className="flex items-center gap-3">
-							<button className="btn flex items-center gap-2 px-4 py-2 text-sm">
+							<button className="flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-lg transition-all duration-200 border border-input bg-background hover:bg-accent hover:text-accent-foreground">
 								<svg
 									className="w-4 h-4"
 									fill="none"
@@ -130,9 +124,11 @@ export default async function ItemsPage() {
 								</svg>
 								List View
 							</button>
-							<button className="btn flex items-center gap-2 px-4 py-2 text-sm" style={{
-								background: 'var(--accent)',
-								transform: 'scale(1.05)'
+							<button className="flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-lg transition-all duration-200" style={{
+								background: 'var(--accent-gradient)',
+								color: 'white',
+								border: 'none',
+								boxShadow: '0 4px 12px rgba(99, 102, 241, 0.25)'
 							}}>
 								<svg
 									className="w-4 h-4"
@@ -155,12 +151,12 @@ export default async function ItemsPage() {
 			</div>
 
 			{/* Main Content */}
-			<div className="container">
+			<div className="container px-4 sm:px-6 lg:px-8">
 				{items.length > 0 ? (
 					<>
 						{/* Featured Items Section */}
 						<div className="mb-12">
-							<div className="flex items-center justify-between mb-6">
+							<div className="flex items-center justify-between mb-8">
 								<h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
 									Featured Items
 								</h2>
@@ -205,7 +201,7 @@ export default async function ItemsPage() {
 								</div>
 
 								{/* Quick Stats Cards */}
-								<div className="card hover:shadow-lg transition-all duration-300">
+								<div className="card hover:shadow-lg transition-all duration-300 p-6">
 									<div className="flex items-center justify-between mb-4">
 										<div className="p-3 rounded-xl" style={{ background: 'var(--bg-secondary)' }}>
 											<svg
@@ -233,7 +229,7 @@ export default async function ItemsPage() {
 									<p style={{ color: 'var(--text-secondary)' }}>Total Swaps</p>
 								</div>
 
-								<div className="card hover:shadow-lg transition-all duration-300">
+								<div className="card hover:shadow-lg transition-all duration-300 p-6">
 									<div className="flex items-center justify-between mb-4">
 										<div className="p-3 rounded-xl" style={{ background: 'var(--bg-secondary)' }}>
 											<svg
@@ -261,7 +257,7 @@ export default async function ItemsPage() {
 									<p style={{ color: 'var(--text-secondary)' }}>Active Users</p>
 								</div>
 
-								<div className="card hover:shadow-lg transition-all duration-300">
+								<div className="card hover:shadow-lg transition-all duration-300 p-6">
 									<div className="flex items-center justify-between mb-4">
 										<div className="p-3 rounded-xl" style={{ background: 'var(--bg-secondary)' }}>
 											<svg
@@ -289,7 +285,7 @@ export default async function ItemsPage() {
 									<p style={{ color: 'var(--text-secondary)' }}>Premium Items</p>
 								</div>
 
-								<div className="card hover:shadow-lg transition-all duration-300">
+								<div className="card hover:shadow-lg transition-all duration-300 p-6">
 									<div className="flex items-center justify-between mb-4">
 										<div className="p-3 rounded-xl" style={{ background: 'var(--bg-secondary)' }}>
 											<svg
@@ -321,23 +317,31 @@ export default async function ItemsPage() {
 
 						{/* All Items Section */}
 						<div className="mb-6">
-							<h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>
+							<h2 className="text-2xl font-bold mb-8" style={{ color: 'var(--text-primary)' }}>
 								All Items
 							</h2>
-							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+							<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
 								{items.map((item) => (
-									<div key={item._id || item.id}>
-										<ItemCard item={item} />
-									</div>
+									<ItemCard key={item._id || item.id} item={item} />
 								))}
 							</div>
 						</div>
 
 						{/* Load More Section */}
 						<div className="text-center mt-12">
-							<button className="btn px-8 py-3 font-semibold" style={{
-								background: 'var(--accent)',
-								boxShadow: 'var(--shadow)'
+							<button className="px-8 py-4 text-base font-semibold rounded-lg transition-all duration-200" style={{
+								background: 'var(--accent-gradient)',
+								color: 'white',
+								border: 'none',
+								boxShadow: '0 4px 14px rgba(99, 102, 241, 0.25)'
+							}}
+							onMouseEnter={(e) => {
+								e.currentTarget.style.transform = 'translateY(-2px)';
+								e.currentTarget.style.boxShadow = '0 6px 20px rgba(99, 102, 241, 0.35)';
+							}}
+							onMouseLeave={(e) => {
+								e.currentTarget.style.transform = 'translateY(0)';
+								e.currentTarget.style.boxShadow = '0 4px 14px rgba(99, 102, 241, 0.25)';
 							}}>
 								Load More Items
 							</button>

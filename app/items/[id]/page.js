@@ -2,15 +2,11 @@
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import SwapRequestForm from "@/components/SwapRequestForm";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import LoadingSpinner from "@/components/LoadingSpinner";
-
-async function fetchItem(id) {
-	const res = await fetch(`/api/items/${id}`);
-	if (!res.ok) return null;
-	return await res.json();
-}
+import { useItem, useItems } from "@/hooks/useItems";
+import { useUser } from "@/hooks/useUser";
 
 function isImageMissing(image) {
 	return !image || image === null || image === undefined || image === "";
@@ -19,53 +15,20 @@ function isImageMissing(image) {
 export default function ItemDetailPage() {
 	const params = useParams();
 	const id = params.id;
-	const [item, setItem] = useState(null);
+	const { item, isLoading } = useItem(id);
+	const { user } = useUser();
 	const [showSwap, setShowSwap] = useState(false);
 	const [showRedeem, setShowRedeem] = useState(false);
-	const [previousListings, setPreviousListings] = useState([]);
-	const [loading, setLoading] = useState(true);
-	const [user, setUser] = useState(null);
-
-	useEffect(() => {
-		async function load() {
-			try {
-				const data = await fetchItem(id);
-				setItem(data);
-				if (data && data.uploaderId) {
-					const res = await fetch(`/api/items?uploaderId=${data.uploaderId}`);
-					if (res.ok) {
-						const apiData = await res.json();
-						if (Array.isArray(apiData.items)) {
-							setPreviousListings(apiData.items.filter((i) => i._id !== id));
-						} else {
-							setPreviousListings([]);
-						}
-					} else {
-						setPreviousListings([]);
-					}
-				}
-				// Fetch current user
-				const userRes = await fetch("/api/auth/me", { credentials: "include" });
-				if (userRes.ok) {
-					const userData = await userRes.json();
-					setUser(userData.user);
-				} else {
-					setUser(null);
-				}
-			} catch (error) {
-				setUser(null);
-			} finally {
-				setLoading(false);
-			}
-		}
-		if (id) {
-			load();
-		}
-	}, [id]);
+	
+	// Get uploader ID for fetching previous listings
+	const uploaderId = item?.uploaderId;
+	const { items: allUserItems } = useItems(uploaderId);
+	const previousListings = allUserItems.filter((i) => i._id !== id);
+	const loading = isLoading;
 
 	if (loading) {
 		return (
-			<div className="min-h-screen pt-28" style={{ background: 'var(--bg-primary)' }}>
+			<div className="min-h-screen pt-40" style={{ background: 'var(--bg-primary)' }}>
 				<div className="container">
 					<div className="flex items-center justify-center min-h-[60vh]">
 						<div className="loader"></div>
@@ -77,7 +40,7 @@ export default function ItemDetailPage() {
 
 	if (!item) {
 		return (
-			<div className="min-h-screen pt-28" style={{ background: 'var(--bg-primary)' }}>
+			<div className="min-h-screen pt-40" style={{ background: 'var(--bg-primary)' }}>
 				<div className="container">
 					<div className="flex items-center justify-center min-h-[60vh]">
 						<div className="card text-center max-w-md" style={{
@@ -137,7 +100,7 @@ export default function ItemDetailPage() {
 	};
 
 	return (
-		<div className="min-h-screen pt-28 pb-12" style={{ background: 'var(--bg-primary)' }}>
+		<div className="min-h-screen pt-40 pb-12" style={{ background: 'var(--bg-primary)' }}>
 			<div className="container">
 				{/* Main Item Card */}
 				<div className="card mb-8" style={{
@@ -166,6 +129,7 @@ export default function ItemDetailPage() {
 										src={item.image}
 										alt={`${item.title} image`}
 										fill
+										sizes="(max-width: 768px) 100vw, 50vw"
 										className="object-cover"
 										style={{ borderRadius: 'var(--radius)' }}
 										onError={(e) => {
@@ -244,36 +208,23 @@ export default function ItemDetailPage() {
 								</div>
 							</div>
 
-							{/* Action Buttons */}
-							{user && item && String(item.owner) !== String(user._id) && String(item.uploaderId) !== String(user._id) && (
+							{/* Action Buttons - Only Redeem with Points */}
+							{user && item && item.isApproved && item.isVisible && item.status === "available" && String(item.owner) !== String(user._id) && String(item.uploaderId) !== String(user._id) && (
 								<div className="space-y-4">
-									<div className="flex gap-3">
-										<button
-											className="btn flex-1 flex items-center justify-center gap-2"
-											onClick={() => setShowSwap((v) => !v)}
-											style={{ background: showSwap ? '#d5c3b8' : 'var(--accent)' }}
-										>
-											<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-											</svg>
-											{showSwap ? "Hide Swap Form" : "Request Swap"}
-										</button>
-										<button
-											className="btn flex-1 flex items-center justify-center gap-2"
-											onClick={() => setShowRedeem((v) => !v)}
-											style={{ background: showRedeem ? '#d5c3b8' : 'var(--accent)' }}
-										>
-											<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v8m4-4H8" />
-											</svg>
-											{showRedeem ? "Hide Redeem Form" : "Redeem with Points"}
-										</button>
-									</div>
-									{showSwap && (
-										<div className="card" style={{ background: 'var(--bg-secondary)' }}>
-											<SwapRequestForm itemId={item._id} type="swap" />
-										</div>
-									)}
+									<button
+										className="btn w-full flex items-center justify-center gap-2"
+										onClick={() => setShowRedeem((v) => !v)}
+										style={{ 
+											background: showRedeem ? '#d5c3b8' : 'var(--accent-gradient)',
+											color: 'white',
+											boxShadow: showRedeem ? 'none' : '0 8px 24px rgba(99, 102, 241, 0.3)'
+										}}
+									>
+										<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v8m4-4H8" />
+										</svg>
+										{showRedeem ? "Hide Redeem Form" : `Redeem with ${item.pointsValue} Points`}
+									</button>
 									{showRedeem && (
 										<div className="card" style={{ background: 'var(--bg-secondary)' }}>
 											<SwapRequestForm itemId={item._id} type="redeem" />

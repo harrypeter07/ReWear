@@ -83,16 +83,16 @@ export default function AddItemPage() {
 	}
 
 	return (
-		<main className="container">
-			<div className="add-item-wrapper">
+		<main className="container px-4 sm:px-6 lg:px-8 pt-40" style={{ paddingTop: '160px' }}>
+			<div className="add-item-wrapper py-8 sm:py-12">
 				{/* Header */}
-				<div className="page-header">
+				<div className="page-header mb-8">
 					<h1>Add New Item</h1>
 					<p>Share something special with the community</p>
 				</div>
 
 				{/* Main Form Card */}
-				<div className="card form-card">
+				<div className="card form-card p-6 sm:p-8">
 					{/* Status Messages */}
 					{error && (
 						<div className="status-message error-message">
@@ -121,7 +121,7 @@ export default function AddItemPage() {
 					)}
 
 					{/* Form Container */}
-					<div className={`form-wrapper ${submitting ? 'submitting' : ''}`}>
+					<div className={`form-wrapper ${submitting ? 'submitting' : ''} mt-6`}>
 						<ItemForm onSubmit={handleSubmit} />
 					</div>
 
