@@ -292,6 +292,11 @@ export default function DashboardPage() {
 								border: '2px solid var(--accent)',
 								color: 'var(--accent)'
 							}}>Browse Items</button>
+							<button className="btn btn-outline" onClick={() => router.push("/orders")} style={{
+								background: 'transparent',
+								border: '2px solid var(--accent)',
+								color: 'var(--accent)'
+							}}>View Orders</button>
 						</div>
 					</div>
 					{/* Listings grid or list here */}
@@ -310,36 +315,46 @@ export default function DashboardPage() {
 					backdropFilter: 'blur(20px)',
 					border: '1px solid rgba(99, 102, 241, 0.1)'
 				}}>
-					<h2 className="mb-6 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
-						Redeem Requests
-					</h2>
-					{/* Redeem requests list here */}
-					{swapRequests.length === 0 ? (
-						<p className="text-secondary">No redeem requests yet.</p>
+					<div className="flex flex-col gap-4 mb-6 sm:flex-row sm:items-center sm:justify-between">
+						<h2 className="mb-4 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 sm:mb-0">
+							Order History
+						</h2>
+						<button className="btn btn-outline" onClick={() => router.push("/orders")} style={{
+							background: 'transparent',
+							border: '2px solid var(--accent)',
+							color: 'var(--accent)'
+						}}>View All Orders</button>
+					</div>
+					<p className="mb-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
+						All redeem orders are automatically approved. View your complete order history including purchases and sales.
+					</p>
+					{userPurchases.length === 0 && swapRequests.filter(r => r.status === 'accepted').length === 0 ? (
+						<p className="text-secondary">No completed orders yet.</p>
 					) : (
-						<div className="space-y-4">
-							{swapRequests.map((req) => (
-								<div key={req._id} className="card p-4" style={{ background: 'var(--bg-secondary)' }}>
-									<div className="flex justify-between items-start mb-2">
-										<div>
-											<p className="font-semibold" style={{ color: 'var(--text-primary)' }}>
-												Redeem Request
-											</p>
-											<p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-												Status: <span className="font-medium">{req.status}</span>
-											</p>
-											{req.message && (
-												<p className="text-sm mt-2" style={{ color: 'var(--text-secondary)' }}>
-													Message: {req.message}
+						<div className="space-y-3">
+							{swapRequests
+								.filter(r => r.status === 'accepted')
+								.slice(0, 5)
+								.map((req) => (
+									<div key={req._id} className="p-4 rounded-lg" style={{ 
+										background: 'rgba(99, 102, 241, 0.05)',
+										border: '1px solid rgba(99, 102, 241, 0.2)'
+									}}>
+										<div className="flex justify-between items-start">
+											<div>
+												<p className="font-semibold" style={{ color: 'var(--text-primary)' }}>
+													Completed Order
 												</p>
-											)}
+												<p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+													Status: <span className="font-medium text-green-600">Accepted</span>
+												</p>
+											</div>
+											<span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+												{new Date(req.resolvedAt || req.createdAt || Date.now()).toLocaleDateString()}
+											</span>
 										</div>
-										<span className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-											{new Date(req.createdAt || Date.now()).toLocaleDateString()}
-										</span>
 									</div>
-								</div>
-							))}
+								))}
 						</div>
 					)}
 				</div>

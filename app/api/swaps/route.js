@@ -44,23 +44,61 @@ async function swapRequestHandler(req) {
 			);
 
 		const targetUserId = String(item.owner || item.uploaderId);
+		const listerId = item.owner || item.uploaderId;
+		const redeemerId = new ObjectId(requesterId);
 
-		// Simple redeem request - no swap logic needed
+		// Auto-approve and process redeem immediately
+		// Deduct points from redeemer
+		const deductResult = await users.updateOne(
+			{ _id: redeemerId },
+			{ $inc: { points: -item.pointsValue } }
+		);
+		
+		if (deductResult.modifiedCount === 0) {
+			return Response.json(
+				{ error: "Failed to deduct points. Please try again." },
+				{ status: 500 }
+			);
+		}
+		
+		// Add points to lister (seller)
+		await users.updateOne(
+			{ _id: listerId },
+			{ $inc: { points: item.pointsValue } }
+		);
+		
+		// Mark item as redeemed and transfer ownership
+		await items.updateOne(
+			{ _id: new ObjectId(itemId) },
+			{ 
+				$set: { 
+					status: "redeemed", 
+					owner: redeemerId,
+					updatedAt: new Date() 
+				} 
+			}
+		);
+		
+		// Create swap document with accepted status
 		const swapDoc = {
 			item: new ObjectId(itemId),
-			requester: new ObjectId(requesterId),
+			requester: redeemerId,
 			targetUser: new ObjectId(targetUserId),
 			type: "redeem", // Always redeem
-			status: "pending",
+			status: "accepted", // Auto-approved
 			message: message || "",
 			createdAt: new Date(),
+			resolvedAt: new Date(), // Resolved immediately
 		};
 
 		const result = await swaps.insertOne(swapDoc);
 
+		console.log(`[SWAPS] Auto-approved redeem: Item ${itemId} redeemed by user ${requesterId} for ${item.pointsValue} points`);
+
 		return Response.json({
-			message: "Redeem request submitted",
+			message: "Item redeemed successfully! Points deducted and order completed.",
 			swapId: result.insertedId,
+			autoApproved: true,
 		});
 	} else if (req.method === "PATCH") {
 		const { swapId, action } = await req.json(); // action: 'accept' or 'reject'

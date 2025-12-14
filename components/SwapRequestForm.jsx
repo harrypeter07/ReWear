@@ -1,6 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { UserContext } from "@/contexts/UserContext";
 
 export default function SwapRequestForm({ itemId, type, onSuccess }) {
+	const { user: contextUser, refetchUser } = useContext(UserContext);
 	const [message, setMessage] = useState("");
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState("");
@@ -9,14 +11,24 @@ export default function SwapRequestForm({ itemId, type, onSuccess }) {
 	const [item, setItem] = useState(null);
 
 	useEffect(() => {
-		async function fetchData() {
+		// Use context user if available, otherwise fetch
+		if (contextUser) {
+			setUser(contextUser);
+		} else {
+			async function fetchUser() {
+				try {
+					const userRes = await fetch("/api/auth/me", { credentials: "include" });
+					if (!userRes.ok) return;
+					const { user } = await userRes.json();
+					setUser(user);
+				} catch {}
+			}
+			fetchUser();
+		}
+		
+		// Fetch item details to show points value
+		async function fetchItem() {
 			try {
-				const userRes = await fetch("/api/auth/me", { credentials: "include" });
-				if (!userRes.ok) return;
-				const { user } = await userRes.json();
-				setUser(user);
-				
-				// Fetch item details to show points value
 				const itemRes = await fetch(`/api/items/${itemId}`);
 				if (itemRes.ok) {
 					const itemData = await itemRes.json();
@@ -24,8 +36,8 @@ export default function SwapRequestForm({ itemId, type, onSuccess }) {
 				}
 			} catch {}
 		}
-		fetchData();
-	}, [itemId]);
+		fetchItem();
+	}, [itemId, contextUser]);
 
 	async function handleSubmit(e) {
 		e.preventDefault();
@@ -66,9 +78,22 @@ export default function SwapRequestForm({ itemId, type, onSuccess }) {
 			});
 			
 			if (res.ok) {
-				setSuccess("Redeem request submitted! The seller will review your request.");
+				const data = await res.json();
+				if (data.autoApproved) {
+					setSuccess("Item redeemed successfully! Points have been deducted and the order is complete.");
+					// Refresh user data to update points
+					await refetchUser();
+					if (onSuccess) onSuccess();
+					// Optionally redirect to orders page after a delay
+					setTimeout(() => {
+						if (window.confirm("Order completed! Would you like to view your orders?")) {
+							window.location.href = "/orders";
+						}
+					}, 2000);
+				} else {
+					setSuccess("Redeem request submitted! The seller will review your request.");
+				}
 				setMessage("");
-				if (onSuccess) onSuccess();
 			} else {
 				const data = await res.json();
 				setError(data.error || "Failed to submit redeem request");

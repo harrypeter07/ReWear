@@ -24,6 +24,7 @@ export default function Navbar() {
 		{ name: "Home", href: "/" },
 		{ name: "Browse", href: "/items" },
 		{ name: "Dashboard", href: "/dashboard" },
+		{ name: "Orders", href: "/orders" },
 	];
 
 	useEffect(() => {
